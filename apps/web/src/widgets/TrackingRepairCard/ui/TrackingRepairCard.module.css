@@ -143,7 +143,7 @@
 
 .barTrack {
   height: 8px;
-  margin: 0 var(--edge-offset);
+  margin: 0;
   border-radius: 999px;
   background: var(--app-border-soft);
   overflow: hidden;

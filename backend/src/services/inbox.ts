@@ -23,6 +23,8 @@ export type InboxThreadItem = {
   preview: string;
   lastAt: number;
   unreadCount: number;
+  /** Мастер недавно активен — зелёный индикатор в списке */
+  counterpartOnline?: boolean;
 };
 
 export type InboxSummary = {
@@ -117,6 +119,17 @@ function toThreadTitle(s: AppState, orderId: string): string {
   return "Заказ";
 }
 
+const MASTER_TTL_MS = 6000;
+const MASTER_MSG_RECENT_MS = 45000;
+
+function masterLooksOnlineForOrder(s: AppState, orderId: string, orderMessages: InboxMessageRow[]): boolean {
+  const thread = s.techPanelMock?.threads.find((t) => t.repairId === orderId);
+  const typing = Boolean(thread && Date.now() - (thread.masterTypingAt ?? 0) < MASTER_TTL_MS);
+  const lastSvc = [...orderMessages].filter((m) => m.from === "service").pop();
+  const recentMsg = Boolean(lastSvc && Date.now() - lastSvc.at < MASTER_MSG_RECENT_MS);
+  return typing || recentMsg;
+}
+
 export async function getInboxSummary(userId: string): Promise<InboxSummary> {
   return withStore((s) => {
     const inbox = ensureInboxByUser(s, userId);
@@ -140,6 +153,7 @@ export async function getInboxSummary(userId: string): Promise<InboxSummary> {
           preview: last?.text ?? "",
           lastAt: last?.at ?? 0,
           unreadCount,
+          counterpartOnline: masterLooksOnlineForOrder(s, orderId, sorted),
         };
       })
       .sort((a, b) => b.lastAt - a.lastAt);

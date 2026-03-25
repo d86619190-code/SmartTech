@@ -21,10 +21,13 @@ type QuoteOptionDraft = {
   repairDaysLabel?: string;
 };
 
+type CustomPartDraft = { id: string; name: string; priceRub: number };
+
 export const TechPricePage: React.FC = () => {
   const { repairId } = useParams();
   const [job, setJob] = React.useState<any | null>(null);
   const [partsCatalog, setPartsCatalog] = React.useState<any[]>([]);
+  const [customParts, setCustomParts] = React.useState<CustomPartDraft[]>([]);
   const [options, setOptions] = React.useState<QuoteOptionDraft[]>([]);
   const [saving, setSaving] = React.useState(false);
   const { toast, showToast, closeToast } = useStatusToast();
@@ -35,6 +38,14 @@ export const TechPricePage: React.FC = () => {
       const [repairRes, partsRes] = await Promise.all([techApi.getRepairById(repairId), techApi.getParts()]);
       setJob(repairRes.repair);
       setPartsCatalog(partsRes.rows);
+      const cp = Array.isArray(repairRes.repair.customParts) ? repairRes.repair.customParts : [];
+      setCustomParts(
+        cp.map((p: any) => ({
+          id: p.id,
+          name: String(p.name ?? ""),
+          priceRub: Number(p.priceRub) || 0,
+        })),
+      );
       const existing = Array.isArray(repairRes.repair.quoteOptions) ? repairRes.repair.quoteOptions : [];
       if (existing.length > 0) {
         setOptions(
@@ -109,11 +120,41 @@ export const TechPricePage: React.FC = () => {
     setOptions((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== idx)));
   };
 
+  const mergedCatalog = React.useMemo(
+    () => [
+      ...partsCatalog,
+      ...customParts.map((p) => ({
+        id: p.id,
+        name: p.name.trim() || "Своя позиция",
+        oem: false,
+        inStock: true,
+        priceRub: p.priceRub,
+        deviceHint: "Своё",
+      })),
+    ],
+    [partsCatalog, customParts],
+  );
+
+  const addCustomPart = () => {
+    setCustomParts((prev) => [...prev, { id: `c-${crypto.randomUUID()}`, name: "", priceRub: 0 }]);
+  };
+
+  const updateCustomPart = (id: string, patch: Partial<CustomPartDraft>) => {
+    setCustomParts((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+  };
+
+  const removeCustomPart = (id: string) => {
+    setCustomParts((prev) => prev.filter((p) => p.id !== id));
+    setOptions((opts) =>
+      opts.map((o) => ({ ...o, selectedPartIds: o.selectedPartIds.filter((pid) => pid !== id) })),
+    );
+  };
+
   const save = async () => {
     setSaving(true);
     try {
       const payload = options.map((opt) => {
-        const selectedParts = partsCatalog.filter((p: any) => opt.selectedPartIds.includes(p.id));
+        const selectedParts = mergedCatalog.filter((p: any) => opt.selectedPartIds.includes(p.id));
         const hasInStock = selectedParts.some((p: any) => p.inStock);
         const hasOem = selectedParts.some((p: any) => p.oem);
         return {
@@ -126,8 +167,15 @@ export const TechPricePage: React.FC = () => {
           repairDaysLabel: opt.repairDaysLabel || (hasInStock ? "1-2 дня" : "2-4 дня"),
         };
       });
-      const res = await techApi.saveQuoteOptions(job.id, payload);
+      const cpPayload = customParts
+        .filter((p) => p.name.trim().length > 0)
+        .map((p) => ({ id: p.id, name: p.name.trim(), priceRub: Math.max(0, Number(p.priceRub) || 0) }));
+      const res = await techApi.saveQuoteOptions(job.id, payload, cpPayload);
       setJob(res.repair);
+      const savedCp = Array.isArray(res.repair.customParts) ? res.repair.customParts : [];
+      setCustomParts(
+        savedCp.map((p: any) => ({ id: p.id, name: String(p.name ?? ""), priceRub: Number(p.priceRub) || 0 })),
+      );
       showToast("success", "Смета сохранена");
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Не удалось сохранить смету";
@@ -142,7 +190,7 @@ export const TechPricePage: React.FC = () => {
       <TechPageHeader title="Смета" subtitle="Работа и запчасти — итог для согласования с клиентом." />
       <div style={{ display: "grid", gap: 14, marginBottom: 14 }}>
         {options.map((opt, idx) => {
-          const selectedParts = partsCatalog.filter((p: any) => opt.selectedPartIds.includes(p.id));
+          const selectedParts = mergedCatalog.filter((p: any) => opt.selectedPartIds.includes(p.id));
           const partsSum = selectedParts.reduce((s: number, p: any) => s + p.priceRub, 0);
           const total = (Number(opt.laborRub) || 0) + partsSum;
           return (
@@ -188,7 +236,7 @@ export const TechPricePage: React.FC = () => {
                 </div>
               </div>
               <div style={{ padding: "0 0 8px" }}>
-                {partsCatalog.map((p: any) => (
+                {mergedCatalog.map((p: any) => (
                   <label
                     key={p.id}
                     style={{
@@ -221,6 +269,40 @@ export const TechPricePage: React.FC = () => {
         })}
       </div>
       <TechCard style={{ padding: 16, marginBottom: 16 }}>
+        <p className={cls.p} style={{ marginBottom: 12 }}>
+          <strong>Свои запчасти и позиции</strong> — добавьте название и цену, затем отметьте их в вариантах сметы.
+        </p>
+        {customParts.map((cp) => (
+          <div
+            key={cp.id}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 120px auto",
+              gap: 8,
+              alignItems: "end",
+              marginBottom: 8,
+            }}
+          >
+            <label>
+              <span className={cls.muted}>Название</span>
+              <AdminInput value={cp.name} onChange={(e) => updateCustomPart(cp.id, { name: e.target.value })} />
+            </label>
+            <label>
+              <span className={cls.muted}>Цена, ₽</span>
+              <AdminInput
+                inputMode="numeric"
+                value={String(cp.priceRub)}
+                onChange={(e) => updateCustomPart(cp.id, { priceRub: Number(e.target.value.replace(/\D/g, "")) || 0 })}
+              />
+            </label>
+            <Button type="button" variant="outline" onClick={() => removeCustomPart(cp.id)}>
+              Удалить
+            </Button>
+          </div>
+        ))}
+        <Button type="button" variant="outline" onClick={addCustomPart} style={{ marginBottom: 16 }}>
+          + Своя позиция
+        </Button>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
           <p className={cls.p}>
             Вариантов: <strong>{options.length}</strong>

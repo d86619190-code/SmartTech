@@ -62,8 +62,13 @@ export const techApi = {
       orderLeadDays?: number;
       isOriginal: boolean;
       repairDaysLabel?: string;
-    }>
-  ) => patchJson<{ repair: any }>(`/api/v1/tech/repairs/${id}/quote-options`, { options }),
+    }>,
+    customParts?: Array<{ id: string; name: string; priceRub: number }>
+  ) => patchJson<{ repair: any }>(`/api/v1/tech/repairs/${id}/quote-options`, { options, customParts }),
+  postThreadTyping: async (threadId: string): Promise<void> => {
+    const res = await authFetch(`/api/v1/tech/threads/${threadId}/typing`, { method: "POST" });
+    if (!res.ok && res.status !== 204) throw new Error(await parseError(res));
+  },
   getThreads: () => getJson<{ rows: any[] }>("/api/v1/tech/threads"),
   getThreadById: (id: string) => getJson<{ thread: any; messages: any[] }>(`/api/v1/tech/threads/${id}`),
   markThreadRead: (id: string) => authFetch(`/api/v1/tech/threads/${id}/read`, { method: "POST" }),

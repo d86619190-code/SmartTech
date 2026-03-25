@@ -5,7 +5,6 @@ import { streamUpdatesLabel } from "@/shared/lib/realtime/streamStatusLabel";
 import { useInboxSummarySse } from "@/shared/lib/realtime/useSseStreams";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
-import { TypingIndicator } from "@/shared/ui/TypingIndicator";
 import { PageHeader } from "@/widgets/PageHeader";
 import cls from "./clientPages.module.css";
 
@@ -94,9 +93,9 @@ export const MessagesListPage: React.FC = () => {
 
         <section className={cls.card} style={{ padding: 0 }}>
           {loading ? (
-            <div style={{ padding: 22 }}>
-              <TypingIndicator label="Печатает" />
-            </div>
+            <p className={cls.lead} style={{ padding: 24 }}>
+              Загрузка диалогов…
+            </p>
           ) : threads.length === 0 ? (
             <p className={cls.lead} style={{ padding: 24 }}>
               Нет активных диалогов.
@@ -106,11 +105,18 @@ export const MessagesListPage: React.FC = () => {
               {threads.map((thread) => {
                 return (
                   <Link key={thread.orderId} className={cls.threadRow} to={`/messages/${thread.orderId}`}>
-                    <div className={cls.threadHead}>
-                      <div className={cls.threadTitle}>{thread.title}</div>
-                      {thread.unreadCount > 0 ? <span className={cls.threadUnread}>{thread.unreadCount}</span> : null}
+                    <span
+                      className={cls.threadOnlineDot}
+                      data-visible={thread.counterpartOnline ? "true" : "false"}
+                      aria-hidden
+                    />
+                    <div className={cls.threadRowMain}>
+                      <div className={cls.threadHead}>
+                        <div className={cls.threadTitle}>{thread.title}</div>
+                        {thread.unreadCount > 0 ? <span className={cls.threadUnread}>{thread.unreadCount}</span> : null}
+                      </div>
+                      <div className={cls.threadMeta}>{thread.preview}</div>
                     </div>
-                    <div className={cls.threadMeta}>{thread.preview}</div>
                   </Link>
                 );
               })}

@@ -37,6 +37,10 @@ export type ClientOrderMeta = {
   canRateOrder?: boolean;
   /** Уже поставленная оценка 1–5 */
   myRating?: number;
+  /** Мастер печатает (для строки статуса в чате) */
+  serviceTyping?: boolean;
+  /** Мастер «на связи» (для зелёного индикатора) */
+  counterpartOnline?: boolean;
   diagnosticFeeRub?: number;
   quoteOptions?: Array<{
     id: string;
@@ -128,19 +132,32 @@ function repairToDto(job: TechRepairJob): ClientRepairDto {
   };
 }
 
+const TYPING_MS = 6000;
+const PEER_ONLINE_MS = 45000;
+
 function userHasOrder(s: AppState, userId: string, orderId: string): boolean {
   const inbox = ensureInboxByUser(s, userId);
   if (inbox.messages.some((m) => m.order_id === orderId)) return true;
   if (inbox.approvals.some((a) => a.order_id === orderId)) return true;
-  return false;
+  return allTechRepairs(s).some((j) => j.id === orderId && j.clientUserId === userId);
+}
+
+function resolvePartRows(s: AppState, tech: TechRepairJob, ids: string[]) {
+  const cat = s.techPanelMock?.partsCatalog ?? [];
+  const custom = tech.customParts ?? [];
+  const rows: { name: string; priceRub: number; oem?: boolean; inStock?: boolean }[] = [];
+  for (const id of ids) {
+    const p = cat.find((x) => x.id === id) ?? custom.find((x) => x.id === id);
+    if (p) rows.push({ name: p.name, priceRub: p.priceRub, oem: p.oem, inStock: p.inStock });
+  }
+  return rows;
 }
 
 function buildQuoteOptionsFromTech(s: AppState, tech: TechRepairJob) {
   const st = s.techPanelMock;
-  const parts = st?.partsCatalog ?? [];
   if (tech.quoteOptions && tech.quoteOptions.length > 0) {
     return tech.quoteOptions.map((opt, idx) => {
-      const selected = parts.filter((p) => opt.selectedPartIds.includes(p.id));
+      const selected = resolvePartRows(s, tech, opt.selectedPartIds);
       const partsSum = selected.reduce((sum, p) => sum + p.priceRub, 0);
       return {
         id: opt.id || `opt-${idx + 1}`,
@@ -154,12 +171,12 @@ function buildQuoteOptionsFromTech(s: AppState, tech: TechRepairJob) {
       };
     });
   }
-  const selected = parts.filter((p) => tech.selectedPartIds.includes(p.id));
+  const selected = resolvePartRows(s, tech, tech.selectedPartIds);
   const partsSum = selected.reduce((sum, p) => sum + p.priceRub, 0);
   const labor = Math.max(0, tech.laborRub || 0);
   const basePrice = Math.max(0, labor + partsSum);
   if (basePrice <= 0) return undefined;
-  const hasInStock = selected.some((p) => p.inStock);
+  const hasInStock = selected.some((p) => p.inStock ?? true);
   const hasOem = selected.some((p) => p.oem);
   return [
     {
@@ -222,6 +239,13 @@ export async function getClientOrderMeta(userId: string, orderId: string): Promi
         ? "awaiting_approval"
         : techStageToClientStep(tech.stage);
       const quoteOptions = buildQuoteOptionsFromTech(s, tech);
+      const thread = s.techPanelMock?.threads.find((t) => t.repairId === orderId);
+      const serviceTyping = Boolean(thread && Date.now() - (thread.masterTypingAt ?? 0) < TYPING_MS);
+      const inbox = ensureInboxByUser(s, userId);
+      const lastSvc = [...inbox.messages].filter((m) => m.order_id === orderId && m.from === "service").pop();
+      const counterpartOnline = Boolean(
+        serviceTyping || (lastSvc && Date.now() - lastSvc.at < PEER_ONLINE_MS),
+      );
       return {
         id: orderId,
         deviceLabel: tech.device,
@@ -230,16 +254,46 @@ export async function getClientOrderMeta(userId: string, orderId: string): Promi
         clientStep,
         canRateOrder: tech.stage === "completed" && !tech.clientRatingStars,
         myRating: tech.clientRatingStars,
+        serviceTyping,
+        counterpartOnline,
         diagnosticFeeRub: 990,
         quoteOptions,
       };
     }
+    const thread = s.techPanelMock?.threads.find((t) => t.repairId === orderId);
+    const serviceTyping = Boolean(thread && Date.now() - (thread.masterTypingAt ?? 0) < TYPING_MS);
+    const inbox = ensureInboxByUser(s, userId);
+    const lastSvc = [...inbox.messages].filter((m) => m.order_id === orderId && m.from === "service").pop();
+    const counterpartOnline = Boolean(
+      serviceTyping || (lastSvc && Date.now() - lastSvc.at < PEER_ONLINE_MS),
+    );
     return {
       id: orderId,
       deviceLabel: "Заказ",
       issueSummary: "Переписка по заказу",
       needsApproval,
       clientStep: needsApproval ? "awaiting_approval" : "diagnostics",
+      serviceTyping,
+      counterpartOnline,
     };
+  });
+}
+
+export async function peekOrderServiceTyping(userId: string, orderId: string): Promise<boolean> {
+  return withStore((s) => {
+    if (!userHasOrder(s, userId, orderId)) return false;
+    const thread = s.techPanelMock?.threads.find((t) => t.repairId === orderId);
+    if (!thread) return false;
+    return Date.now() - (thread.masterTypingAt ?? 0) < TYPING_MS;
+  });
+}
+
+export async function recordClientTypingForOrder(userId: string, orderId: string): Promise<boolean> {
+  return withStore((s) => {
+    if (!userHasOrder(s, userId, orderId)) return false;
+    const thread = s.techPanelMock?.threads.find((t) => t.repairId === orderId);
+    if (!thread) return false;
+    thread.clientTypingAt = Date.now();
+    return true;
   });
 }

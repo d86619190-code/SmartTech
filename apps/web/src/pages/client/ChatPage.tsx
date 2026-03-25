@@ -5,6 +5,7 @@ import {
   getClientOrderMetaApi,
   getOrderMessagesApi,
   markOrderMessagesReadApi,
+  postOrderTyping,
   rateClientOrderApi,
   sendOrderMessageApi,
   type ChatMessage,
@@ -37,8 +38,16 @@ export const ChatPage: React.FC = () => {
   const [ratingBusy, setRatingBusy] = React.useState(false);
   const { toast, showToast, closeToast } = useStatusToast();
   const presence = useUserPresence();
+  const [sseServiceTyping, setSseServiceTyping] = React.useState<boolean | undefined>(undefined);
+  const typingPingRef = React.useRef<number | undefined>(undefined);
 
-  const streamStatus = useOrderMessagesSse(orderId, setMessages);
+  const streamStatus = useOrderMessagesSse(orderId, setMessages, (meta) => {
+    setSseServiceTyping(meta.serviceTyping);
+  });
+
+  React.useEffect(() => {
+    setSseServiceTyping(undefined);
+  }, [orderId]);
 
   React.useEffect(() => {
     if (!orderId) return;
@@ -172,6 +181,10 @@ export const ChatPage: React.FC = () => {
   const userAvatar = auth?.user.avatarUrl?.trim() || "";
   const userAvatarSrc = userAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(userName)}`;
 
+  const serviceTyping =
+    sseServiceTyping !== undefined ? sseServiceTyping : Boolean(orderMeta?.serviceTyping);
+  const masterOnlineDot = Boolean(orderMeta?.counterpartOnline);
+
   if (!orderId) {
     return <Navigate to="/messages" replace />;
   }
@@ -200,11 +213,14 @@ export const ChatPage: React.FC = () => {
             </div>
             <div className={cls.participantDivider} aria-hidden />
             <div className={cls.participant}>
-              <img
-                className={cls.participantAvatar}
-                src={masterAvatar ?? `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(masterName)}`}
-                alt=""
-              />
+              <div className={cls.avatarWrap}>
+                <img
+                  className={cls.participantAvatar}
+                  src={masterAvatar ?? `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(masterName)}`}
+                  alt=""
+                />
+                {masterOnlineDot ? <span className={cls.onlineDot} title="Мастер на связи" /> : null}
+              </div>
               <div>
                 <div className={cls.participantRole}>Мастер</div>
                 <div className={cls.participantName}>{masterName}</div>
@@ -214,11 +230,19 @@ export const ChatPage: React.FC = () => {
         ) : null}
 
         <div className={cls.chatShell}>
-          <div className={cls.chatBody}>
-            <p className={cls.streamStatus}>
-              {streamStatusLabel(streamStatus)} · {presence === "online" ? "вы в сети" : "оффлайн"}
+          <div className={cls.chatHeaderSticky}>
+            <p className={[cls.streamStatus, cls.streamStatusLine].join(" ")}>
+              <span>{streamStatusLabel(streamStatus)} ·</span>
+              {loading ? (
+                <span>Загрузка…</span>
+              ) : serviceTyping ? (
+                <TypingIndicator variant="inline" label="Мастер печатает" />
+              ) : (
+                <span>{presence === "online" ? "вы в сети" : "оффлайн"}</span>
+              )}
             </p>
-            {loading ? <TypingIndicator label="Мастер печатает" /> : null}
+          </div>
+          <div className={cls.chatScroll}>
             {!orderMetaLoading && orderMeta?.canRateOrder ? (
               <div className={cls.ratingPrompt}>
                 <p className={cls.ratingTitle}>Заказ выдан. Оцените работу сервиса:</p>
@@ -301,7 +325,16 @@ export const ChatPage: React.FC = () => {
             <textarea
               className={cls.chatTextarea}
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => {
+                const v = e.target.value;
+                setText(v);
+                if (!orderId) return;
+                window.clearTimeout(typingPingRef.current);
+                if (!v.trim()) return;
+                typingPingRef.current = window.setTimeout(() => {
+                  void postOrderTyping(orderId).catch(() => {});
+                }, 400);
+              }}
               placeholder="Напишите сообщение…"
               rows={2}
             />

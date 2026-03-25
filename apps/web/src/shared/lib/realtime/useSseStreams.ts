@@ -27,11 +27,14 @@ export function useInboxSummarySse(enabled: boolean, onSummary: (summary: InboxS
 
 export function useOrderMessagesSse(
   orderId: string | undefined,
-  onMessages: (messages: ChatMessage[]) => void
+  onMessages: (messages: ChatMessage[]) => void,
+  onChatMeta?: (meta: { serviceTyping: boolean }) => void
 ): StreamStatus {
   const [streamStatus, setStreamStatus] = React.useState<StreamStatus>("connecting");
   const onMessagesRef = React.useRef(onMessages);
   onMessagesRef.current = onMessages;
+  const onChatMetaRef = React.useRef(onChatMeta);
+  onChatMetaRef.current = onChatMeta;
   React.useEffect(() => {
     if (!orderId) return;
     return openOrderMessagesStream(
@@ -40,7 +43,8 @@ export function useOrderMessagesSse(
         onMessagesRef.current(msgs);
       },
       undefined,
-      setStreamStatus
+      setStreamStatus,
+      (meta) => onChatMetaRef.current?.(meta)
     );
   }, [orderId]);
   return streamStatus;

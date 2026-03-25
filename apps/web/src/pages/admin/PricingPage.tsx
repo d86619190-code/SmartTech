@@ -62,6 +62,26 @@ export const AdminPricingPage: React.FC = () => {
         subtitle="Структура работ и запчастей по категориям устройств."
         actions={
           <>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setRows((r) => [
+                  ...r,
+                  {
+                    id: `p-${crypto.randomUUID()}`,
+                    category: "",
+                    deviceGroup: "",
+                    service: "",
+                    laborRub: 0,
+                    partsFromRub: 0,
+                  },
+                ]);
+                setDirty(true);
+              }}
+            >
+              Добавить строку
+            </Button>
             <Button type="button" variant="outline" onClick={reset} disabled={saving || !dirty}>
               Отменить
             </Button>

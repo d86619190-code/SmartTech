@@ -197,6 +197,8 @@ export type TechRepairJob = {
     isOriginal: boolean;
     repairDaysLabel?: string;
   }>;
+  /** Свои позиции мастера (не из общего каталога) */
+  customParts?: TechPart[];
 };
 export type TechPart = {
   id: string;
@@ -232,6 +234,10 @@ export type TechThread = {
   /** Почта или телефон для подсказки в UI */
   masterContact?: string;
   unreadCount?: number;
+  /** Время последнего события «мастер печатает» */
+  masterTypingAt?: number;
+  /** Время последнего события «клиент печатает» */
+  clientTypingAt?: number;
 };
 export type TechAlert = { id: string; at: string; message: string; type: "info" | "warning" };
 export type TechProfile = {

@@ -20,6 +20,7 @@ import {
   listTechThreadMessages,
   listTechThreads,
   markTechThreadRead,
+  recordMasterTyping,
   saveTechDiagnostics,
   saveTechPartsSelection,
   saveTechPricing,
@@ -52,6 +53,16 @@ const quoteOptionsBody = z.object({
       })
     )
     .max(6),
+  customParts: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string().max(200),
+        priceRub: z.number().min(0),
+      })
+    )
+    .max(24)
+    .optional(),
 });
 const messageBody = z
   .object({
@@ -142,11 +153,17 @@ techRouter.patch("/repairs/:repairId/parts", async (req, res) => {
 techRouter.patch("/repairs/:repairId/quote-options", async (req, res) => {
   const parsed = quoteOptionsBody.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: "Некорректные данные", details: parsed.error.flatten() });
-  const repair = await saveTechQuoteOptions(req.params.repairId, parsed.data.options);
+  const repair = await saveTechQuoteOptions(req.params.repairId, parsed.data.options, parsed.data.customParts);
   if (!repair) return res.status(404).json({ error: "Ремонт не найден" });
   return res.status(200).json({ repair });
 });
 techRouter.get("/parts", async (_req, res) => res.status(200).json({ rows: await getTechPartsCatalog() }));
+
+techRouter.post("/threads/:threadId/typing", async (req, res) => {
+  const ok = await recordMasterTyping(req.params.threadId);
+  if (!ok) return res.status(404).json({ error: "Диалог не найден" });
+  return res.status(204).send();
+});
 
 techRouter.get("/threads", async (_req, res) => res.status(200).json({ rows: await listTechThreads() }));
 techRouter.get("/threads/:threadId", async (req, res) => {
@@ -187,7 +204,8 @@ techRouter.get("/threads/:threadId/stream", async (req, res) => {
     const thread = await getTechThreadById(threadId);
     const messages = await listTechThreadMessages(threadId);
     const last = messages[messages.length - 1];
-    const sig = `${messages.length}|${last?.id ?? "none"}|${messages.filter((m) => m.from === "client" && !m.read_by_tech_at).length}|${messages.filter((m) => m.from === "tech" && !m.read_by_client_at).length}|${thread?.unreadCount ?? 0}`;
+    const clientTyping = Boolean(thread?.clientTyping);
+    const sig = `${messages.length}|${last?.id ?? "none"}|${messages.filter((m) => m.from === "client" && !m.read_by_tech_at).length}|${messages.filter((m) => m.from === "tech" && !m.read_by_client_at).length}|${thread?.unreadCount ?? 0}|${clientTyping ? 1 : 0}`;
     if (sig === lastSig) return;
     lastSig = sig;
     res.write(`event: messages\n`);

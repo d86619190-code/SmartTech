@@ -9,6 +9,7 @@ import {
   type TechProfile,
   type TechRepairJob,
   type TechRepairStage,
+  type TechPart,
   type TechThread,
 } from "../store.js";
 import { MOCK_MASTERS } from "./mockMasters.js";
@@ -18,6 +19,53 @@ function nowLabel(): string {
 }
 
 const M = MOCK_MASTERS;
+
+const TYPING_MS = 6000;
+const PEER_ONLINE_MS = 45000;
+
+function partsRubForIds(st: TechPanelMockState, repair: TechRepairJob, ids: string[]): number {
+  let sum = 0;
+  for (const id of ids) {
+    const p = st.partsCatalog.find((x) => x.id === id) ?? repair.customParts?.find((x) => x.id === id);
+    if (p) sum += p.priceRub;
+  }
+  return sum;
+}
+
+export function augmentThreadForList(
+  s: AppState,
+  t: TechThread
+): TechThread & { clientTyping: boolean; clientOnline: boolean } {
+  const st = ensureTechState(s);
+  const list = st.messagesByThread[t.id] ?? [];
+  const clientTyping = Date.now() - (t.clientTypingAt ?? 0) < TYPING_MS;
+  let lastClientAt = 0;
+  for (const m of list) {
+    if (m.from !== "client") continue;
+    const at = m.delivered_at ?? Date.parse(m.at);
+    if (!Number.isNaN(at) && at > lastClientAt) lastClientAt = at;
+  }
+  const clientOnline = clientTyping || (lastClientAt > 0 && Date.now() - lastClientAt < PEER_ONLINE_MS);
+  return { ...t, clientTyping, clientOnline };
+}
+
+export async function recordMasterTyping(threadId: string): Promise<boolean> {
+  return withStore((s) => {
+    const st = ensureTechState(s);
+    const thread = st.threads.find((t) => t.id === threadId);
+    if (!thread) return false;
+    thread.masterTypingAt = Date.now();
+    return true;
+  });
+}
+
+export async function peekThreadClientTyping(threadId: string): Promise<boolean> {
+  return withStore((s) => {
+    const t = ensureTechState(s).threads.find((x) => x.id === threadId);
+    if (!t) return false;
+    return Date.now() - (t.clientTypingAt ?? 0) < TYPING_MS;
+  });
+}
 
 function isLegacyMockRepairLike(input: { id?: string; publicId?: string }): boolean {
   const id = (input.id ?? "").toLowerCase();
@@ -601,9 +649,11 @@ export async function saveTechPricing(id: string, laborRub: number, selectedPart
     if (!repair) return null;
     repair.laborRub = laborRub;
     repair.selectedPartIds = selectedPartIds;
-    repair.partsRub = st.partsCatalog.filter((p) => selectedPartIds.includes(p.id)).reduce((sum, p) => sum + p.priceRub, 0);
+    repair.partsRub = partsRubForIds(st, repair, selectedPartIds);
     // Базовый вариант сметы — чтобы клиент всегда видел хотя бы один актуальный вариант.
-    const selectedParts = st.partsCatalog.filter((p) => selectedPartIds.includes(p.id));
+    const selectedParts = selectedPartIds
+      .map((id) => st.partsCatalog.find((p) => p.id === id) ?? repair.customParts?.find((p) => p.id === id))
+      .filter((x): x is TechPart => Boolean(x));
     const hasInStock = selectedParts.some((p) => p.inStock);
     const hasOem = selectedParts.some((p) => p.oem);
     repair.quoteOptions = [
@@ -633,12 +683,25 @@ export async function saveTechQuoteOptions(
     orderLeadDays?: number;
     isOriginal: boolean;
     repairDaysLabel?: string;
-  }>
+  }>,
+  customParts?: Array<{ id: string; name: string; priceRub: number }>
 ) {
   return withStore((s) => {
     const st = ensureTechState(s);
     const repair = allRepairs(st).find((x) => x.id === id);
     if (!repair) return null;
+    if (customParts !== undefined) {
+      repair.customParts = customParts
+        .filter((p) => p.name.trim().length > 0)
+        .map((p) => ({
+          id: p.id,
+          name: p.name.trim(),
+          oem: false,
+          inStock: true,
+          priceRub: Math.max(0, p.priceRub || 0),
+          deviceHint: "Своё",
+        }));
+    }
     const normalized = options
       .filter((o) => o.title.trim().length > 0)
       .map((o) => ({
@@ -656,7 +719,7 @@ export async function saveTechQuoteOptions(
     const primary = normalized[0];
     repair.laborRub = primary.laborRub;
     repair.selectedPartIds = [...primary.selectedPartIds];
-    repair.partsRub = st.partsCatalog.filter((p) => primary.selectedPartIds.includes(p.id)).reduce((sum, p) => sum + p.priceRub, 0);
+    repair.partsRub = partsRubForIds(st, repair, primary.selectedPartIds);
     return repair;
   });
 }
@@ -710,13 +773,15 @@ export async function listTechThreads() {
       const list = st.messagesByThread[t.id] ?? [];
       t.unreadCount = unreadForTech(list);
     }
-    return st.threads;
+    return st.threads.map((t) => augmentThreadForList(s, t));
   });
 }
 export async function getTechThreadById(id: string) {
   return withStore((s) => {
     hydrateThreadParticipants(s);
-    return ensureTechState(s).threads.find((t) => t.id === id);
+    const raw = ensureTechState(s).threads.find((t) => t.id === id);
+    if (!raw) return undefined;
+    return augmentThreadForList(s, raw);
   });
 }
 export async function listTechThreadMessages(id: string) {

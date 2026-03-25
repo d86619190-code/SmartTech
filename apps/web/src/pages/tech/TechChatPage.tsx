@@ -9,9 +9,8 @@ import { pickPhotosOrVideos } from "@/shared/lib/deviceFiles";
 import { ChatAttachment } from "@/shared/ui/ChatAttachment";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
 import { TypingIndicator } from "@/shared/ui/TypingIndicator";
-import { AdminInput } from "@/widgets/admin";
 import { TechPageHeader } from "@/widgets/technician";
-import cls from "./techPages.module.css";
+import chatCls from "@/pages/client/clientPages.module.css";
 
 type TechMsg = {
   id: string;
@@ -29,6 +28,12 @@ function dicebear(seed: string): string {
   return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`;
 }
 
+function formatMsgAt(at: string): string {
+  const t = Date.parse(at);
+  if (!Number.isNaN(t)) return new Date(t).toLocaleString("ru-RU");
+  return at;
+}
+
 export const TechChatPage: React.FC = () => {
   const { threadId } = useParams();
   const [thread, setThread] = React.useState<{
@@ -38,7 +43,10 @@ export const TechChatPage: React.FC = () => {
     orderPublicId: string;
     masterName?: string;
     masterAvatarUrl?: string;
+    clientTyping?: boolean;
+    clientOnline?: boolean;
   } | null>(null);
+  const typingPingRef = React.useRef<number | undefined>(undefined);
   const [baseMessages, setBaseMessages] = React.useState<TechMsg[]>([]);
   const [templates, setTemplates] = React.useState<string[]>([]);
   const [text, setText] = React.useState("");
@@ -91,12 +99,13 @@ export const TechChatPage: React.FC = () => {
             orderPublicId: string;
             masterName?: string;
             masterAvatarUrl?: string;
+            clientTyping?: boolean;
+            clientOnline?: boolean;
           }
         );
       if (Array.isArray(payload.messages)) {
         const next = payload.messages as TechMsg[];
         setBaseMessages((prev) => {
-          /** Не затираем список устаревшим снимком (до фикса сигнатуры на бэке возможна гонка). */
           if (next.length < prev.length) return prev;
           return next;
         });
@@ -127,17 +136,19 @@ export const TechChatPage: React.FC = () => {
   }, [threadId, baseMessages, presence, loadThread]);
 
   if (!threadId) return <Navigate to="/tech/messages" replace />;
+
   if (!thread) {
     return (
       <>
-        <TechPageHeader title="Чат" />
-        <TypingIndicator label="Печатает" />
+        <TechPageHeader title="Чат" subtitle="Загрузка…" />
+        <div className={chatCls.body}>
+          <p className={chatCls.streamStatus}>Загрузка…</p>
+        </div>
       </>
     );
   }
-  const messages = baseMessages;
 
-  /** В моке у каждого треда свой мастер; профиль панели — общий (часто Алексей). Показываем мастера треда. */
+  const messages = baseMessages;
   const masterName = thread.masterName ?? profile?.name ?? "Мастер";
   const masterAvatar = thread.masterAvatarUrl ?? profile?.avatar_url ?? dicebear(masterName);
   const clientAvatar = thread.clientAvatarUrl ?? dicebear(thread.clientName);
@@ -181,59 +192,77 @@ export const TechChatPage: React.FC = () => {
     }
   };
 
+  const showClientTyping = Boolean(thread.clientTyping);
+  const clientOn = Boolean(thread.clientOnline);
+
   return (
     <>
       <TechPageHeader title={thread.clientName} subtitle={`Заказ ${thread.orderPublicId} · ведёт ${masterName}`} />
-      <Link className={cls.backCircle} to="/tech/messages" aria-label="К списку диалогов" title="К списку диалогов">
-        ←
-      </Link>
-      <div className={cls.chatParticipants} aria-label="Участники чата">
-        <div className={cls.participant}>
-          <img className={cls.participantAvatar} src={clientAvatar} alt="" />
-          <div>
-            <div className={cls.participantRole}>Клиент</div>
-            <div className={cls.participantName}>{thread.clientName}</div>
+      <div className={chatCls.body}>
+        <Link
+          to="/tech/messages"
+          className={chatCls.backCircle}
+          aria-label="К списку диалогов"
+          title="К списку диалогов"
+        >
+          ←
+        </Link>
+        <div className={chatCls.chatParticipants} aria-label="Участники чата">
+          <div className={chatCls.participant}>
+            <div className={chatCls.avatarWrap}>
+              <img className={chatCls.participantAvatar} src={clientAvatar} alt="" />
+              {clientOn ? <span className={chatCls.onlineDot} title="Клиент на связи" /> : null}
+            </div>
+            <div>
+              <div className={chatCls.participantRole}>Клиент</div>
+              <div className={chatCls.participantName}>{thread.clientName}</div>
+            </div>
+          </div>
+          <div className={chatCls.participantDivider} aria-hidden />
+          <div className={chatCls.participant}>
+            <img className={chatCls.participantAvatar} src={masterAvatar} alt="" />
+            <div>
+              <div className={chatCls.participantRole}>Вы</div>
+              <div className={chatCls.participantName}>{masterName}</div>
+            </div>
           </div>
         </div>
-        <div className={cls.participantDivider} aria-hidden />
-        <div className={cls.participant}>
-          <img className={cls.participantAvatar} src={masterAvatar} alt="" />
-          <div>
-            <div className={cls.participantRole}>Вы</div>
-            <div className={cls.participantName}>{masterName}</div>
-          </div>
-        </div>
-      </div>
-      <div className={cls.chatShellSingle}>
-        <div className={cls.chatPane}>
-          <div className={cls.chatHead}>Переписка</div>
-          <div className={cls.chatBody}>
-            <p className={cls.streamStatus}>
-              {streamStatusLabel(streamStatus)} · {presence === "online" ? "вы в сети" : "оффлайн"}
+
+        <div className={chatCls.chatShell}>
+          <div className={chatCls.chatHeaderSticky}>
+            <p className={[chatCls.streamStatus, chatCls.streamStatusLine].join(" ")}>
+              <span>{streamStatusLabel(streamStatus)} ·</span>
+              {messagesLoading ? (
+                <span>Загрузка…</span>
+              ) : showClientTyping ? (
+                <TypingIndicator variant="inline" label="Клиент печатает" />
+              ) : (
+                <span>{presence === "online" ? "вы в сети" : "оффлайн"}</span>
+              )}
             </p>
-            {messagesLoading ? <TypingIndicator label="Клиент печатает" /> : null}
+          </div>
+          <div className={chatCls.chatScroll}>
             {messages.map((m, i) => {
               const isTech = m.from === "tech";
               const name = m.senderName ?? (isTech ? masterName : thread.clientName);
-              const avatar =
-                m.senderAvatarUrl ?? (isTech ? masterAvatar : clientAvatar);
+              const avatar = m.senderAvatarUrl ?? (isTech ? masterAvatar : clientAvatar);
               return (
                 <div
                   key={`${m.id}-${i}`}
-                  className={[cls.bubbleRow, isTech ? cls.bubbleRowTech : cls.bubbleRowClient].join(" ")}
+                  className={[chatCls.bubbleRow, isTech ? chatCls.bubbleRowUser : chatCls.bubbleRowService].join(" ")}
                 >
-                  <img className={cls.msgAvatar} src={avatar} alt="" />
-                  <div className={cls.bubbleColumn}>
-                    <div className={cls.bubbleSender}>{name}</div>
-                    <div className={[cls.bubble, isTech ? cls.bubbleTech : cls.bubbleClient].join(" ")}>
+                  <img className={chatCls.msgAvatar} src={avatar} alt="" />
+                  <div className={chatCls.bubbleColumn}>
+                    <div className={chatCls.bubbleSender}>{name}</div>
+                    <div className={[chatCls.bubble, isTech ? chatCls.bubbleUser : chatCls.bubbleService].join(" ")}>
                       {m.text.trim() ? m.text : null}
                       {m.attachment ? <ChatAttachment attachment={{ dataUrl: m.attachment }} /> : null}
-                      <div className={cls.bubbleMeta}>
-                        {m.at}
+                      <div className={chatCls.bubbleMeta}>
+                        {formatMsgAt(m.at)}
                         {isTech ? (
-                          <span className={cls.tickStatus}>
+                          <span className={chatCls.tickStatus}>
                             {m.read_by_client_at ? (
-                              <span className={cls.tickRead} title="Прочитано клиентом">
+                              <span className={chatCls.tickRead} title="Прочитано клиентом">
                                 ✓✓
                               </span>
                             ) : (
@@ -248,54 +277,60 @@ export const TechChatPage: React.FC = () => {
               );
             })}
           </div>
-          <div className={cls.quickReplies}>
+          <div className={chatCls.templates}>
             {templates.map((tpl) => (
-              <button
-                key={tpl}
-                type="button"
-                onClick={() => insertTemplate(tpl)}
-                className={cls.quickReplyBtn}
-              >
+              <button key={tpl} type="button" className={chatCls.templateBtn} onClick={() => insertTemplate(tpl)}>
                 {tpl}
               </button>
             ))}
           </div>
           {pendingAttachment ? (
-            <div className={cls.pendingAttachRow}>
-              К отправке: {pendingAttachment.name || "вложение"}{" "}
-              <button
-                type="button"
-                onClick={() => setPendingAttachment(null)}
-                className={cls.pendingAttachClear}
-              >
+            <div className={chatCls.pendingAttach}>
+              <span>Готово к отправке: {pendingAttachment.name || "вложение"}</span>
+              <button type="button" className={chatCls.pendingAttachClear} onClick={() => setPendingAttachment(null)}>
                 Убрать
               </button>
             </div>
           ) : null}
-          <div className={cls.chatInputRow}>
-            <div className={cls.chatInputGrow}>
-              <AdminInput placeholder="Сообщение…" value={text} onChange={(e) => setText(e.target.value)} />
+          <div className={chatCls.chatFooter}>
+            <textarea
+              className={chatCls.chatTextarea}
+              value={text}
+              onChange={(e) => {
+                const v = e.target.value;
+                setText(v);
+                if (!threadId) return;
+                window.clearTimeout(typingPingRef.current);
+                if (!v.trim()) return;
+                typingPingRef.current = window.setTimeout(() => {
+                  void techApi.postThreadTyping(threadId).catch(() => {});
+                }, 400);
+              }}
+              placeholder="Напишите сообщение…"
+              rows={2}
+            />
+            <div className={chatCls.chatInputTools}>
+              <button
+                type="button"
+                className={chatCls.chatCircleBtn}
+                onClick={() => void onPickMedia()}
+                disabled={picking || isSending}
+                aria-label="Добавить фото или видео"
+                title="Добавить фото или видео"
+              >
+                📎
+              </button>
+              <button
+                type="button"
+                className={[chatCls.chatCircleBtn, chatCls.chatCircleBtnPrimary].join(" ")}
+                onClick={send}
+                disabled={isSending || (!text.trim() && !pendingAttachment)}
+                aria-label="Отправить сообщение"
+                title="Отправить сообщение"
+              >
+                ➤
+              </button>
             </div>
-            <button
-              type="button"
-              className={cls.chatCircleBtn}
-              onClick={() => void onPickMedia()}
-              disabled={picking || isSending}
-              aria-label="Добавить фото или видео"
-              title="Добавить фото или видео"
-            >
-              📎
-            </button>
-            <button
-              type="button"
-              className={[cls.chatCircleBtn, cls.chatCircleBtnPrimary].join(" ")}
-              onClick={send}
-              disabled={isSending || (!text.trim() && !pendingAttachment)}
-              aria-label="Отправить сообщение"
-              title="Отправить сообщение"
-            >
-              ➤
-            </button>
           </div>
         </div>
       </div>

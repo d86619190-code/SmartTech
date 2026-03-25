@@ -2,7 +2,12 @@ import { Router } from "express";
 import { z } from "zod";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { verifyStreamToken } from "../services/jwt.js";
-import { getClientOrderMeta, listClientRepairs } from "../services/clientRepairs.js";
+import {
+  getClientOrderMeta,
+  listClientRepairs,
+  peekOrderServiceTyping,
+  recordClientTypingForOrder,
+} from "../services/clientRepairs.js";
 import {
   getInboxSummary,
   getOrderMessages,
@@ -115,11 +120,14 @@ clientRouter.get("/messages/:orderId/stream", async (req, res) => {
   let lastSig = "";
   const pushSnapshot = async () => {
     const messages = await getOrderMessages(userId, orderId);
-    const sig = `${messages.length}|${messages[messages.length - 1]?.id ?? "none"}|${messages.filter((m) => m.from === "user" && !m.readByService).length}`;
-    if (sig === lastSig) return;
-    lastSig = sig;
-    res.write(`event: messages\n`);
-    res.write(`data: ${JSON.stringify({ orderId, messages })}\n\n`);
+    const serviceTyping = await peekOrderServiceTyping(userId, orderId);
+    const sig = `${messages.length}|${messages[messages.length - 1]?.id ?? "none"}|${messages.filter((m) => m.from === "user" && !m.readByService).length}|${serviceTyping ? 1 : 0}`;
+    if (sig !== lastSig) {
+      lastSig = sig;
+      res.write(`event: messages\n`);
+      res.write(`data: ${JSON.stringify({ orderId, messages })}\n\n`);
+    }
+    res.write(`event: chatmeta\ndata: ${JSON.stringify({ serviceTyping })}\n\n`);
   };
   void pushSnapshot();
   const timer = setInterval(() => {
@@ -136,6 +144,20 @@ clientRouter.get("/messages/:orderId/stream", async (req, res) => {
 });
 
 clientRouter.use(requireAuth);
+
+clientRouter.post("/messages/:orderId/typing", async (req, res) => {
+  const userId = req.auth?.userId;
+  if (!userId) {
+    res.status(401).json({ error: "Требуется авторизация" });
+    return;
+  }
+  const ok = await recordClientTypingForOrder(userId, req.params.orderId);
+  if (!ok) {
+    res.status(403).json({ error: "Нет доступа к этому заказу" });
+    return;
+  }
+  res.status(204).send();
+});
 
 clientRouter.get("/repairs", async (req, res) => {
   const userId = req.auth?.userId;

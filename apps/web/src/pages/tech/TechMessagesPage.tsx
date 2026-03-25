@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { techApi } from "@/shared/lib/techApi";
-import { TypingIndicator } from "@/shared/ui/TypingIndicator";
 import { TechCard, TechPageHeader } from "@/widgets/technician";
 import cls from "./techPages.module.css";
 
@@ -30,7 +29,9 @@ export const TechMessagesPage: React.FC = () => {
         <div className={cls.threadList}>
           {loading ? (
             <div className={cls.threadItem} style={{ pointerEvents: "none" }}>
-              <TypingIndicator label="Печатает" />
+              <p className={cls.p} style={{ padding: "4px 0" }}>
+                Загрузка…
+              </p>
             </div>
           ) : threads.length === 0 ? (
             <p className={cls.p} style={{ padding: 20 }}>
@@ -39,12 +40,19 @@ export const TechMessagesPage: React.FC = () => {
           ) : (
             threads.map((t) => (
               <Link key={t.id} className={cls.threadItem} to={`/tech/messages/${t.id}`}>
-                <div className={cls.threadName}>{t.clientName}</div>
-                {t.unreadCount > 0 ? <div className={cls.threadUnread}>{t.unreadCount}</div> : null}
-                <div className={cls.muted}>{t.orderPublicId}</div>
-                <div className={cls.threadPreview}>{t.lastMessage}</div>
-                <div className={cls.muted} style={{ marginTop: 6 }}>
-                  {t.updatedAt}
+                <span
+                  className={cls.threadOnlineDot}
+                  data-visible={t.clientOnline ? "true" : "false"}
+                  aria-hidden
+                />
+                <div className={cls.threadItemMain}>
+                  <div className={cls.threadName}>{t.clientName}</div>
+                  {t.unreadCount > 0 ? <div className={cls.threadUnread}>{t.unreadCount}</div> : null}
+                  <div className={cls.muted}>{t.orderPublicId}</div>
+                  <div className={cls.threadPreview}>{t.lastMessage}</div>
+                  <div className={cls.muted} style={{ marginTop: 6 }}>
+                    {t.updatedAt}
+                  </div>
                 </div>
               </Link>
             ))

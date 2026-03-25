@@ -69,3 +69,44 @@
 .rowTech {
   justify-content: flex-end;
 }
+
+/* В одну строку со статусом «стрим · …» вместо блока «онлайн» */
+.inlineRoot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+}
+
+.inlineLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.inlineDots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.inlineDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  animation: typingPulse 1s ease-in-out infinite;
+}
+
+.inlineDot:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.inlineDot:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.inlineDot:nth-child(3) {
+  animation-delay: 0.36s;
+}

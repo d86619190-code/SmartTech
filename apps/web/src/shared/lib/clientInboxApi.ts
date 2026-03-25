@@ -18,6 +18,7 @@ export type InboxThread = {
   preview: string;
   lastAt: number;
   unreadCount: number;
+  counterpartOnline?: boolean;
 };
 
 export type InboxSummary = {
@@ -54,6 +55,10 @@ export type ClientOrderMeta = {
     | "completed";
   canRateOrder?: boolean;
   myRating?: number;
+  /** Мастер набирает сообщение (когда бэкенд отдаёт) — показываем «Печатает» вместо «вы в сети» */
+  serviceTyping?: boolean;
+  /** Мастер недавно на связи — зелёный индикатор */
+  counterpartOnline?: boolean;
   diagnosticFeeRub?: number;
   quoteOptions?: Array<{
     id: string;
@@ -163,6 +168,11 @@ export async function markOrderMessagesReadApi(orderId: string): Promise<void> {
   if (!res.ok && res.status !== 204) throw new Error(await parseError(res));
 }
 
+export async function postOrderTyping(orderId: string): Promise<void> {
+  const res = await authorizedFetch(`/api/v1/client/messages/${orderId}/typing`, { method: "POST" });
+  if (!res.ok && res.status !== 204) throw new Error(await parseError(res));
+}
+
 export async function sendOrderMessageApi(
   orderId: string,
   text: string,
@@ -253,7 +263,8 @@ export function openOrderMessagesStream(
   orderId: string,
   onMessages: (messages: ChatMessage[]) => void,
   onError?: (e: Event) => void,
-  onStatus?: (status: StreamStatus) => void
+  onStatus?: (status: StreamStatus) => void,
+  onChatMeta?: (meta: { serviceTyping: boolean }) => void
 ): () => void {
   return openSseStream({
     getUrl: async () => {
@@ -265,6 +276,14 @@ export function openOrderMessagesStream(
         try {
           const payload = JSON.parse(raw) as { orderId: string; messages: ChatMessage[] };
           onMessages(payload.messages);
+        } catch {
+          // noop
+        }
+      },
+      chatmeta: (raw) => {
+        try {
+          const meta = JSON.parse(raw) as { serviceTyping: boolean };
+          onChatMeta?.(meta);
         } catch {
           // noop
         }
