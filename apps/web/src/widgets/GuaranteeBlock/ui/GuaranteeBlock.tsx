@@ -2,9 +2,16 @@ import * as React from "react";
 import { GUARANTEE } from "@/shared/config/marketing";
 import cls from "./GuaranteeBlock.module.css";
 
-export const GuaranteeBlock: React.FC = () => {
+type Props = {
+  variant?: "default" | "dark";
+};
+
+export const GuaranteeBlock: React.FC<Props> = ({ variant = "default" }) => {
   return (
-    <section className={cls.root} aria-labelledby="guarantee-heading">
+    <section
+      className={[cls.root, variant === "dark" ? cls.dark : ""].filter(Boolean).join(" ")}
+      aria-labelledby="guarantee-heading"
+    >
       <div className={cls.media}>
         <img
           src={GUARANTEE.imageUrl}

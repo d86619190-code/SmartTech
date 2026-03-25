@@ -1,11 +1,11 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { HashRouter, Navigate, Route, Routes, useParams } from "react-router-dom";
 import AppLayout from "./app/AppLayout";
+import { RouteLoading } from "./app/RouteLoading";
 import "./app/index.css";
 import { ContactsPage } from "./pages/Contacts";
 import { CreateOrderPage, CreateOrderSuccessPage } from "./pages/CreateOrder";
-import { HomePage } from "./pages/Home";
 import { LoginPage } from "./pages/Login";
 import { OrderHistoryPage } from "./pages/OrderHistory";
 import { OrderRepairApprovalPage } from "./pages/OrderRepairApproval";
@@ -55,6 +55,9 @@ import {
   TechTrackingPage,
 } from "./pages/tech";
 
+const HomePage = React.lazy(() => import("./pages/Home").then((m) => ({ default: m.HomePage })));
+const LandingPage = React.lazy(() => import("./pages/Landing").then((m) => ({ default: m.LandingPage })));
+
 function OrdersToTrackingRedirect() {
   const { orderId } = useParams<{ orderId: string }>();
   return <Navigate to={`/tracking/${orderId}`} replace />;
@@ -64,8 +67,23 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <HashRouter>
       <Routes>
+        <Route
+          path="landing"
+          element={
+            <Suspense fallback={<RouteLoading />}>
+              <LandingPage />
+            </Suspense>
+          }
+        />
         <Route element={<AppLayout />}>
-          <Route index element={<HomePage />} />
+          <Route
+            index
+            element={
+              <Suspense fallback={<RouteLoading />}>
+                <HomePage />
+              </Suspense>
+            }
+          />
           <Route path="tracking/:orderId" element={<TrackingDetailPage />} />
           <Route path="tracking" element={<TrackingPage />} />
           <Route path="repairs" element={<Navigate to="/history" replace />} />

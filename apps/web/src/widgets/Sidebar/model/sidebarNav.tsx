@@ -6,6 +6,7 @@ import {
   IconMapPin,
   IconMessage,
   IconPlus,
+  IconSpark,
   IconTrack,
   IconUser,
 } from "@/shared/ui/Icon/NavAndAuthIcons";
@@ -19,6 +20,7 @@ export type SidebarNavItem = {
 
 export const primarySidebarItems: SidebarNavItem[] = [
   { key: "home", label: "Главная", to: "/", Icon: IconDashboard },
+  { key: "landing", label: "Шоу-лендинг", to: "/landing", Icon: IconSpark },
   { key: "tracking", label: "Отслеживание", to: "/tracking", Icon: IconTrack },
   { key: "create", label: "Новая заявка", to: "/create-order", Icon: IconPlus },
   { key: "history", label: "История заказов", to: "/history", Icon: IconHistory },

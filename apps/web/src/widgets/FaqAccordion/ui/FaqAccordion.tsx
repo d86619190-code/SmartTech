@@ -5,13 +5,15 @@ import cls from "./FaqAccordion.module.css";
 type FaqAccordionProps = {
   items: FaqItem[];
   idPrefix?: string;
+  /** Тёмная тема для лендинга / тёмных экранов */
+  variant?: "default" | "dark";
 };
 
-export const FaqAccordion: React.FC<FaqAccordionProps> = ({ items, idPrefix = "faq" }) => {
+export const FaqAccordion: React.FC<FaqAccordionProps> = ({ items, idPrefix = "faq", variant = "default" }) => {
   const [open, setOpen] = React.useState<number | null>(0);
 
   return (
-    <div className={cls.root}>
+    <div className={[cls.root, variant === "dark" ? cls.dark : ""].filter(Boolean).join(" ")}>
       {items.map((item, i) => {
         const isOpen = open === i;
         const panelId = `${idPrefix}-panel-${i}`;

@@ -7,9 +7,10 @@ import cls from "./LeadForm.module.css";
 
 type LeadFormProps = {
   className?: string;
+  variant?: "default" | "dark";
 };
 
-export const LeadForm: React.FC<LeadFormProps> = ({ className }) => {
+export const LeadForm: React.FC<LeadFormProps> = ({ className, variant = "default" }) => {
   const navigate = useNavigate();
   const [name, setName] = React.useState("");
   const [phone, setPhone] = React.useState("");
@@ -24,7 +25,10 @@ export const LeadForm: React.FC<LeadFormProps> = ({ className }) => {
   };
 
   return (
-    <section className={[cls.root, className].filter(Boolean).join(" ")} aria-labelledby="lead-heading">
+    <section
+      className={[cls.root, variant === "dark" ? cls.dark : "", className].filter(Boolean).join(" ")}
+      aria-labelledby="lead-heading"
+    >
       <h2 id="lead-heading" className={cls.heading}>
         Всегда на связи
       </h2>

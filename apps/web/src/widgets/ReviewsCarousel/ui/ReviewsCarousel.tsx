@@ -6,11 +6,15 @@ import cls from "./ReviewsCarousel.module.css";
 
 type ReviewsCarouselProps = {
   reviews: ReviewCard[];
+  variant?: "default" | "dark";
 };
 
-export const ReviewsCarousel: React.FC<ReviewsCarouselProps> = ({ reviews }) => {
+export const ReviewsCarousel: React.FC<ReviewsCarouselProps> = ({ reviews, variant = "default" }) => {
   return (
-    <section className={cls.root} aria-labelledby="reviews-heading">
+    <section
+      className={[cls.root, variant === "dark" ? cls.dark : ""].filter(Boolean).join(" ")}
+      aria-labelledby="reviews-heading"
+    >
       <div className={cls.head}>
         <h2 id="reviews-heading" className={cls.title}>
           Отзывы

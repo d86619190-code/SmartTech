@@ -17,6 +17,84 @@
   padding: max(16px, env(safe-area-inset-top)) 24px 0;
 }
 
+.appHero {
+  margin-bottom: 28px;
+  padding: 28px 24px 26px;
+  border-radius: 18px;
+  border: 1px solid var(--color-input-border);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.06);
+}
+
+.appHeroInner {
+  max-width: 720px;
+}
+
+.appHeroKicker {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.appHeroTitle {
+  margin: 0 0 12px;
+  font-size: clamp(26px, 3.6vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  color: var(--color-text-primary);
+}
+
+.appHeroText {
+  margin: 0 0 22px;
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.appHeroText strong {
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.appHeroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 14px;
+  align-items: center;
+}
+
+.landingCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 22px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  color: #fff;
+  text-decoration: none;
+  border-radius: var(--radius-control);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  background-size: 200% 100%;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.2);
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.landingCta:hover {
+  box-shadow: 0 12px 36px rgba(56, 189, 248, 0.18);
+}
+
+.landingCta:active {
+  transform: translateY(1px);
+}
+
 .hero {
   margin-bottom: 14px;
 }
@@ -363,6 +441,12 @@
   .inner {
     padding: max(12px, env(safe-area-inset-top)) var(--content-pad-x-sm) 0;
     padding-bottom: 32px;
+  }
+
+  .cinematic {
+    margin: 0 calc(-1 * var(--content-pad-x-sm)) 16px;
+    padding: 4px var(--content-pad-x-sm) 4px;
+    border-radius: 0 0 18px 18px;
   }
 
   .hero {

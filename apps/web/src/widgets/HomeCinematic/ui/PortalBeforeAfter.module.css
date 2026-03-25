@@ -1,0 +1,443 @@
+.root {
+  position: relative;
+}
+
+.wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.45),
+    0 28px 90px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  background: radial-gradient(120% 90% at 50% 100%, rgba(56, 189, 248, 0.08), transparent 55%), #07080a;
+  aspect-ratio: 16 / 9;
+  max-height: min(58vh, 640px);
+  margin: 0 auto;
+  touch-action: none;
+  user-select: none;
+}
+
+.wrapImmersive {
+  max-height: none;
+  width: min(96vw, min(1280px, 100vw - 24px));
+  height: auto;
+  aspect-ratio: 16 / 9;
+  max-height: min(88dvh, calc((100vw - 24px) * 9 / 16));
+  margin: 0 auto;
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.25),
+    0 0 80px rgba(56, 189, 248, 0.12),
+    0 40px 120px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Первая секция лендинга: весь вьюпорт (хедер лендинга скрыт до скролла) */
+.rootHero {
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  min-height: 100vh;
+}
+
+.wrapHero {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 100dvh;
+  min-height: 100vh;
+  max-height: none;
+  aspect-ratio: auto;
+  margin: 0;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+}
+
+/* Hero: без тяжёлой рамки-портала — только лёгкий край */
+.rootHero .wrapHero::before {
+  opacity: 0.35;
+  animation-duration: 14s;
+}
+
+/* Внешнее кольцо «портала» */
+.wrap::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 24px;
+  padding: 2px;
+  background: linear-gradient(
+    135deg,
+    rgba(56, 189, 248, 0.55),
+    rgba(147, 51, 234, 0.35),
+    rgba(56, 189, 248, 0.45),
+    rgba(14, 165, 233, 0.5)
+  );
+  background-size: 300% 300%;
+  animation: borderFlow 8s ease-in-out infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrapImmersive::before {
+  border-radius: 20px;
+  inset: -3px;
+  animation-duration: 5s;
+}
+
+@keyframes borderFlow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.viewport {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  isolation: isolate;
+}
+
+/* Пульс между слоями */
+.portalPulse {
+  position: absolute;
+  inset: -18%;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 52% 58% at calc(var(--split, 0.5) * 100%) 50%,
+    rgba(56, 189, 248, 0.32) 0%,
+    rgba(167, 139, 250, 0.14) 38%,
+    transparent 72%
+  );
+  animation: portalBreath 4.2s ease-in-out infinite;
+  mix-blend-mode: screen;
+  opacity: 0.88;
+}
+
+@keyframes portalBreath {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+.img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Снизу — сломанный (полный кадр), сверху — починенный (клип слева до разделителя) */
+.layerBroken {
+  z-index: 1;
+  filter: saturate(0.92) contrast(1.05);
+}
+
+.layerRepaired {
+  z-index: 3;
+}
+
+/* Разделитель */
+.seam {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--split, 0.5) * 100%);
+  z-index: 6;
+  width: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.beamGlow {
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  left: 50%;
+  width: 140px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    rgba(147, 197, 253, 0.55) 0%,
+    rgba(56, 189, 248, 0.2) 42%,
+    transparent 72%
+  );
+  animation: glowPulse 1.8s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    filter: blur(10px);
+  }
+  50% {
+    opacity: 0.98;
+    filter: blur(16px);
+  }
+}
+
+.beamCore {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 5px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    rgba(56, 189, 248, 0) 0%,
+    rgba(255, 255, 255, 1) 16%,
+    rgba(186, 230, 253, 0.98) 50%,
+    rgba(255, 255, 255, 1) 84%,
+    rgba(56, 189, 248, 0) 100%
+  );
+  box-shadow:
+    0 0 20px 6px rgba(56, 189, 248, 0.95),
+    0 0 56px 18px rgba(59, 130, 246, 0.55),
+    0 0 100px 32px rgba(14, 165, 233, 0.35),
+    0 0 4px 1px rgba(255, 255, 255, 0.9);
+  animation: beamFlicker 0.32s ease-in-out infinite alternate;
+}
+
+@keyframes beamFlicker {
+  from {
+    opacity: 0.88;
+    filter: brightness(1);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1.35);
+  }
+}
+
+.lightningSvg {
+  position: absolute;
+  top: 4%;
+  bottom: 4%;
+  left: 50%;
+  width: min(140px, 24vw);
+  height: 92%;
+  transform: translateX(-50%);
+  overflow: visible;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.95)) drop-shadow(0 0 32px rgba(147, 197, 253, 0.65));
+}
+
+.lightningSvgSide {
+  position: absolute;
+  top: 8%;
+  bottom: 8%;
+  left: calc(50% + min(52px, 10vw));
+  width: min(56px, 12vw);
+  height: 84%;
+  transform: translateX(-50%);
+  overflow: visible;
+  opacity: 0.72;
+  filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.85));
+}
+
+.bolt {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 36 140;
+  animation: boltDash 2.1s linear infinite;
+  opacity: 0.92;
+}
+
+.bolt2 {
+  opacity: 0.72;
+  animation-delay: 0.22s;
+}
+
+.bolt3 {
+  opacity: 0.52;
+  stroke-dasharray: 28 160;
+  animation-duration: 2.6s;
+  animation-delay: 0.45s;
+}
+
+.bolt4 {
+  opacity: 0.38;
+  animation-delay: 0.68s;
+  stroke-dasharray: 22 150;
+  animation-duration: 2.3s;
+}
+
+.boltSide {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 32 110;
+  animation: boltDash 1.75s linear infinite reverse;
+  opacity: 0.62;
+}
+
+.boltSide2 {
+  opacity: 0.45;
+  animation-delay: 0.3s;
+}
+
+@keyframes boltDash {
+  to {
+    stroke-dashoffset: -200;
+  }
+}
+
+.labels {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 14px 16px;
+  background: linear-gradient(180deg, transparent 35%, rgba(0, 0, 0, 0.62) 100%);
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.75);
+}
+
+.hint {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+/* Полноэкранное погружение */
+.immersiveOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 35%, rgba(56, 189, 248, 0.12), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(167, 139, 250, 0.08), transparent 50%),
+    rgba(2, 4, 12, 0.94);
+  backdrop-filter: blur(10px);
+}
+
+.immersiveClose {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  z-index: 10001;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(15, 23, 42, 0.65);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.immersiveClose:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.immersiveClose:active {
+  transform: scale(0.96);
+}
+
+.immersiveHint {
+  margin: 0 0 10px;
+  padding: 0 52px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(148, 163, 184, 0.95);
+}
+
+.immersiveStage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  .wrap:not(.wrapImmersive) {
+    aspect-ratio: 4 / 5;
+    max-height: none;
+  }
+
+  .lightningSvg {
+    width: min(100px, 28vw);
+  }
+
+  .lightningSvgSide {
+    left: calc(50% + min(44px, 11vw));
+    width: min(44px, 11vw);
+  }
+
+  .wrapImmersive {
+    width: 100%;
+    max-height: min(82dvh, calc(100vw * 9 / 16));
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap::before,
+  .portalPulse,
+  .beamGlow,
+  .beamCore,
+  .bolt,
+  .bolt2,
+  .bolt3,
+  .bolt4,
+  .boltSide,
+  .boltSide2 {
+    animation: none;
+  }
+
+  .beamCore {
+    opacity: 0.95;
+  }
+}

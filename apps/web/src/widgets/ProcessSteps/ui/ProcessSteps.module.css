@@ -92,6 +92,23 @@
   text-underline-offset: 2px;
 }
 
+.dark {
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-link: #38bdf8;
+  --color-order-row-border: rgba(56, 189, 248, 0.15);
+}
+
+.dark .visual {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(56, 189, 248, 0.22);
+}
+
+.dark .step {
+  border-top-color: rgba(56, 189, 248, 0.15);
+}
+
 @media (max-width: 767px) {
   .step {
     grid-template-columns: 1fr;

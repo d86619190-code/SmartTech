@@ -266,6 +266,30 @@ export const IconTrack: React.FC<IconProps> = ({ className, size = 18, "aria-hid
   </svg>
 );
 
+export const IconSpark: React.FC<IconProps> = ({
+  className,
+  size = 18,
+  "aria-hidden": ariaHidden = true,
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    aria-hidden={ariaHidden}
+  >
+    <path
+      d="M13 2L10 14h4l-1 8 7-11h-4l1-9z"
+      stroke="currentColor"
+      strokeWidth="1.35"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export const IconChevronLeft: React.FC<IconProps> = ({
   className,
   size = 22,

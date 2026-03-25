@@ -58,3 +58,12 @@
   line-height: 1.55;
   color: var(--color-text-secondary);
 }
+
+.dark .item {
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(56, 189, 248, 0.22);
+}
+
+.dark .trigger:focus-visible {
+  outline-color: #38bdf8;
+}

@@ -8,6 +8,7 @@ export function getRouteNavOrder(pathname: string): number {
 
   const exact: Record<string, number> = {
     "/": 0,
+    "/landing": 0.15,
     "/tracking": 1,
     "/create-order": 2,
     "/create-order/success": 2,

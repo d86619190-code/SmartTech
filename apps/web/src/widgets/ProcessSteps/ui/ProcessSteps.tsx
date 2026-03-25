@@ -5,11 +5,15 @@ import cls from "./ProcessSteps.module.css";
 
 type ProcessStepsProps = {
   steps: ProcessStep[];
+  variant?: "default" | "dark";
 };
 
-export const ProcessSteps: React.FC<ProcessStepsProps> = ({ steps }) => {
+export const ProcessSteps: React.FC<ProcessStepsProps> = ({ steps, variant = "default" }) => {
   return (
-    <section className={cls.root} aria-labelledby="process-heading">
+    <section
+      className={[cls.root, variant === "dark" ? cls.dark : ""].filter(Boolean).join(" ")}
+      aria-labelledby="process-heading"
+    >
       <h2 id="process-heading" className={cls.title}>
         Наши процессы абсолютно прозрачны для вас
       </h2>

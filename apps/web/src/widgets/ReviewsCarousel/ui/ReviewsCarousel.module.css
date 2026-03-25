@@ -85,3 +85,25 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.dark {
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+}
+
+.dark .card {
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(56, 189, 248, 0.22);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.dark .card:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.dark .head :global(button) {
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #e2e8f0;
+  background: rgba(56, 189, 248, 0.08);
+}

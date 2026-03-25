@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   BENEFITS,
   FAQ_ITEMS,
@@ -16,14 +17,37 @@ import { ReviewsCarousel } from "@/widgets/ReviewsCarousel";
 import cls from "./HomePage.module.css";
 
 export const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+  const prefetchLanding = React.useCallback(() => {
+    void import("@/pages/Landing");
+  }, []);
   return (
     <div className={cls.shell}>
       <div className={cls.inner}>
-        <section className={cls.hero} aria-labelledby="home-title">
-          <h1 id="home-title" className={cls.title}>
-            Отслеживание
-          </h1>
-          <p className={cls.subtitle}>{HERO.subtitle}</p>
+        <section className={cls.appHero} aria-labelledby="app-home-title">
+          <div className={cls.appHeroInner}>
+            <p className={cls.appHeroKicker}>Приложение</p>
+            <h1 id="app-home-title" className={cls.appHeroTitle}>
+              Рабочий стол
+            </h1>
+            <p className={cls.appHeroText}>
+              {HERO.subtitle} Полное шоу с заставкой, порталом «до/после» и эффектами — на{" "}
+              <strong>отдельном лендинге</strong> (грузится только по переходу).
+            </p>
+            <div className={cls.appHeroActions}>
+              <Link
+                className={cls.landingCta}
+                to="/landing"
+                onMouseEnter={prefetchLanding}
+                onFocus={prefetchLanding}
+              >
+                Открыть шоу-лендинг
+              </Link>
+              <Button type="button" variant="outline" onClick={() => navigate("/create-order")}>
+                Новая заявка
+              </Button>
+            </div>
+          </div>
         </section>
 
         <section className={cls.infoGrid}>
