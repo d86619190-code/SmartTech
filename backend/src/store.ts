@@ -149,6 +149,8 @@ export type TechIncomingRequest = {
   clientName: string;
   clientAvatarUrl?: string;
   clientPhone: string;
+  /** Владелец заказа (клиент) — для доставки inbox/чата только ему */
+  clientUserId?: string;
   photoDataUrls?: string[];
   createdAt: string;
   priority: "normal" | "high";
@@ -177,6 +179,11 @@ export type TechRepairJob = {
   startedAt?: string;
   completedAt?: string;
   rating?: number;
+  /** ID клиента-владельца заказа */
+  clientUserId?: string;
+  /** Оценка клиента после выдачи (1–5) */
+  clientRatingStars?: number;
+  clientRatedAt?: number;
   earningsRub?: number;
   diagnosticsIssues: string[];
   selectedPartIds: string[];

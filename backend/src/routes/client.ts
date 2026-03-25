@@ -10,7 +10,7 @@ import {
   resolveApproval,
   sendUserMessage,
 } from "../services/inbox.js";
-import { createTechIncomingFromClient } from "../services/techMock.js";
+import { createTechIncomingFromClient, submitClientOrderRating } from "../services/techMock.js";
 
 const sendMessageBody = z
   .object({
@@ -30,6 +30,10 @@ const resolveApprovalBody = z.object({
   decision: z.enum(["approved", "declined"]),
   optionId: z.string().min(1).max(100).optional(),
 });
+const rateOrderBody = z.object({
+  stars: z.number().int().min(1).max(5),
+});
+
 const createOrderBody = z.object({
   deviceType: z.enum(["phone", "tablet", "laptop"]),
   device: z.string().trim().min(2).max(100),
@@ -155,6 +159,39 @@ clientRouter.get("/orders/:orderId", async (req, res) => {
     return;
   }
   res.status(200).json({ order });
+});
+
+clientRouter.post("/orders/:orderId/rate", async (req, res) => {
+  const userId = req.auth?.userId;
+  if (!userId) {
+    res.status(401).json({ error: "Требуется авторизация" });
+    return;
+  }
+  const parsed = rateOrderBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Укажите оценку от 1 до 5", details: parsed.error.flatten() });
+    return;
+  }
+  const result = await submitClientOrderRating(userId, req.params.orderId, parsed.data.stars);
+  if (!result.ok) {
+    const map: Record<string, number> = {
+      not_found: 404,
+      forbidden: 403,
+      not_completed: 400,
+      already_rated: 409,
+      invalid_stars: 400,
+    };
+    const msg: Record<string, string> = {
+      not_found: "Заказ не найден",
+      forbidden: "Нет доступа к этому заказу",
+      not_completed: "Оценку можно поставить после выдачи заказа",
+      already_rated: "Оценка уже сохранена",
+      invalid_stars: "Некорректная оценка",
+    };
+    res.status(map[result.error] ?? 400).json({ error: msg[result.error] ?? "Ошибка" });
+    return;
+  }
+  res.status(200).json({ ok: true });
 });
 
 clientRouter.post("/orders", async (req, res) => {

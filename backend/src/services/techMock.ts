@@ -80,6 +80,39 @@ function allRepairs(st: TechPanelMockState): TechRepairJob[] {
   return [...st.repairs, ...st.completed];
 }
 
+function ensureInboxUser(s: AppState, userId: string) {
+  if (!s.inboxByUserId[userId]) {
+    s.inboxByUserId[userId] = { approvals: [], messages: [] };
+  }
+  return s.inboxByUserId[userId];
+}
+
+function repairById(st: TechPanelMockState, orderId: string): TechRepairJob | undefined {
+  return allRepairs(st).find((r) => r.id === orderId);
+}
+
+function resolveClientUserIdForOrder(s: AppState, orderId: string): string | undefined {
+  const st = s.techPanelMock;
+  const fromJob = st ? repairById(st, orderId)?.clientUserId : undefined;
+  if (fromJob) return fromJob;
+  const matches: string[] = [];
+  for (const [uid, inbox] of Object.entries(s.inboxByUserId)) {
+    const has =
+      inbox.messages.some((m) => m.order_id === orderId) || inbox.approvals.some((a) => a.order_id === orderId);
+    if (has) matches.push(uid);
+  }
+  return matches.length === 1 ? matches[0] : undefined;
+}
+
+function syncMasterAvgRating(st: TechPanelMockState): void {
+  const rated = [...st.repairs, ...st.completed].filter(
+    (r) => typeof r.clientRatingStars === "number" && r.clientRatingStars >= 1,
+  );
+  if (rated.length === 0) return;
+  const sum = rated.reduce((acc, r) => acc + (r.clientRatingStars ?? 0), 0);
+  st.profile.rating = Math.round((sum / rated.length) * 10) / 10;
+}
+
 function ensureThreadForIncoming(s: AppState, req: TechIncomingRequest): string {
   const st = ensureTechState(s);
   const existing = st.threads.find((t) => t.repairId === req.id);
@@ -114,16 +147,26 @@ function staffFromContact(contact: string | undefined): { name: string; avatarUr
 }
 
 function resolveClientForRepair(s: AppState, repairId: string): { label: string; avatarUrl?: string } | undefined {
-  for (const [uid, inbox] of Object.entries(s.inboxByUserId)) {
-    const hasOrder = inbox.messages.some((m) => m.order_id === repairId) || inbox.approvals.some((a) => a.order_id === repairId);
-    if (!hasOrder) continue;
+  const uid = resolveClientUserIdForOrder(s, repairId);
+  if (uid) {
     const u = s.usersById[uid];
-    if (!u) continue;
-    const name = u.name?.trim() || "Клиент";
-    const contact = u.phone?.trim() || u.email?.trim() || "";
+    if (u) {
+      const name = u.name?.trim() || "Клиент";
+      const contact = u.phone?.trim() || u.email?.trim() || "";
+      return {
+        label: contact ? `${name} · ${contact}` : name,
+        avatarUrl: u.avatar_url,
+      };
+    }
+  }
+  const st = s.techPanelMock;
+  const job = st ? repairById(st, repairId) : undefined;
+  if (job) {
+    const name = job.customer?.trim() || "Клиент";
+    const contact = job.phone?.trim() || job.email?.trim() || "";
     return {
       label: contact ? `${name} · ${contact}` : name,
-      avatarUrl: u.avatar_url,
+      avatarUrl: undefined,
     };
   }
   return undefined;
@@ -223,20 +266,21 @@ function broadcastClientServiceMessage(
 ): void {
   const m = masterForRepair(s, orderId);
   const now = Date.now();
-  for (const inbox of Object.values(s.inboxByUserId)) {
-    inbox.messages.push({
-      id: crypto.randomUUID(),
-      order_id: orderId,
-      from: "service",
-      text,
-      at: now,
-      read_by_user: false,
-      service_sender_name: m?.name,
-      service_sender_avatar_url: m?.avatarUrl,
-      attachment_data_url: att?.attachment_data_url,
-      attachment_name: att?.attachment_name,
-    });
-  }
+  const uid = resolveClientUserIdForOrder(s, orderId);
+  if (!uid) return;
+  const inbox = ensureInboxUser(s, uid);
+  inbox.messages.push({
+    id: crypto.randomUUID(),
+    order_id: orderId,
+    from: "service",
+    text,
+    at: now,
+    read_by_user: false,
+    service_sender_name: m?.name,
+    service_sender_avatar_url: m?.avatarUrl,
+    attachment_data_url: att?.attachment_data_url,
+    attachment_name: att?.attachment_name,
+  });
 }
 
 /** Сообщение клиента из inbox — копия в тред мастера (локально, без облака). */
@@ -286,10 +330,14 @@ export async function markTechThreadRead(threadId: string): Promise<void> {
     }
     thread.unreadCount = unreadForTech(list);
 
-    for (const inbox of Object.values(s.inboxByUserId)) {
-      for (const row of inbox.messages) {
-        if (row.order_id === thread.repairId && row.from === "user" && !row.read_by_service) {
-          row.read_by_service = true;
+    const uid = resolveClientUserIdForOrder(s, thread.repairId);
+    if (uid) {
+      const inbox = s.inboxByUserId[uid];
+      if (inbox) {
+        for (const row of inbox.messages) {
+          if (row.order_id === thread.repairId && row.from === "user" && !row.read_by_service) {
+            row.read_by_service = true;
+          }
         }
       }
     }
@@ -298,15 +346,15 @@ export async function markTechThreadRead(threadId: string): Promise<void> {
 
 function broadcastClientApproval(s: AppState, orderId: string, label: string): void {
   const now = Date.now();
-  for (const inbox of Object.values(s.inboxByUserId)) {
-    inbox.approvals.push({
-      id: crypto.randomUUID(),
-      order_id: orderId,
-      label,
-      status: "pending",
-      created_at: now,
-    });
-  }
+  const uid = resolveClientUserIdForOrder(s, orderId);
+  if (!uid) return;
+  ensureInboxUser(s, uid).approvals.push({
+    id: crypto.randomUUID(),
+    order_id: orderId,
+    label,
+    status: "pending",
+    created_at: now,
+  });
 }
 
 export async function getTechDashboard() {
@@ -366,6 +414,7 @@ export async function createTechIncomingFromClient(
       clientName: u?.name?.trim() || "Клиент",
       clientAvatarUrl: u?.avatar_url,
       clientPhone: payload.contactPhone.trim() || u?.phone?.trim() || "—",
+      clientUserId: userId,
       photoDataUrls: payload.photoDataUrls.slice(0, 8),
       createdAt: `${d}.${m}.${y}`,
       priority: payload.photoDataUrls.length > 0 ? "high" : "normal",
@@ -380,18 +429,15 @@ export async function createTechIncomingFromClient(
       message: `Новая заявка ${publicId} — ${payload.device}`,
     });
     st.alerts = st.alerts.slice(0, 30);
-    const inbox = s.inboxByUserId[userId];
-    if (inbox) {
-      inbox.messages.push({
-        id: crypto.randomUUID(),
-        order_id: row.id,
-        from: "service",
-        text: "Заявка принята сервисом. Ожидайте, мастер рассмотрит её во входящих.",
-        at: Date.now(),
-        read_by_user: false,
-        service_sender_name: "Сервис",
-      });
-    }
+    ensureInboxUser(s, userId).messages.push({
+      id: crypto.randomUUID(),
+      order_id: row.id,
+      from: "service",
+      text: "Заявка принята сервисом. Ожидайте, мастер рассмотрит её во входящих.",
+      at: Date.now(),
+      read_by_user: false,
+      service_sender_name: "Сервис",
+    });
     if (s.adminPanelMock) {
       s.adminPanelMock.orders.unshift({
         id: row.id,
@@ -437,6 +483,7 @@ export async function acceptIncoming(id: string): Promise<string | null> {
       customer: req.clientName,
       phone: req.clientPhone,
       email: "",
+      clientUserId: req.clientUserId ?? userIdForIncomingRequest(s, req),
       stage: "accepted",
       issue: req.issueShort,
       photos: req.photoDataUrls?.length ?? 0,
@@ -450,6 +497,10 @@ export async function acceptIncoming(id: string): Promise<string | null> {
       diagnosticsIssues: [],
       selectedPartIds: [],
     };
+    const ownerId = newRepair.clientUserId;
+    const owner = ownerId ? s.usersById[ownerId] : undefined;
+    if (owner?.email?.trim()) newRepair.email = owner.email.trim();
+
     st.repairs.unshift(newRepair);
 
     const threadId = ensureThreadForIncoming(s, req);
@@ -724,6 +775,52 @@ export async function saveTechSettings(patch: Partial<TechPanelMockState["settin
     const st = ensureTechState(s);
     st.settings = { ...st.settings, ...patch };
     return st.settings;
+  });
+}
+
+function userInboxHasOrder(s: AppState, userId: string, orderId: string): boolean {
+  const inbox = s.inboxByUserId[userId];
+  if (!inbox) return false;
+  return (
+    inbox.messages.some((m) => m.order_id === orderId) || inbox.approvals.some((a) => a.order_id === orderId)
+  );
+}
+
+export async function submitClientOrderRating(
+  userId: string,
+  orderId: string,
+  stars: number
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  return withStore((s) => {
+    const st = ensureTechState(s);
+    const repair = allRepairs(st).find((r) => r.id === orderId);
+    if (!repair) return { ok: false, error: "not_found" };
+    if (repair.stage !== "completed") return { ok: false, error: "not_completed" };
+    if (repair.clientRatingStars) return { ok: false, error: "already_rated" };
+    if (repair.clientUserId) {
+      if (repair.clientUserId !== userId) return { ok: false, error: "forbidden" };
+    } else if (!userInboxHasOrder(s, userId, orderId)) {
+      return { ok: false, error: "forbidden" };
+    }
+    const raw = Number(stars);
+    if (!Number.isFinite(raw)) return { ok: false, error: "invalid_stars" };
+    const n = Math.min(5, Math.max(1, Math.round(raw)));
+    repair.clientRatingStars = n;
+    repair.clientRatedAt = Date.now();
+    if (!repair.clientUserId) repair.clientUserId = userId;
+    repair.rating = n;
+    syncMasterAvgRating(st);
+    const inbox = ensureInboxUser(s, userId);
+    inbox.messages.push({
+      id: crypto.randomUUID(),
+      order_id: orderId,
+      from: "service",
+      text: `Спасибо за оценку заказа: ${n} из 5 ⭐`,
+      at: Date.now(),
+      read_by_user: true,
+      service_sender_name: "Сервис",
+    });
+    return { ok: true };
   });
 }
 

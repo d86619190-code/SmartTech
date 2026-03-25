@@ -33,6 +33,10 @@ export type ClientOrderMeta = {
   needsApproval: boolean;
   /** Этап для таймлайна; синхронизирован с тех. заявкой и согласованиями */
   clientStep: ClientOrderClientStep;
+  /** Заказ выдан (completed) и клиент ещё не ставил оценку */
+  canRateOrder?: boolean;
+  /** Уже поставленная оценка 1–5 */
+  myRating?: number;
   diagnosticFeeRub?: number;
   quoteOptions?: Array<{
     id: string;
@@ -58,16 +62,12 @@ function allTechRepairs(s: AppState): TechRepairJob[] {
   return [...st.repairs, ...st.completed];
 }
 
+/** Принят 0%, в работе 50%, готов/выдан 100% */
 function progressFromStage(stage: TechRepairStage): number {
-  const map: Record<TechRepairStage, number> = {
-    accepted: 18,
-    diagnostics: 32,
-    waiting_approval: 48,
-    repair: 72,
-    ready: 92,
-    completed: 100,
-  };
-  return map[stage] ?? 40;
+  if (stage === "accepted") return 0;
+  if (stage === "diagnostics" || stage === "waiting_approval" || stage === "repair") return 50;
+  if (stage === "ready" || stage === "completed") return 100;
+  return 0;
 }
 
 function estimateFromStage(stage: TechRepairStage): string {
@@ -183,6 +183,9 @@ export async function listClientRepairs(userId: string): Promise<ClientRepairDto
     for (const a of inbox.approvals) ids.add(a.order_id);
 
     const techJobs = allTechRepairs(s);
+    for (const j of techJobs) {
+      if (j.clientUserId === userId) ids.add(j.id);
+    }
     const byTechId = new Map(techJobs.map((j) => [j.id, j]));
 
     const rows: ClientRepairDto[] = [];
@@ -225,6 +228,8 @@ export async function getClientOrderMeta(userId: string, orderId: string): Promi
         issueSummary: tech.issue.length > 160 ? `${tech.issue.slice(0, 157)}…` : tech.issue,
         needsApproval,
         clientStep,
+        canRateOrder: tech.stage === "completed" && !tech.clientRatingStars,
+        myRating: tech.clientRatingStars,
         diagnosticFeeRub: 990,
         quoteOptions,
       };

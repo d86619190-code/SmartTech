@@ -5,6 +5,7 @@ import {
   getClientOrderMetaApi,
   getOrderMessagesApi,
   markOrderMessagesReadApi,
+  rateClientOrderApi,
   sendOrderMessageApi,
   type ChatMessage,
   type ClientOrderMeta,
@@ -32,6 +33,7 @@ export const ChatPage: React.FC = () => {
   const [text, setText] = React.useState("");
   const [pendingAttachment, setPendingAttachment] = React.useState<{ name: string; dataUrl: string } | null>(null);
   const [picking, setPicking] = React.useState(false);
+  const [ratingBusy, setRatingBusy] = React.useState(false);
   const { toast, showToast, closeToast } = useStatusToast();
   const presence = useUserPresence();
 
@@ -94,6 +96,36 @@ export const ChatPage: React.FC = () => {
     }, 250);
     return () => window.clearTimeout(t);
   }, [orderId, messages, presence]);
+
+  const reloadMeta = React.useCallback(async () => {
+    if (!orderId) return;
+    try {
+      const meta = await getClientOrderMetaApi(orderId);
+      setOrderMeta(meta);
+    } catch {
+      // noop
+    }
+  }, [orderId]);
+
+  const submitRating = React.useCallback(
+    async (stars: number) => {
+      if (!orderId || ratingBusy) return;
+      setRatingBusy(true);
+      try {
+        await rateClientOrderApi(orderId, stars);
+        showToast("success", "Спасибо за оценку");
+        await reloadMeta();
+        const data = await getOrderMessagesApi(orderId);
+        setMessages(data);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "Не удалось сохранить оценку";
+        showToast("error", msg);
+      } finally {
+        setRatingBusy(false);
+      }
+    },
+    [orderId, ratingBusy, reloadMeta, showToast],
+  );
 
   const send = async () => {
     if (!orderId || sending) return;
@@ -186,6 +218,30 @@ export const ChatPage: React.FC = () => {
               {streamStatusLabel(streamStatus)} · {presence === "online" ? "вы в сети" : "оффлайн"}
             </p>
             {loading ? <p className={cls.lead}>Загрузка...</p> : null}
+            {!orderMetaLoading && orderMeta?.canRateOrder ? (
+              <div className={cls.ratingPrompt}>
+                <p className={cls.ratingTitle}>Заказ выдан. Оцените работу сервиса:</p>
+                <div className={cls.starRow} role="group" aria-label="Оценка от 1 до 5">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      className={cls.starBtn}
+                      disabled={ratingBusy}
+                      aria-label={`${n} из 5`}
+                      onClick={() => void submitRating(n)}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {!orderMetaLoading && orderMeta?.myRating ? (
+              <p className={cls.ratedNote} role="status">
+                Ваша оценка: {orderMeta.myRating} из 5
+              </p>
+            ) : null}
             {messages.map((m, i) => (
               <div
                 key={`${m.id}-${i}`}

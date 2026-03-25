@@ -52,6 +52,8 @@ export type ClientOrderMeta = {
     | "in_repair"
     | "ready"
     | "completed";
+  canRateOrder?: boolean;
+  myRating?: number;
   diagnosticFeeRub?: number;
   quoteOptions?: Array<{
     id: string;
@@ -201,6 +203,15 @@ export async function getClientOrderMetaApi(orderId: string): Promise<ClientOrde
   if (!res.ok) throw new Error(await parseError(res));
   const body = (await res.json()) as { order: ClientOrderMeta };
   return body.order;
+}
+
+export async function rateClientOrderApi(orderId: string, stars: number): Promise<void> {
+  const res = await authorizedFetch(`/api/v1/client/orders/${orderId}/rate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ stars }),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
 }
 
 export async function createOrderApi(payload: CreateOrderPayload): Promise<{ incoming: { id: string; publicId: string } }> {

@@ -13,9 +13,10 @@ function stageClass(active: boolean): string {
   return active ? cls.stageActive : cls.stageInactive;
 }
 
+/** Принят: 0–49%, в работе: 50–99%, готов: 100% */
 function stageActiveFlags(progressPercent: number): [boolean, boolean, boolean] {
   const p = Math.min(100, Math.max(0, progressPercent));
-  return [p > 0, p >= 45, p >= 100];
+  return [p < 50, p >= 50 && p < 100, p >= 100];
 }
 
 type TrackingRepairCardProps = {
