@@ -1,0 +1,15 @@
+export { TechDashboardPage } from "./TechDashboardPage";
+export { TechIncomingPage } from "./TechIncomingPage";
+export { TechIncomingDetailPage } from "./TechIncomingDetailPage";
+export { TechRepairDetailPage } from "./TechRepairDetailPage";
+export { TechDiagnosticsPage } from "./TechDiagnosticsPage";
+export { TechPricePage } from "./TechPricePage";
+export { TechApprovalSendPage } from "./TechApprovalSendPage";
+export { TechTrackingPage } from "./TechTrackingPage";
+export { TechPartsPage } from "./TechPartsPage";
+export { TechTasksPage } from "./TechTasksPage";
+export { TechCompletedPage } from "./TechCompletedPage";
+export { TechMessagesPage } from "./TechMessagesPage";
+export { TechChatPage } from "./TechChatPage";
+export { TechProfilePage } from "./TechProfilePage";
+export { TechSettingsPage } from "./TechSettingsPage";

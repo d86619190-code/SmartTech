@@ -1,0 +1,75 @@
+:root {
+  /* Адаптив: один брейкпоинт для макета и выезжающего меню */
+  --breakpoint-mobile: 767px;
+  --sidebar-width: 280px;
+  --content-pad-x: 28px;
+  --content-pad-x-sm: 16px;
+
+  --color-sidebar-bg: #1e1e21;
+  --color-sidebar-hover: #2c2c30;
+  --color-sidebar-active: #353538;
+  --color-sidebar-text: #9a9ea3;
+  --color-sidebar-text-active: #f2f3f5;
+
+  --color-main-bg: #f4f4f4;
+  --color-card-bg: #ffffff;
+  --color-text-primary: #141619;
+  --color-text-secondary: #5c656d;
+  --color-text-muted: #8b949c;
+  --color-link: #5a6f7d;
+
+  --color-input-border: #d8dde0;
+  --color-input-bg: #ffffff;
+  --color-button-primary: #1c1f22;
+  --color-button-primary-hover: #2a2e33;
+
+  --color-order-card-border: #ebecee;
+  --color-order-row-border: #eef0f2;
+
+  --badge-completed-bg: #d9f3ef;
+  --badge-completed-fg: #0d6b5c;
+  --badge-canceled-bg: #fde4e8;
+  --badge-canceled-fg: #9b1c2e;
+  --badge-progress-bg: #ffe8d9;
+  --badge-progress-fg: #b45309;
+
+  --shadow-card: 0 12px 40px rgba(15, 23, 42, 0.06), 0 2px 8px rgba(15, 23, 42, 0.03);
+  --shadow-order-card: 0 1px 2px rgba(15, 23, 42, 0.04);
+
+  --radius-card: 14px;
+  --radius-card-large: 16px;
+  --radius-control: 10px;
+  --radius-sidebar-item: 8px;
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+
+  /* UI kit (отслеживание / карточки) — использовать по приложению */
+  --app-text-primary: #24282b;
+  --app-text-muted: #939496;
+  --app-border-soft: #dde1e4;
+  --app-btn-primary-bg: #24282b;
+  --app-btn-primary-text: #dde1e4;
+  --app-btn-secondary-bg: #efeff0;
+  --app-surface-page: #f3f4f6;
+
+  /* Переход между экранами: «шторка» / оверлей (тот же ряд, что кнопки) */
+  --page-transition-curtain: var(--color-button-primary);
+
+  /* Вертикальное «перелистывание» (не linear — кастомный cubic-bezier) */
+  --page-transition-duration: 0.68s;
+  --page-transition-duration-neutral: 0.48s;
+  --page-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Шторка: фаза накрытия и ухода (секунды, для синхронизации с JS fallback) */
+  --page-transition-curtain-in-duration: 0.52s;
+  --page-transition-curtain-out-duration: 0.55s;
+
+  /* Админ-панель: тот же тон, усиленный ритм как в референсе */
+  --admin-sidebar-w: var(--sidebar-width);
+  --admin-radius-xl: 20px;
+  --admin-radius-2xl: 24px;
+  --admin-content-max: 1280px;
+  --admin-shadow-elevated: 0 4px 24px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
+  --admin-surface-canvas: #f3f4f6;
+}

@@ -1,0 +1,68 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 20px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #fff;
+  background: var(--color-button-primary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.08s ease;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-button-primary-hover);
+}
+
+.outline {
+  color: var(--color-text-primary);
+  background: #fff;
+  border-color: var(--color-input-border);
+}
+
+.outline:hover:not(:disabled) {
+  background: #f8f9fa;
+  border-color: #cfd6db;
+}
+
+.ghost {
+  color: var(--color-text-secondary);
+  background: transparent;
+  border-color: transparent;
+}
+
+.ghost:hover:not(:disabled) {
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--color-text-primary);
+}
+
+.primary:active:not(:disabled),
+.outline:active:not(:disabled),
+.ghost:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.primary:focus-visible,
+.outline:focus-visible,
+.ghost:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.primary:disabled,
+.outline:disabled,
+.ghost:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.fullWidth {
+  width: 100%;
+}

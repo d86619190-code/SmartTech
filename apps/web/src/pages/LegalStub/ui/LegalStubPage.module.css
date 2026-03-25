@@ -1,0 +1,23 @@
+.shell {
+  flex: 1;
+  background: var(--color-main-bg);
+}
+
+.body {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 8px 28px 48px;
+}
+
+.p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 767px) {
+  .body {
+    padding: 8px var(--content-pad-x-sm) 40px;
+  }
+}

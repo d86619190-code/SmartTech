@@ -1,0 +1,57 @@
+.shell {
+  flex: 1;
+  background: var(--app-surface-page, var(--color-main-bg));
+}
+
+.inner {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: max(16px, env(safe-area-inset-top)) 24px 36px;
+}
+
+.title {
+  margin: 0 0 14px;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.cardWrap {
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .inner {
+    padding: max(12px, env(safe-area-inset-top)) var(--content-pad-x-sm) max(24px, env(safe-area-inset-bottom));
+  }
+
+  .title {
+    margin-bottom: 10px;
+    font-size: 28px;
+  }
+
+  .cardsGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.loginHint {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.loginLink {
+  color: var(--color-link);
+  font-weight: 700;
+}

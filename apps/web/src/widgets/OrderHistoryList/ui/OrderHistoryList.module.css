@@ -1,0 +1,31 @@
+.card {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 28px 32px 20px;
+  background: #f7f9fb;
+  border: 1px solid #e1e6ec;
+  border-radius: 22px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+}
+
+.sectionLabel {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #4b5563;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 22px 18px 16px;
+  }
+}

@@ -1,0 +1,6 @@
+.root {
+  background: var(--color-card-bg);
+  border-radius: var(--admin-radius-xl);
+  box-shadow: var(--admin-shadow-elevated);
+  border: 1px solid var(--color-order-card-border);
+}

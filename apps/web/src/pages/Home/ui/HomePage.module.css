@@ -1,0 +1,442 @@
+.shell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-bottom: 48px;
+  background:
+    radial-gradient(90% 58% at -8% -12%, rgba(100, 116, 139, 0.14), transparent 60%),
+    radial-gradient(80% 50% at 110% -14%, rgba(30, 41, 59, 0.1), transparent 58%),
+    var(--color-main-bg);
+}
+
+.inner {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: max(24px, env(safe-area-inset-top)) 28px 0;
+}
+
+.hero {
+  margin-bottom: 14px;
+}
+
+.welcome {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  letter-spacing: -0.01em;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: clamp(34px, 4.4vw, 46px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.repairPanel {
+  margin: 16px 0 18px;
+}
+
+.repairTitle {
+  margin: 0 0 12px;
+  font-size: 34px;
+  letter-spacing: -0.03em;
+  color: #111827;
+}
+
+.emptyTrackingMessage {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.singleTrackingCard {
+  width: 100%;
+}
+
+.trackingScrollViewport {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+
+.trackingScrollTrack {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  width: max-content;
+  min-width: 100%;
+}
+
+.trackingScrollItem {
+  flex: 0 0 auto;
+  width: min(588px, calc(100vw - 96px));
+  min-width: 360px;
+  max-width: 100%;
+}
+
+.repairCard {
+  border: 1px solid #e7ebf0;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  padding: 14px;
+}
+
+.repairMain {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.repairThumb {
+  border-radius: 14px;
+  border: 1px solid #d7dde5;
+  background: #f4f6f9;
+  min-height: 112px;
+  width: 112px;
+  height: 112px;
+  object-fit: cover;
+}
+
+.repairCopy {
+  min-width: 0;
+}
+
+.repairDevice {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.repairIssue {
+  margin: 4px 0 8px;
+  font-size: 14px;
+  color: #5b6570;
+}
+
+.progressTrack {
+  height: 8px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.progressFill {
+  display: block;
+  width: 66%;
+  height: 100%;
+  border-radius: inherit;
+  background: #1f2937;
+}
+
+.progressMeta {
+  margin-top: 6px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.repairEta {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.repairActions {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.emptyRepair {
+  margin: 0;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 14px;
+  margin-bottom: 28px;
+  align-items: stretch;
+}
+
+.benefits {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.benefitsCard {
+  min-height: 100%;
+}
+
+.benefitsHeading {
+  margin: 0 0 12px;
+  font-size: 30px;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+
+.benefitItem {
+  position: relative;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 10px 12px 10px 30px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #334155;
+  border: 1px solid #e4e8ee;
+  border-radius: 12px;
+  background: #fbfdff;
+}
+
+.benefitItem::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-radius: 999px;
+  background: var(--color-button-primary);
+  box-shadow: 0 0 0 3px rgba(28, 31, 34, 0.15);
+}
+
+.benefitText {
+  display: block;
+}
+
+.lead {
+  margin: 0;
+  min-height: 100%;
+}
+
+.section {
+  margin-bottom: 28px;
+  padding: 22px;
+  border-radius: 20px;
+  border: 1px solid #e4e8ee;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.sectionTitle {
+  margin: 0 0 14px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+}
+
+.card {
+  padding: 20px 20px 18px;
+  margin-bottom: 16px;
+  background: #fff;
+  border: 1px solid #e4e8ee;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.cardTitle {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.cardMuted {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.addressRow {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mapWrap {
+  margin-top: 14px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #e4e8ee;
+  background: #f8fafc;
+}
+
+.mapFrame {
+  display: block;
+  width: 100%;
+  height: 280px;
+  border: 0;
+}
+
+.addressText {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.trustGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.stat {
+  padding: 14px;
+  text-align: left;
+  background: #f6f7f8;
+  border-radius: 12px;
+}
+
+.statVal {
+  display: block;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+}
+
+.statLabel {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.sectionHeading {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 767px) {
+  .inner {
+    padding: max(12px, env(safe-area-inset-top)) var(--content-pad-x-sm) 0;
+    padding-bottom: 32px;
+  }
+
+  .hero {
+    margin-bottom: 22px;
+  }
+
+  .title {
+    font-size: 34px;
+  }
+
+  .repairPanel {
+    padding: 0;
+  }
+
+  .repairTitle {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .trackingScrollTrack {
+    gap: 10px;
+  }
+
+  .trackingScrollItem {
+    width: calc(100vw - (var(--content-pad-x-sm) * 2));
+    min-width: calc(100vw - (var(--content-pad-x-sm) * 2));
+  }
+
+  .repairCard {
+    padding: 12px;
+  }
+
+  .repairMain {
+    grid-template-columns: 84px 1fr;
+    gap: 10px;
+  }
+
+  .repairThumb {
+    min-height: 84px;
+    width: 84px;
+    height: 84px;
+  }
+
+  .repairDevice {
+    font-size: 22px;
+  }
+
+  .repairActions {
+    grid-template-columns: 1fr;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+    margin-bottom: 22px;
+  }
+
+  .benefits {
+    grid-template-columns: 1fr;
+  }
+
+  .benefitsHeading {
+    font-size: 23px;
+  }
+
+  .trustGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .mapFrame {
+    height: 220px;
+  }
+
+  .card {
+    padding: 16px 16px 14px;
+  }
+}

@@ -1,0 +1,55 @@
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 28px 12px;
+  flex-shrink: 0;
+  background: var(--admin-surface-canvas);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatarLink {
+  display: block;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid #fff;
+  box-shadow: var(--shadow-order-card);
+  transition: transform 0.08s ease, box-shadow 0.15s ease;
+}
+
+.avatarLink:hover {
+  transform: scale(1.04);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+}
+
+.avatarLink:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: linear-gradient(145deg, #e8eaed, #d1d5db);
+}
+
+@media (max-width: 767px) {
+  .root {
+    padding: 12px max(68px, calc(46px + 10px + env(safe-area-inset-right))) 8px 16px;
+  }
+}

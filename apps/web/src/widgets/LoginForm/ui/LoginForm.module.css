@@ -1,0 +1,141 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.orRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 2px 0 0;
+}
+
+.orLine {
+  flex: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--color-muted, #94a3b8) 45%, transparent);
+}
+
+.orText {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted, #64748b);
+  text-transform: lowercase;
+}
+
+.googleWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.googleButtonHost {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.googleButtonHost[data-disabled="true"] {
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.googleHint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-muted, #64748b);
+}
+
+.googleHint .code {
+  font-size: 12px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-muted, #64748b) 12%, transparent);
+}
+
+.googleError {
+  margin: 0;
+  font-size: 13px;
+  color: #b91c1c;
+}
+
+.googleAltBtn {
+  border: 1px solid color-mix(in srgb, var(--color-muted, #64748b) 35%, transparent);
+  background: var(--color-surface, #fff);
+  color: var(--color-text, #111827);
+  border-radius: 12px;
+  min-height: 42px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.devCode {
+  margin: -6px 0 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-link);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.linkButton {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-link);
+  cursor: pointer;
+}
+
+.linkButton:hover {
+  text-decoration: underline;
+}
+
+.link:hover {
+  color: #3d5566;
+  text-decoration: underline;
+}
+
+.link:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (max-width: 767px) {
+  .footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .footer .link {
+    text-align: center;
+    padding: 8px 0;
+  }
+}

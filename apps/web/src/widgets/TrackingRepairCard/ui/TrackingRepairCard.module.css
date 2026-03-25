@@ -1,0 +1,302 @@
+/*
+  Сетка карточки 588px:
+  28 pad | 182 фото | 58 зазор | 292 текст | 28 pad
+  Вертикаль: фото и текстовый блок выровнены по центру (визуально спокойнее, чем «висящий» offset).
+*/
+
+.root {
+  --pad-x: 28px;
+  --pad-y: 22px;
+  --thumb: 182px;
+  --col-gap: 58px;
+  --text-w: 292px;
+  --text-min-h: 157px;
+  --text-radius: 30px;
+  --text-pad-x: 14px;
+  --text-pad-y: 12px;
+  --stack-gap: 10px;
+  --actions-gap: 15px;
+  --actions-mt: 45px;
+
+  box-sizing: border-box;
+  width: 588px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  padding: var(--pad-y) var(--pad-x);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  font-family: var(--font-sans);
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(36, 40, 43, 0.08), 0 2px 8px rgba(36, 40, 43, 0.04);
+  overflow: visible;
+}
+
+.rootFullWidth {
+  width: 100%;
+}
+
+.cardHeading {
+  flex-shrink: 0;
+  margin: 0 0 16px;
+  width: 100%;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-align: left;
+  color: var(--app-text-primary);
+}
+
+.mainRow {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--col-gap);
+  width: 100%;
+  min-height: var(--thumb);
+}
+
+.thumb {
+  flex-shrink: 0;
+  width: var(--thumb);
+  height: var(--thumb);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eef0f2;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.textCol {
+  box-sizing: border-box;
+  flex: 0 0 var(--text-w);
+  width: var(--text-w);
+  min-width: 0;
+  min-height: var(--text-min-h);
+  height: auto;
+  padding: var(--text-pad-y) var(--text-pad-x);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--stack-gap);
+  border-radius: var(--text-radius);
+  background: transparent;
+  overflow: hidden;
+}
+
+.device {
+  margin: 0;
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  text-align: left;
+  color: var(--app-text-primary);
+}
+
+.issue {
+  margin: 0;
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  text-align: left;
+  color: var(--app-text-primary);
+}
+
+.progressBlock {
+  --stages-count: 3;
+  --edge-offset: calc(50% / var(--stages-count));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.progressLabel {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  text-align: left;
+  color: var(--app-text-primary);
+}
+
+.barTrack {
+  height: 8px;
+  margin: 0 var(--edge-offset);
+  border-radius: 999px;
+  background: var(--app-border-soft);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--app-btn-primary-bg);
+  transition: width 0.35s ease;
+}
+
+.stages {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 10px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.stageActive {
+  color: var(--app-text-primary);
+}
+
+.stageInactive {
+  color: var(--app-text-muted);
+}
+
+/* После блока прогресса до Estimate — 25px (gap 10 + margin-top 15) */
+.estimate {
+  margin: 15px 0 0;
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-align: left;
+  color: var(--app-text-primary);
+}
+
+.actions {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--actions-gap);
+  width: 100%;
+  margin-top: var(--actions-mt);
+}
+
+.btnPrimary,
+.btnSecondary {
+  box-sizing: border-box;
+  width: 250px;
+  max-width: 100%;
+  height: 45px;
+  padding: 0 12px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.08s ease;
+}
+
+.btnPrimary {
+  color: var(--app-btn-primary-text);
+  background: var(--app-btn-primary-bg);
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+.btnPrimary:hover {
+  opacity: 0.92;
+}
+
+.btnPrimary:active {
+  transform: translateY(1px);
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.btnSecondary {
+  color: var(--app-text-primary);
+  background: var(--app-btn-secondary-bg);
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.btnSecondary:hover {
+  filter: brightness(0.98);
+}
+
+.btnSecondary:active {
+  transform: translateY(1px);
+}
+
+.btnSecondary:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  .root {
+    width: 100%;
+    padding: 18px 16px;
+  }
+
+  .mainRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    min-height: 0;
+  }
+
+  .thumb {
+    align-self: center;
+  }
+
+  .textCol {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    min-height: var(--text-min-h);
+  }
+
+  .barTrack {
+    margin: 0;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: var(--actions-mt);
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    width: 100%;
+    max-width: none;
+  }
+}

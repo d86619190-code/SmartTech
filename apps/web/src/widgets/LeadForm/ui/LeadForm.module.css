@@ -1,0 +1,35 @@
+.root {
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e4e8ee;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.heading {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+}
+
+.sub {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #475569;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cta {
+
+  margin-top:130px;
+  min-height: 50px;
+  font-size: 15px;
+}

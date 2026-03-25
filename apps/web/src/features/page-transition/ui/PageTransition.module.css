@@ -1,0 +1,295 @@
+.root {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  position: relative;
+}
+
+.rootIdle {
+  display: block;
+}
+
+.rootTransitioning {
+  min-height: 100%;
+  flex: 1;
+  align-self: stretch;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.layer {
+  width: 100%;
+  will-change: transform;
+}
+
+.rootTransitioning .layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.from {
+  z-index: 1;
+}
+
+.to {
+  z-index: 2;
+}
+
+/* Вперёд по меню: старый уезжает влево, новый заезжает справа */
+.exitForward {
+  animation: exitForward var(--page-transition-duration) var(--page-transition-easing) forwards;
+}
+
+.enterForward {
+  animation: enterForward var(--page-transition-duration) var(--page-transition-easing) forwards;
+}
+
+.exitBackward {
+  animation: exitBackward var(--page-transition-duration) var(--page-transition-easing) forwards;
+}
+
+.enterBackward {
+  animation: enterBackward var(--page-transition-duration) var(--page-transition-easing) forwards;
+}
+
+.exitNeutral {
+  animation: exitNeutral var(--page-transition-duration-neutral) var(--page-transition-easing) forwards;
+}
+
+.enterNeutral {
+  animation: enterNeutral var(--page-transition-duration-neutral) var(--page-transition-easing) forwards;
+}
+
+@keyframes exitForward {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes enterForward {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes exitBackward {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes enterBackward {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes exitNeutral {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+}
+
+@keyframes enterNeutral {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Десктоп: шторка --page-transition-curtain */
+.rootTransitioningCurtain {
+  position: relative;
+  min-height: 100%;
+  flex: 1;
+  align-self: stretch;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.pageLayer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.curtain {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-color: var(--page-transition-curtain);
+  will-change: transform;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
+}
+
+.curtainInForward {
+  animation: curtainInFromTop var(--page-transition-curtain-in-duration) var(--page-transition-easing) forwards;
+}
+
+.curtainOutForward {
+  animation: curtainOutToBottom var(--page-transition-curtain-out-duration) var(--page-transition-easing) forwards;
+}
+
+.curtainInBackward {
+  animation: curtainInFromBottom var(--page-transition-curtain-in-duration) var(--page-transition-easing) forwards;
+}
+
+.curtainOutBackward {
+  animation: curtainOutToTop var(--page-transition-curtain-out-duration) var(--page-transition-easing) forwards;
+}
+
+.curtainInNeutral {
+  animation: curtainInFromTop var(--page-transition-curtain-in-duration) var(--page-transition-easing) forwards;
+}
+
+.curtainOutNeutral {
+  animation: curtainOutToBottom var(--page-transition-curtain-out-duration) var(--page-transition-easing) forwards;
+}
+
+@keyframes curtainInFromTop {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes curtainOutToBottom {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes curtainInFromBottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes curtainOutToTop {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .curtainInForward,
+  .curtainOutForward,
+  .curtainInBackward,
+  .curtainOutBackward,
+  .curtainInNeutral,
+  .curtainOutNeutral {
+    animation-duration: 0.08s !important;
+    animation-timing-function: ease !important;
+  }
+
+  .exitForward,
+  .enterForward,
+  .exitBackward,
+  .enterBackward,
+  .exitNeutral,
+  .enterNeutral {
+    animation-duration: 0.12s !important;
+    animation-timing-function: ease !important;
+  }
+
+  @keyframes exitForward {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes enterForward {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes exitBackward {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes enterBackward {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes exitNeutral {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes enterNeutral {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

@@ -1,0 +1,42 @@
+.shell {
+  flex: 1;
+  background: var(--color-main-bg);
+}
+
+.inner {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: max(18px, env(safe-area-inset-top)) 28px 32px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.hint a {
+  color: var(--color-link);
+  font-weight: 700;
+}
+
+.title {
+  margin: 0 0 18px;
+  font-size: clamp(36px, 5vw, 58px);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  color: #1f2937;
+}
+
+@media (max-width: 767px) {
+  .inner {
+    padding: max(10px, env(safe-area-inset-top)) var(--content-pad-x-sm) max(24px, env(safe-area-inset-bottom));
+  }
+
+  .title {
+    margin-bottom: 12px;
+    font-size: 40px;
+  }
+}

@@ -1,0 +1,75 @@
+.root {
+  width: 100%;
+  max-width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+.viewport {
+  --slide-gap: 12px;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: var(--slide-gap);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pinch-zoom;
+  cursor: grab;
+  user-select: none;
+  -webkit-overflow-scrolling: touch;
+  /* скроллбар скрыт — листание жестом / drag */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.viewport.dragging {
+  scroll-behavior: auto;
+  cursor: grabbing;
+  touch-action: none;
+}
+
+.slide {
+  box-sizing: border-box;
+  flex: 0 0 min(588px, 100%);
+  width: min(588px, 100%);
+  min-width: 0;
+  min-height: min-content;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewport {
+    scroll-behavior: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .root {
+    padding: 0 4px;
+  }
+
+  .viewport {
+    --slide-gap: 8px;
+  }
+
+  .slide {
+    flex: 0 0 min(588px, calc(100vw - 24px));
+    width: min(588px, calc(100vw - 24px));
+  }
+}

@@ -1,0 +1,10 @@
+{
+    "name": "evrenyan-mobile",
+    "version": "1.0.0",
+    "devDependencies": {
+        "@capacitor/android": "^8.2.0",
+        "@capacitor/cli": "^8.2.0",
+        "@capacitor/core": "^8.2.0",
+        "typescript": "^6.0.2"
+    }
+}
