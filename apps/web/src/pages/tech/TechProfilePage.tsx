@@ -1,4 +1,5 @@
 import * as React from "react";
+import { SkeletonKpiGrid } from "@/shared/ui/Skeleton";
 import { techApi } from "@/shared/lib/techApi";
 import { formatRub } from "@/shared/lib/formatMoney";
 import { TechCard, TechPageHeader } from "@/widgets/technician";
@@ -12,7 +13,14 @@ export const TechProfilePage: React.FC = () => {
       setTechProfile(res.profile);
     })();
   }, []);
-  if (!techProfile) return <TechPageHeader title="Профиль" subtitle="Загрузка..." />;
+  if (!techProfile) {
+    return (
+      <>
+        <TechPageHeader title="Профиль" subtitle="Загрузка…" />
+        <SkeletonKpiGrid count={5} />
+      </>
+    );
+  }
   return (
     <>
       <TechPageHeader title="Профиль" subtitle="Показатели и репутация мастера." />

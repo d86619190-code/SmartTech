@@ -2,6 +2,7 @@ import * as React from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { getAdminMockUserByIdApi } from "@/shared/lib/adminPanelApi";
 import { Button } from "@/shared/ui/Button/Button";
+import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { AdminCard, AdminPageHeader, AdminTable, AdminTd, AdminTh } from "@/widgets/admin";
 import cls from "./adminPages.module.css";
 
@@ -39,7 +40,14 @@ export const AdminUserDetailPage: React.FC = () => {
     })();
   }, [userId]);
   if (notFound) return <Navigate to="/admin/users" replace />;
-  if (!user) return <AdminPageHeader title="Карточка клиента" subtitle="Загрузка..." />;
+  if (!user) {
+    return (
+      <>
+        <AdminPageHeader title="Карточка клиента" subtitle="Загрузка…" />
+        <SkeletonCard rows={6} />
+      </>
+    );
+  }
 
   const activity = ACTIVITY[user.id] ?? ["Нет записей активности."];
   const orders = ORDERS_SUMMARY[user.id] ?? [];

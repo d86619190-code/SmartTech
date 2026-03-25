@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { techApi } from "@/shared/lib/techApi";
 import { downloadDataUrl, MAX_DIAGNOSTIC_PHOTO_BYTES, mimeFromDataUrl, pickFiles } from "@/shared/lib/deviceFiles";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
+import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { Button } from "@/shared/ui/Button/Button";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
 import { AdminInput } from "@/widgets/admin";
@@ -31,7 +32,14 @@ export const TechDiagnosticsPage: React.FC = () => {
     })();
   }, [repairId]);
   if (!repairId) return <Navigate to="/tech/tasks" replace />;
-  if (!job) return <TechPageHeader title="Диагностика" subtitle="Загрузка..." />;
+  if (!job) {
+    return (
+      <>
+        <TechPageHeader title="Диагностика" subtitle="Загрузка…" />
+        <SkeletonCard rows={5} />
+      </>
+    );
+  }
 
   const displayCount = serverPhotoUrls.length + pendingPhotoUrls.length;
 

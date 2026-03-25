@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { SkeletonCard, SkeletonProfileHero } from "@/shared/ui/Skeleton";
 import { PageHeader } from "@/widgets/PageHeader";
 import { Button } from "@/shared/ui/Button/Button";
 import { getMe, logoutCurrentSession, updateMe } from "@/shared/lib/authApi";
@@ -225,7 +226,10 @@ export const ProfilePage: React.FC = () => {
     return (
       <div className={cls.shell}>
         <PageHeader title="Профиль" />
-        <div className={cls.body}>Загрузка профиля...</div>
+        <div className={cls.body}>
+          <SkeletonProfileHero />
+          <SkeletonCard rows={4} />
+        </div>
       </div>
     );
   }

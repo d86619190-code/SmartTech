@@ -10,6 +10,7 @@ import {
 import { SITE } from "@/shared/config/siteContacts";
 import { getClientRepairsApi } from "@/shared/lib/clientInboxApi";
 import { readAuthSession } from "@/shared/lib/authSession";
+import { SkeletonTrackingCards } from "@/shared/ui/Skeleton";
 import { Button } from "@/shared/ui/Button/Button";
 import { FaqAccordion } from "@/widgets/FaqAccordion";
 import { GuaranteeBlock } from "@/widgets/GuaranteeBlock";
@@ -64,7 +65,9 @@ export const HomePage: React.FC = () => {
 
         <section className={cls.repairPanel} aria-label="Отслеживание">
           {auth && trackingLoading ? (
-            <p className={cls.emptyTrackingMessage}>Загрузка статусов…</p>
+            <div className={cls.emptyTrackingMessage} style={{ padding: 18 }}>
+              <SkeletonTrackingCards count={1} />
+            </div>
           ) : !hasActiveRepairs ? (
             <p className={cls.emptyTrackingMessage}>
               Сейчас у вас нет активного ремонта. Оставьте заявку, и мы сразу примем устройство в работу.

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
+import { SkeletonCard, SkeletonKpiGrid } from "@/shared/ui/Skeleton";
 import { techApi } from "@/shared/lib/techApi";
 import { formatRub } from "@/shared/lib/formatMoney";
 import { Button } from "@/shared/ui/Button/Button";
@@ -12,7 +13,15 @@ export const TechDashboardPage: React.FC = () => {
   React.useEffect(() => {
     void (async () => setData(await techApi.getDashboard()))();
   }, []);
-  if (!data) return <TechPageHeader title="Рабочий стол" subtitle="Загрузка..." />;
+  if (!data) {
+    return (
+      <>
+        <TechPageHeader title="Рабочий стол" subtitle="Загрузка данных…" />
+        <SkeletonKpiGrid count={4} />
+        <SkeletonCard rows={6} />
+      </>
+    );
+  }
   const active = data.active;
 
   return (

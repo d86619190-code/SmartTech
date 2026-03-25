@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import type { TechRepairStage } from "@/entities/technician";
 import { techApi } from "@/shared/lib/techApi";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
+import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { Button } from "@/shared/ui/Button/Button";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
 import { AdminSelect } from "@/widgets/admin";
@@ -26,7 +27,14 @@ export const TechTrackingPage: React.FC = () => {
   }, [repairId]);
 
   if (!repairId) return <Navigate to="/tech/tasks" replace />;
-  if (!baseJob) return <TechPageHeader title="Этапы ремонта" subtitle="Загрузка..." />;
+  if (!baseJob) {
+    return (
+      <>
+        <TechPageHeader title="Этапы ремонта" subtitle="Загрузка…" />
+        <SkeletonCard rows={5} />
+      </>
+    );
+  }
   const current = stage ?? baseJob.stage;
 
   const save = async () => {

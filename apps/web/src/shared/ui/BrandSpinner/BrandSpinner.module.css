@@ -1,0 +1,110 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.track {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.orbitDot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  background: var(--brand-loader-ash);
+  transform: rotate(calc(var(--i) * 45deg)) translateY(var(--orbit-r));
+  transform-origin: center;
+  animation: snakeDot 0.95s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.09s);
+}
+
+.trackSm {
+  width: 26px;
+  height: 26px;
+  --orbit-r: -11px;
+}
+
+.trackSm .orbitDot {
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+}
+
+.trackMd {
+  width: 40px;
+  height: 40px;
+  --orbit-r: -17px;
+}
+
+.trackMd .orbitDot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+}
+
+.trackLg {
+  width: 52px;
+  height: 52px;
+  --orbit-r: -22px;
+}
+
+.trackLg .orbitDot {
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+}
+
+.onDark .orbitDot {
+  animation-name: snakeDotDark;
+}
+
+@keyframes snakeDot {
+  0%,
+  100% {
+    background: var(--brand-loader-ash);
+    opacity: 0.45;
+    transform: rotate(calc(var(--i) * 45deg)) translateY(var(--orbit-r)) scale(0.92);
+  }
+  40% {
+    background: var(--brand-loader-charcoal);
+    opacity: 1;
+    transform: rotate(calc(var(--i) * 45deg)) translateY(var(--orbit-r)) scale(1.05);
+  }
+}
+
+@keyframes snakeDotDark {
+  0%,
+  100% {
+    background: var(--brand-loader-mist);
+    opacity: 0.5;
+    transform: rotate(calc(var(--i) * 45deg)) translateY(var(--orbit-r)) scale(0.92);
+  }
+  40% {
+    background: #1a1d21;
+    opacity: 1;
+    transform: rotate(calc(var(--i) * 45deg)) translateY(var(--orbit-r)) scale(1.05);
+  }
+}
+
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px 20px;
+  width: 100%;
+}
+
+.label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}

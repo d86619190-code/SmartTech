@@ -18,6 +18,7 @@ import { useOrderMessagesSse } from "@/shared/lib/realtime/useSseStreams";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
 import { ChatAttachment } from "@/shared/ui/ChatAttachment";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
+import { TypingIndicator } from "@/shared/ui/TypingIndicator";
 import { PageHeader } from "@/widgets/PageHeader";
 import cls from "./clientPages.module.css";
 
@@ -182,7 +183,7 @@ export const ChatPage: React.FC = () => {
     <div className={cls.shell}>
       <PageHeader
         title={orderMetaLoading ? "…" : orderMeta?.deviceLabel ?? "Чат"}
-        subtitle={orderMetaLoading ? "Загрузка…" : `${masterName} · ${orderMeta?.issueSummary ?? ""}`}
+        subtitle={orderMetaLoading ? "" : `${masterName} · ${orderMeta?.issueSummary ?? ""}`}
       />
       <div className={cls.body}>
         <Link to="/messages" className={cls.backCircle} aria-label="К списку диалогов" title="К списку диалогов">
@@ -217,7 +218,7 @@ export const ChatPage: React.FC = () => {
             <p className={cls.streamStatus}>
               {streamStatusLabel(streamStatus)} · {presence === "online" ? "вы в сети" : "оффлайн"}
             </p>
-            {loading ? <p className={cls.lead}>Загрузка...</p> : null}
+            {loading ? <TypingIndicator label="Мастер печатает" /> : null}
             {!orderMetaLoading && orderMeta?.canRateOrder ? (
               <div className={cls.ratingPrompt}>
                 <p className={cls.ratingTitle}>Заказ выдан. Оцените работу сервиса:</p>

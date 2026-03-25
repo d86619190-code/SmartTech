@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { clientRepairToTrackingCard } from "@/entities/tracking";
 import { getClientRepairsApi } from "@/shared/lib/clientInboxApi";
 import { readAuthSession } from "@/shared/lib/authSession";
+import { SkeletonTrackingCards } from "@/shared/ui/Skeleton";
+import { PageHeader } from "@/widgets/PageHeader";
 import { TrackingRepairCard } from "@/widgets/TrackingRepairCard";
 import cls from "./TrackingPage.module.css";
 
@@ -52,7 +54,7 @@ export const TrackingPage: React.FC = () => {
     return (
       <div className={cls.shell}>
         <div className={cls.inner}>
-          <h1 className={cls.title}>Отслеживание</h1>
+          <PageHeader embedded title="Отслеживание" />
           <p className={cls.loginHint}>
             Войдите в аккаунт, чтобы видеть статусы ремонтов.{" "}
             <Link className={cls.loginLink} to="/login">
@@ -67,9 +69,9 @@ export const TrackingPage: React.FC = () => {
   return (
     <div className={cls.shell}>
       <div className={cls.inner}>
-        <h1 className={cls.title}>Отслеживание</h1>
+        <PageHeader embedded title="Отслеживание" subtitle="Статусы ваших ремонтов." />
         {loading ? (
-          <p className={cls.loginHint}>Загрузка…</p>
+          <SkeletonTrackingCards count={2} />
         ) : cards.length === 0 ? (
           <p className={cls.loginHint}>Пока нет заказов для отображения.</p>
         ) : (

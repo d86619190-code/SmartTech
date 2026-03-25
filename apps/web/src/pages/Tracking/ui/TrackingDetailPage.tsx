@@ -5,6 +5,7 @@ import { SITE } from "@/shared/config/siteContacts";
 import { readAuthSession } from "@/shared/lib/authSession";
 import { getClientOrderMetaApi } from "@/shared/lib/clientInboxApi";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
+import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { Button } from "@/shared/ui/Button/Button";
 import { PageHeader } from "@/widgets/PageHeader";
 import { OrderStagePanel } from "@/widgets/OrderStagePanel";
@@ -90,7 +91,7 @@ export const TrackingDetailPage: React.FC = () => {
     return (
       <div className={cls.shell}>
         <div className={cls.inner}>
-          <h1 className={cls.pageTitle}>Отслеживание</h1>
+          <PageHeader embedded title="Отслеживание" />
           <p className={cls.loginHint}>
             Войдите в аккаунт, чтобы видеть статус ремонта.{" "}
             <Link className={cls.loginLink} to="/login">
@@ -105,9 +106,10 @@ export const TrackingDetailPage: React.FC = () => {
   if (metaLoading) {
     return (
       <div className={cls.shell}>
-        <PageHeader title="…" subtitle="Отслеживание заказа" />
+        <PageHeader maxWidth="narrow" title="Заказ" subtitle="Отслеживание" />
         <div className={cls.body}>
-          <p className={cls.mutedLead}>Загрузка…</p>
+          <SkeletonCard rows={3} />
+          <SkeletonCard rows={4} />
         </div>
       </div>
     );
@@ -116,7 +118,7 @@ export const TrackingDetailPage: React.FC = () => {
   if (metaError || !meta) {
     return (
       <div className={cls.shell}>
-        <PageHeader title="Заказ" />
+        <PageHeader maxWidth="narrow" title="Заказ" />
         <div className={cls.body}>
           <p className={cls.mutedLead}>Заказ не найден или нет доступа.</p>
           <Button type="button" variant="outline" onClick={() => navigate("/tracking")}>
@@ -130,7 +132,7 @@ export const TrackingDetailPage: React.FC = () => {
   if (!order) {
     return (
       <div className={cls.shell}>
-        <PageHeader title={meta.deviceLabel} subtitle="Отслеживание заказа" />
+        <PageHeader maxWidth="narrow" title={meta.deviceLabel} subtitle="Отслеживание заказа" />
         <div className={cls.body}>
           <section className={cls.card} aria-label="Устройство">
             <p className={cls.deviceIssue}>{meta.issueSummary}</p>
@@ -159,7 +161,7 @@ export const TrackingDetailPage: React.FC = () => {
 
   return (
     <div className={cls.shell}>
-      <PageHeader title={`${order.deviceLabel}`} subtitle="Отслеживание заказа" />
+      <PageHeader maxWidth="narrow" title={`${order.deviceLabel}`} subtitle="Отслеживание заказа" />
       <div className={cls.body}>
         <section className={cls.card} aria-label="Устройство">
           <div className={cls.deviceRow}>

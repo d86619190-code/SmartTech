@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { techApi } from "@/shared/lib/techApi";
 import { formatRub } from "@/shared/lib/formatMoney";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
+import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { Button } from "@/shared/ui/Button/Button";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
 import { TechCard, TechPageHeader } from "@/widgets/technician";
@@ -22,7 +23,14 @@ export const TechApprovalSendPage: React.FC = () => {
     })();
   }, [repairId]);
   if (!repairId) return <Navigate to="/tech/tasks" replace />;
-  if (!job) return <TechPageHeader title="Отправить на согласование" subtitle="Загрузка..." />;
+  if (!job) {
+    return (
+      <>
+        <TechPageHeader title="Отправить на согласование" subtitle="Загрузка…" />
+        <SkeletonCard rows={4} />
+      </>
+    );
+  }
   const total = job.laborRub + job.partsRub;
   const alreadySent = job.stage === "waiting_approval";
 

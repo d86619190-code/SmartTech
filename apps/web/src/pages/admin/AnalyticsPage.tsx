@@ -1,4 +1,5 @@
 import * as React from "react";
+import { SkeletonCard, SkeletonKpiGrid } from "@/shared/ui/Skeleton";
 import { getAdminAnalyticsApi } from "@/shared/lib/adminPanelApi";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
 import { AdminCard, AdminPageHeader, AdminSelect, ChartPlaceholder } from "@/widgets/admin";
@@ -193,7 +194,15 @@ export const AdminAnalyticsPage: React.FC = () => {
   const repeatClients = Array.from(customerFrequency.entries()).filter(([, count]) => count > 1).length;
   const selectedAverageCheck = Math.round(selectedRevenue / Math.max(scopeOrders.length, 1));
 
-  if (!data) return <AdminPageHeader title="Аналитика" subtitle="Загрузка..." />;
+  if (!data) {
+    return (
+      <>
+        <AdminPageHeader title="Аналитика" subtitle="Загрузка данных…" />
+        <SkeletonKpiGrid count={4} />
+        <SkeletonCard rows={8} />
+      </>
+    );
+  }
 
   return (
     <>

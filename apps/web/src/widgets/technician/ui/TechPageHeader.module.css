@@ -1,15 +1,19 @@
 .root {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 28px;
-  padding-top: 8px;
+  padding-top: 12px;
+  width: 100%;
 }
 
 .text {
   min-width: 0;
+  flex: 1;
+  text-align: left;
 }
 
 .title {
@@ -33,6 +37,8 @@
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 @media (max-width: 767px) {

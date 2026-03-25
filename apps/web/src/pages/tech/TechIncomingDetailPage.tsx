@@ -2,6 +2,7 @@ import * as React from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { techApi } from "@/shared/lib/techApi";
 import { downloadDataUrl, mimeFromDataUrl, pickPhotos } from "@/shared/lib/deviceFiles";
+import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { Button } from "@/shared/ui/Button/Button";
 import { AdminInput, AdminSelect } from "@/widgets/admin";
 import { TechCard, TechModal, TechPageHeader } from "@/widgets/technician";
@@ -66,7 +67,14 @@ export const TechIncomingDetailPage: React.FC = () => {
   };
 
   if (!requestId) return <Navigate to="/tech/incoming" replace />;
-  if (!req) return <TechPageHeader title="Загрузка..." subtitle="Входящая заявка" />;
+  if (!req) {
+    return (
+      <>
+        <TechPageHeader title="Входящая заявка" subtitle="Загрузка…" />
+        <SkeletonCard rows={6} />
+      </>
+    );
+  }
 
   const confirmAccept = async () => {
     setModal(null);

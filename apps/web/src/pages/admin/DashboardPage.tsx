@@ -11,6 +11,7 @@ import {
   ChartPlaceholder,
   KpiCard,
 } from "@/widgets/admin";
+import { SkeletonCard, SkeletonKpiGrid } from "@/shared/ui/Skeleton";
 import { getAdminDashboardApi } from "@/shared/lib/adminPanelApi";
 import { formatRub } from "@/shared/lib/formatMoney";
 import cls from "./adminPages.module.css";
@@ -23,7 +24,15 @@ export const AdminDashboardPage: React.FC = () => {
       setData(next);
     })();
   }, []);
-  if (!data) return <AdminPageHeader title="Дашборд" subtitle="Загрузка..." />;
+  if (!data) {
+    return (
+      <>
+        <AdminPageHeader title="Дашборд" subtitle="Загрузка данных…" />
+        <SkeletonKpiGrid count={5} />
+        <SkeletonCard rows={6} />
+      </>
+    );
+  }
   return (
     <>
       <AdminPageHeader title="Дашборд" subtitle="Быстрый обзор сервиса и ключевые метрики." />

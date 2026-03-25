@@ -2,7 +2,9 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { readAuthSession } from "@/shared/lib/authSession";
 import { getInboxSummaryApi, type InboxApproval } from "@/shared/lib/clientInboxApi";
+import { SkeletonBone } from "@/shared/ui/Skeleton";
 import { Button } from "@/shared/ui/Button/Button";
+import { PageHeader } from "@/widgets/PageHeader";
 import cls from "./NotificationsPage.module.css";
 
 export const NotificationsPage: React.FC = () => {
@@ -37,7 +39,7 @@ export const NotificationsPage: React.FC = () => {
   return (
     <div className={cls.shell}>
       <div className={cls.inner}>
-        <h1 className={cls.title}>Уведомления</h1>
+        <PageHeader embedded title="Уведомления" subtitle="Согласования и напоминания по заказам." />
 
         <section className={cls.card} aria-labelledby="approvals-heading">
           <h2 id="approvals-heading" className={cls.cardTitle}>
@@ -45,7 +47,12 @@ export const NotificationsPage: React.FC = () => {
           </h2>
 
           {loading ? (
-            <p className={cls.empty}>Загрузка…</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, paddingTop: 4 }} aria-hidden>
+              <SkeletonBone style={{ height: 18, width: "72%", borderRadius: 8 }} />
+              <SkeletonBone style={{ height: 14, width: "100%", borderRadius: 8 }} />
+              <SkeletonBone style={{ height: 14, width: "55%", borderRadius: 8 }} />
+              <SkeletonBone style={{ height: 40, width: 200, borderRadius: 12, marginTop: 8 }} />
+            </div>
           ) : !auth?.accessToken ? (
             <p className={cls.empty}>Войдите в аккаунт, чтобы видеть согласования.</p>
           ) : approvals.length === 0 ? (

@@ -1,14 +1,20 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { techApi } from "@/shared/lib/techApi";
+import { TypingIndicator } from "@/shared/ui/TypingIndicator";
 import { TechCard, TechPageHeader } from "@/widgets/technician";
 import cls from "./techPages.module.css";
 
 export const TechMessagesPage: React.FC = () => {
   const [threads, setThreads] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const load = React.useCallback(async () => {
-    const res = await techApi.getThreads();
-    setThreads(res.rows);
+    try {
+      const res = await techApi.getThreads();
+      setThreads(res.rows);
+    } finally {
+      setLoading(false);
+    }
   }, []);
   React.useEffect(() => {
     void load();
@@ -22,17 +28,27 @@ export const TechMessagesPage: React.FC = () => {
       <TechPageHeader title="Сообщения" subtitle="Переписка с клиентами по заказам." />
       <TechCard style={{ padding: 0 }}>
         <div className={cls.threadList}>
-          {threads.map((t) => (
-            <Link key={t.id} className={cls.threadItem} to={`/tech/messages/${t.id}`}>
-              <div className={cls.threadName}>{t.clientName}</div>
-              {t.unreadCount > 0 ? <div className={cls.threadUnread}>{t.unreadCount}</div> : null}
-              <div className={cls.muted}>{t.orderPublicId}</div>
-              <div className={cls.threadPreview}>{t.lastMessage}</div>
-              <div className={cls.muted} style={{ marginTop: 6 }}>
-                {t.updatedAt}
-              </div>
-            </Link>
-          ))}
+          {loading ? (
+            <div className={cls.threadItem} style={{ pointerEvents: "none" }}>
+              <TypingIndicator label="Печатает" />
+            </div>
+          ) : threads.length === 0 ? (
+            <p className={cls.p} style={{ padding: 20 }}>
+              Нет диалогов.
+            </p>
+          ) : (
+            threads.map((t) => (
+              <Link key={t.id} className={cls.threadItem} to={`/tech/messages/${t.id}`}>
+                <div className={cls.threadName}>{t.clientName}</div>
+                {t.unreadCount > 0 ? <div className={cls.threadUnread}>{t.unreadCount}</div> : null}
+                <div className={cls.muted}>{t.orderPublicId}</div>
+                <div className={cls.threadPreview}>{t.lastMessage}</div>
+                <div className={cls.muted} style={{ marginTop: 6 }}>
+                  {t.updatedAt}
+                </div>
+              </Link>
+            ))
+          )}
         </div>
       </TechCard>
     </>

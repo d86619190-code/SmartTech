@@ -3,6 +3,7 @@ import { Link, NavLink, Navigate, useParams } from "react-router-dom";
 import { techApi } from "@/shared/lib/techApi";
 import { downloadDataUrl, mimeFromDataUrl } from "@/shared/lib/deviceFiles";
 import { formatRub } from "@/shared/lib/formatMoney";
+import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { Button } from "@/shared/ui/Button/Button";
 import { TechCard, TechPageHeader, TechStageBadge, TechTimeline } from "@/widgets/technician";
 import cls from "./techPages.module.css";
@@ -38,7 +39,14 @@ export const TechRepairDetailPage: React.FC = () => {
   }, [job?.id]);
 
   if (!repairId) return <Navigate to="/tech/tasks" replace />;
-  if (!job) return <TechPageHeader title="Загрузка..." subtitle="Карточка ремонта" />;
+  if (!job) {
+    return (
+      <>
+        <TechPageHeader title="Карточка ремонта" subtitle="Загрузка…" />
+        <SkeletonCard rows={6} />
+      </>
+    );
+  }
   const base = `/tech/repairs/${job.id}`;
   const messagesHref = chatThreadId ? `/tech/messages/${chatThreadId}` : "/tech/messages";
 

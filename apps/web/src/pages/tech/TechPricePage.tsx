@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { techApi } from "@/shared/lib/techApi";
 import { formatRub } from "@/shared/lib/formatMoney";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
+import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { Button } from "@/shared/ui/Button/Button";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
 import { AdminInput } from "@/widgets/admin";
@@ -64,7 +65,14 @@ export const TechPricePage: React.FC = () => {
     })();
   }, [repairId]);
   if (!repairId) return <Navigate to="/tech/tasks" replace />;
-  if (!job) return <TechPageHeader title="Смета" subtitle="Загрузка..." />;
+  if (!job) {
+    return (
+      <>
+        <TechPageHeader title="Смета" subtitle="Загрузка…" />
+        <SkeletonCard rows={6} />
+      </>
+    );
+  }
 
   const updateOption = (idx: number, patch: Partial<QuoteOptionDraft>) => {
     setOptions((prev) => prev.map((o, i) => (i === idx ? { ...o, ...patch } : o)));

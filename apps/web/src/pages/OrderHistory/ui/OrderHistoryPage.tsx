@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import type { RepairOrder } from "@/entities/repair-order";
 import { getClientRepairsApi, type ClientRepairDto } from "@/shared/lib/clientInboxApi";
 import { readAuthSession } from "@/shared/lib/authSession";
+import { SkeletonOrderRows } from "@/shared/ui/Skeleton";
 import { OrderHistoryList } from "@/widgets/OrderHistoryList";
 import { PageHeader } from "@/widgets/PageHeader";
 import cls from "./OrderHistoryPage.module.css";
@@ -55,14 +56,18 @@ export const OrderHistoryPage: React.FC = () => {
 
   return (
     <div className={cls.shell}>
-      <PageHeader title="История заказов" subtitle="Заказы из вашего аккаунта (данные с сервера)." />
       <div className={cls.inner}>
+        <PageHeader
+          embedded
+          title="История заказов"
+          subtitle="Заказы из вашего аккаунта (данные с сервера)."
+        />
         {!auth?.accessToken ? (
           <p className={cls.hint}>
             Войдите, чтобы видеть историю. <Link to="/login">Вход</Link>
           </p>
         ) : loading ? (
-          <p className={cls.hint}>Загрузка…</p>
+          <SkeletonOrderRows count={4} />
         ) : orders.length === 0 ? (
           <p className={cls.hint}>Пока нет заказов в истории.</p>
         ) : (

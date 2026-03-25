@@ -5,6 +5,7 @@ import { streamUpdatesLabel } from "@/shared/lib/realtime/streamStatusLabel";
 import { useInboxSummarySse } from "@/shared/lib/realtime/useSseStreams";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
+import { TypingIndicator } from "@/shared/ui/TypingIndicator";
 import { PageHeader } from "@/widgets/PageHeader";
 import cls from "./clientPages.module.css";
 
@@ -93,9 +94,9 @@ export const MessagesListPage: React.FC = () => {
 
         <section className={cls.card} style={{ padding: 0 }}>
           {loading ? (
-            <p className={cls.lead} style={{ padding: 24 }}>
-              Загрузка...
-            </p>
+            <div style={{ padding: 22 }}>
+              <TypingIndicator label="Печатает" />
+            </div>
           ) : threads.length === 0 ? (
             <p className={cls.lead} style={{ padding: 24 }}>
               Нет активных диалогов.

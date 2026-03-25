@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { getAdminTechnicianByIdApi } from "@/shared/lib/adminPanelApi";
 import { formatRub } from "@/shared/lib/formatMoney";
 import { Button } from "@/shared/ui/Button/Button";
+import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { AdminCard, AdminPageHeader } from "@/widgets/admin";
 import cls from "./adminPages.module.css";
 
@@ -22,7 +23,14 @@ export const AdminTechnicianDetailPage: React.FC = () => {
     })();
   }, [techId]);
   if (notFound) return <Navigate to="/admin/technicians" replace />;
-  if (!tech) return <AdminPageHeader title="Карточка мастера" subtitle="Загрузка..." />;
+  if (!tech) {
+    return (
+      <>
+        <AdminPageHeader title="Карточка мастера" subtitle="Загрузка…" />
+        <SkeletonCard rows={5} />
+      </>
+    );
+  }
 
   return (
     <>

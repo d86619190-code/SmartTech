@@ -4,6 +4,7 @@ import type { ServiceOrder } from "@/entities/order";
 import { getClientOrderMetaApi, getInboxSummaryApi, resolveApprovalApi } from "@/shared/lib/clientInboxApi";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
+import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { PageHeader } from "@/widgets/PageHeader";
 import { RepairApproval } from "@/widgets/RepairApproval";
 import cls from "./OrderRepairApprovalPage.module.css";
@@ -50,7 +51,8 @@ export const OrderRepairApprovalPage: React.FC = () => {
       <div className={cls.shell}>
         <PageHeader title="Согласование ремонта" />
         <div className={cls.body}>
-          <p className={cls.lead}>Загрузка…</p>
+          <SkeletonCard rows={3} />
+          <SkeletonCard rows={4} />
         </div>
       </div>
     );

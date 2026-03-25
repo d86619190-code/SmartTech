@@ -5,6 +5,7 @@ import { readAuthSession } from "@/shared/lib/authSession";
 import { getClientOrderMetaApi } from "@/shared/lib/clientInboxApi";
 import { Button } from "@/shared/ui/Button/Button";
 import { SITE } from "@/shared/config/siteContacts";
+import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { PageHeader } from "@/widgets/PageHeader";
 import cls from "./clientPages.module.css";
 
@@ -52,7 +53,7 @@ export const OrderPickupPage: React.FC = () => {
       <div className={cls.shell}>
         <PageHeader title="Выдача" subtitle={order.deviceLabel} />
         <div className={cls.body}>
-          <p className={cls.lead}>Загрузка…</p>
+          <SkeletonCard rows={5} />
         </div>
       </div>
     );

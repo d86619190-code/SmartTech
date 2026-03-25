@@ -4,6 +4,7 @@ import { getAdminOrderByIdApi } from "@/shared/lib/adminPanelApi";
 import { downloadDataUrl, mimeFromDataUrl } from "@/shared/lib/deviceFiles";
 import { formatRub } from "@/shared/lib/formatMoney";
 import { Button } from "@/shared/ui/Button/Button";
+import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { AdminCard, AdminPageHeader, AdminStatusBadge } from "@/widgets/admin";
 import cls from "./adminPages.module.css";
 
@@ -23,7 +24,14 @@ export const AdminOrderDetailPage: React.FC = () => {
     })();
   }, [orderId]);
   if (notFound) return <Navigate to="/admin/orders" replace />;
-  if (!order) return <AdminPageHeader title="Карточка заказа" subtitle="Загрузка..." />;
+  if (!order) {
+    return (
+      <>
+        <AdminPageHeader title="Карточка заказа" subtitle="Загрузка…" />
+        <SkeletonCard rows={6} />
+      </>
+    );
+  }
 
   return (
     <>

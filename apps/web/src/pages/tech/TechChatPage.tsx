@@ -8,6 +8,7 @@ import { useStatusToast } from "@/shared/lib/useStatusToast";
 import { pickPhotosOrVideos } from "@/shared/lib/deviceFiles";
 import { ChatAttachment } from "@/shared/ui/ChatAttachment";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
+import { TypingIndicator } from "@/shared/ui/TypingIndicator";
 import { AdminInput } from "@/widgets/admin";
 import { TechPageHeader } from "@/widgets/technician";
 import cls from "./techPages.module.css";
@@ -126,7 +127,14 @@ export const TechChatPage: React.FC = () => {
   }, [threadId, baseMessages, presence, loadThread]);
 
   if (!threadId) return <Navigate to="/tech/messages" replace />;
-  if (!thread) return <TechPageHeader title="Загрузка..." subtitle="Чат" />;
+  if (!thread) {
+    return (
+      <>
+        <TechPageHeader title="Чат" />
+        <TypingIndicator label="Печатает" />
+      </>
+    );
+  }
   const messages = baseMessages;
 
   /** В моке у каждого треда свой мастер; профиль панели — общий (часто Алексей). Показываем мастера треда. */
@@ -203,7 +211,7 @@ export const TechChatPage: React.FC = () => {
             <p className={cls.streamStatus}>
               {streamStatusLabel(streamStatus)} · {presence === "online" ? "вы в сети" : "оффлайн"}
             </p>
-            {messagesLoading ? <p className={cls.muted}>Загрузка...</p> : null}
+            {messagesLoading ? <TypingIndicator label="Клиент печатает" /> : null}
             {messages.map((m, i) => {
               const isTech = m.from === "tech";
               const name = m.senderName ?? (isTech ? masterName : thread.clientName);
