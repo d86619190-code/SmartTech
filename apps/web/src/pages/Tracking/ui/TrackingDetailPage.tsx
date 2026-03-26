@@ -25,6 +25,7 @@ export const TrackingDetailPage: React.FC = () => {
   const auth = readAuthSession();
   const isNarrow = useMediaQuery("(max-width: 767px)");
   const [detailsOpen, setDetailsOpen] = React.useState(false);
+  const [pricingOpen, setPricingOpen] = React.useState(false);
   const mockOrder = orderId ? getOrderById(orderId) : undefined;
   const [meta, setMeta] = React.useState<Awaited<ReturnType<typeof getClientOrderMetaApi>> | null>(null);
   const [metaLoading, setMetaLoading] = React.useState(true);
@@ -81,6 +82,30 @@ export const TrackingDetailPage: React.FC = () => {
   const handleCancel = () => {
     if (!window.confirm("Отменить заявку? При необходимости уточним детали по телефону.")) return;
     navigate("/history");
+  };
+
+  const downloadAct = () => {
+    if (!meta) return;
+    const lines = [
+      "Акт выполненных работ",
+      `Заказ: ${meta.id}`,
+      `Устройство: ${meta.deviceLabel}`,
+      `Проблема: ${meta.issueSummary}`,
+      "",
+      "Стоимость:",
+      ...(meta.pricing?.items?.map((it) => `- ${it.type === "service" ? "Услуга" : "Деталь"}: ${it.name} — ${formatRub(it.priceRub)}${it.description ? ` (${it.description})` : ""}`) ?? []),
+      `Итого: ${formatRub(meta.pricing?.totalRub)}`,
+      "",
+      "Хронология:",
+      ...(meta.timeline?.map((t) => `- ${t.atLabel}: ${t.title}${t.description ? ` — ${t.description}` : ""}`) ?? []),
+    ].join("\n");
+    const blob = new Blob([lines], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `act-${meta.id}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   if (!orderId) {
@@ -198,6 +223,58 @@ export const TrackingDetailPage: React.FC = () => {
         </section>
 
         <section className={cls.card}>
+          <button type="button" className={cls.detailsToggle} onClick={() => setPricingOpen((v) => !v)}>
+            Стоимость {pricingOpen ? "▼" : "▶"}
+          </button>
+          <p className={cls.meta} style={{ marginTop: 10 }}>
+            <strong>Итого:</strong> {formatRub(meta.pricing?.totalRub)}
+          </p>
+          {pricingOpen ? (
+            <div className={cls.detailsBody}>
+              {meta.pricing?.items?.length ? (
+                meta.pricing.items.map((it) => (
+                  <p key={it.id}>
+                    <strong>{it.type === "service" ? "Услуга" : "Деталь"}:</strong> {it.name}
+                    {it.description ? ` · ${it.description}` : ""} ·{" "}
+                    <strong>{it.priceRub === 0 ? "Бесплатно" : formatRub(it.priceRub)}</strong>
+                  </p>
+                ))
+              ) : (
+                <p className={cls.mutedSmall}>Стоимость пока не добавлена мастером.</p>
+              )}
+            </div>
+          ) : null}
+        </section>
+
+        <section className={cls.card}>
+          <h2 className={cls.cardHeading}>История работ</h2>
+          {meta.timeline?.length ? (
+            <div style={{ display: "grid", gap: 10 }}>
+              {[...meta.timeline].reverse().map((item) => (
+                <article key={item.id} style={{ border: "1px solid var(--color-order-row-border)", borderRadius: 10, padding: 12 }}>
+                  <p className={cls.meta} style={{ margin: 0 }}>
+                    <strong>{item.title}</strong> · {item.atLabel}
+                  </p>
+                  <p className={cls.mutedSmall}>
+                    {item.kind === "stage" ? "Этап" : "Подпункт"} · {item.stage}
+                  </p>
+                  {item.description ? <p className={cls.meta} style={{ marginTop: 6 }}>{item.description}</p> : null}
+                  {item.photoDataUrls?.length ? (
+                    <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(84px,1fr))", gap: 8 }}>
+                      {item.photoDataUrls.map((src, idx) => (
+                        <img key={`${item.id}-${idx}`} src={src} alt="" style={{ width: "100%", aspectRatio: "1 / 1", objectFit: "cover", borderRadius: 8 }} />
+                      ))}
+                    </div>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className={cls.mutedSmall}>Мастер ещё не добавил подробную хронологию.</p>
+          )}
+        </section>
+
+        <section className={cls.card}>
           <h2 className={cls.cardHeading}>Краткое резюме</h2>
           <p className={cls.meta}>
             <strong>Создан:</strong> {order.createdAtLabel}
@@ -221,6 +298,9 @@ export const TrackingDetailPage: React.FC = () => {
           <div className={cls.actions}>
             <Button type="button" variant="outline" onClick={() => window.open(`tel:${SITE.phoneTel}`)}>
               Связаться с сервисом
+            </Button>
+            <Button type="button" variant="outline" onClick={downloadAct} disabled={meta.clientStep !== "completed"}>
+              Скачать акт
             </Button>
             <Button type="button" variant="ghost" onClick={handleCancel}>
               Отменить заявку

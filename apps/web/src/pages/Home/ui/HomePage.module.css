@@ -95,6 +95,174 @@
   transform: translateY(1px);
 }
 
+.quickHub {
+  margin-bottom: 22px;
+}
+
+.primaryCard {
+  margin-bottom: 16px;
+  padding: 24px;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.primaryTitle {
+  margin: 0 0 8px;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--color-text-primary);
+}
+
+.primaryText {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  max-width: 72ch;
+}
+
+.primaryActions {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.primaryBtn {
+  color: #fff;
+  background: #0f172a;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+}
+
+.secondaryBtn {
+  color: var(--color-text-primary);
+  border-color: var(--color-order-card-border);
+  background: #fff;
+}
+
+.quickGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.quickCard {
+  display: block;
+  text-decoration: none;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--color-order-card-border);
+  background: #fff;
+  box-shadow: var(--shadow-order-card);
+}
+
+.quickCard:hover {
+  border-color: #cbd5e1;
+}
+
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.stepCard {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--color-order-card-border);
+  background: #fff;
+}
+
+.stepNum {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--color-text-muted);
+}
+
+.stepTitle {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.stepText {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.inlineActions {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ordersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.orderCard {
+  display: block;
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--color-order-card-border);
+  background: #fff;
+}
+
+.orderTitle {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.orderText {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.orderMeta {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.quickTitle {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.quickText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
 .hero {
   margin-bottom: 14px;
 }
@@ -451,6 +619,15 @@
 
   .hero {
     margin-bottom: 22px;
+  }
+
+  .primaryActions {
+    flex-direction: column;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    width: 100%;
   }
 
   .title {

@@ -93,7 +93,7 @@ export const TechPricePage: React.FC = () => {
           ]);
         }
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Не удалось загрузить смету";
+        const msg = e instanceof Error ? e.message : "Не удалось загрузить стоимость";
         setLoadError(msg);
         setJob(null);
       }
@@ -103,7 +103,7 @@ export const TechPricePage: React.FC = () => {
   if (loadError) {
     return (
       <>
-        <TechPageHeader title="Смета" subtitle="Ошибка загрузки" />
+        <TechPageHeader title="Стоимость" subtitle="Ошибка загрузки" />
         <TechCard style={{ padding: 20 }}>
           <p className={cls.p} style={{ marginBottom: 16 }}>
             {loadError}
@@ -118,7 +118,7 @@ export const TechPricePage: React.FC = () => {
   if (!job) {
     return (
       <>
-        <TechPageHeader title="Смета" subtitle="Загрузка…" />
+        <TechPageHeader title="Стоимость" subtitle="Загрузка…" />
         <SkeletonCard rows={6} />
       </>
     );
@@ -215,9 +215,9 @@ export const TechPricePage: React.FC = () => {
       setCustomParts(
         savedCp.map((p: any) => ({ id: p.id, name: String(p.name ?? ""), priceRub: Number(p.priceRub) || 0 })),
       );
-      showToast("success", "Смета сохранена");
+      showToast("success", "Стоимость сохранена");
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось сохранить смету";
+      const msg = e instanceof Error ? e.message : "Не удалось сохранить стоимость";
       showToast("error", msg);
     } finally {
       setSaving(false);
@@ -226,7 +226,7 @@ export const TechPricePage: React.FC = () => {
 
   return (
     <>
-      <TechPageHeader title="Смета" subtitle="Работа и запчасти — итог для согласования с клиентом." />
+      <TechPageHeader title="Стоимость" subtitle="Работа и запчасти — итог для согласования с клиентом." />
       <div style={{ display: "grid", gap: 14, marginBottom: 14 }}>
         {options.map((opt, idx) => {
           const selectedParts = mergedCatalog.filter((p: any) => opt.selectedPartIds.includes(p.id));
@@ -309,7 +309,7 @@ export const TechPricePage: React.FC = () => {
       </div>
       <TechCard style={{ padding: 16, marginBottom: 16 }}>
         <p className={cls.p} style={{ marginBottom: 12 }}>
-          <strong>Свои запчасти и позиции</strong> — добавьте название и цену, затем отметьте их в вариантах сметы.
+          <strong>Свои запчасти и позиции</strong> — добавьте название и цену, затем отметьте их в вариантах стоимости.
         </p>
         {customParts.map((cp) => (
           <div
@@ -352,7 +352,7 @@ export const TechPricePage: React.FC = () => {
         </div>
       </TechCard>
       <Button type="button" onClick={() => void save()} disabled={saving}>
-        {saving ? "Сохранение…" : "Сохранить смету"}
+        {saving ? "Сохранение…" : "Сохранить стоимость"}
       </Button>
       <Link className={cls.link} to={`/tech/repairs/${job.id}/approval`} style={{ marginLeft: 16 }}>
         Далее: согласование →

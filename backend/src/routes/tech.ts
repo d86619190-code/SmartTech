@@ -25,6 +25,7 @@ import {
   saveTechPartsSelection,
   saveTechPricing,
   saveTechQuoteOptions,
+  addTechProgressEntry,
   saveTechSettings,
   saveTechStage,
   sendTechApproval,
@@ -38,6 +39,14 @@ const diagnosticsBody = z.object({
 const pricingBody = z.object({ laborRub: z.number(), selectedPartIds: z.array(z.string()) });
 const stageBody = z.object({ stage: z.enum(["accepted", "diagnostics", "waiting_approval", "repair", "ready", "completed"]) });
 const partsBody = z.object({ selectedPartIds: z.array(z.string()) });
+const progressBody = z.object({
+  stage: z.enum(["accepted", "diagnostics", "waiting_approval", "repair", "ready", "completed"]),
+  kind: z.enum(["stage", "substep"]).default("substep"),
+  title: z.string().trim().min(1).max(140),
+  description: z.string().trim().max(1200).optional(),
+  photoDataUrls: z.array(z.string().max(4_000_000)).max(8).optional(),
+  at: z.number().optional(),
+});
 const rubIn = z.preprocess((v) => {
   const n = typeof v === "number" ? v : Number(v);
   return Number.isFinite(n) ? n : 0;
@@ -157,6 +166,13 @@ techRouter.patch("/repairs/:repairId/parts", async (req, res) => {
   const parsed = partsBody.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: "Некорректные данные", details: parsed.error.flatten() });
   const repair = await saveTechPartsSelection(req.params.repairId, parsed.data.selectedPartIds);
+  if (!repair) return res.status(404).json({ error: "Ремонт не найден" });
+  return res.status(200).json({ repair });
+});
+techRouter.post("/repairs/:repairId/progress", async (req, res) => {
+  const parsed = progressBody.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "Некорректные данные", details: parsed.error.flatten() });
+  const repair = await addTechProgressEntry(req.params.repairId, parsed.data);
   if (!repair) return res.status(404).json({ error: "Ремонт не найден" });
   return res.status(200).json({ repair });
 });

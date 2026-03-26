@@ -7,6 +7,7 @@ import {
   type TechMessage,
   type TechPanelMockState,
   type TechProfile,
+  type TechProgressEntry,
   type TechRepairJob,
   type TechRepairStage,
   type TechPart,
@@ -16,6 +17,40 @@ import { MOCK_MASTERS } from "./mockMasters.js";
 
 function nowLabel(): string {
   return new Date().toLocaleString("ru-RU", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" });
+}
+
+function nowMs(): number {
+  return Date.now();
+}
+
+function pushProgress(
+  repair: TechRepairJob,
+  payload: {
+    stage: TechRepairStage;
+    kind: "stage" | "substep";
+    title: string;
+    description?: string;
+    photoDataUrls?: string[];
+    at?: number;
+  }
+): void {
+  const at = payload.at ?? nowMs();
+  const entry: TechProgressEntry = {
+    id: crypto.randomUUID(),
+    stage: payload.stage,
+    kind: payload.kind,
+    title: payload.title.trim() || "Обновление",
+    description: payload.description?.trim() || undefined,
+    at,
+    atLabel: new Date(at).toLocaleString("ru-RU", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    photoDataUrls: (payload.photoDataUrls ?? []).filter((u) => typeof u === "string" && u.length > 0).slice(0, 8),
+  };
+  repair.progressLog = [...(repair.progressLog ?? []), entry].slice(-80);
 }
 
 const M = MOCK_MASTERS;
@@ -544,7 +579,15 @@ export async function acceptIncoming(id: string): Promise<string | null> {
       startedAt: nowLabel(),
       diagnosticsIssues: [],
       selectedPartIds: [],
+      progressLog: [],
     };
+    pushProgress(newRepair, {
+      stage: "accepted",
+      kind: "stage",
+      title: "Заказ принят в работу",
+      description: "Мастер приступил к первичной диагностике.",
+      photoDataUrls: newRepair.photoUrls.slice(0, 4),
+    });
     const ownerId = newRepair.clientUserId;
     const owner = ownerId ? s.usersById[ownerId] : undefined;
     if (owner?.email?.trim()) newRepair.email = owner.email.trim();
@@ -636,6 +679,16 @@ export async function saveTechDiagnostics(id: string, diagnosticsIssues: string[
     if (repair.stage === "accepted") {
       repair.stage = "diagnostics";
     }
+    pushProgress(repair, {
+      stage: "diagnostics",
+      kind: "stage",
+      title: "Диагностика обновлена",
+      description:
+        diagnosticsIssues.length > 0
+          ? `Найдено пунктов: ${diagnosticsIssues.length}.`
+          : "Результаты диагностики обновлены мастером.",
+      photoDataUrls: photoDataUrls?.slice(0, 4),
+    });
     return repair;
   });
 }
@@ -729,6 +782,12 @@ export async function sendTechApproval(id: string) {
     const repair = allRepairs(st).find((x) => x.id === id);
     if (!repair) return null;
     repair.stage = "waiting_approval";
+    pushProgress(repair, {
+      stage: "waiting_approval",
+      kind: "stage",
+      title: "Стоимость отправлена на согласование",
+      description: "Ожидаем решение клиента по варианту ремонта.",
+    });
     broadcastClientApproval(s, repair.id, `${repair.device} — мастер отправил смету на согласование`);
     broadcastClientServiceMessage(
       s,
@@ -758,6 +817,32 @@ export async function saveTechStage(id: string, stage: TechRepairStage) {
       const row = s.adminPanelMock.orders.find((o) => o.id === repair.id);
       if (row) row.status = techStageToAdminStatus(stage);
     }
+    pushProgress(repair, {
+      stage,
+      kind: "stage",
+      title: `Этап: ${stageLabel[stage]}`,
+      description: "Статус заказа обновлён мастером.",
+    });
+    return repair;
+  });
+}
+
+export async function addTechProgressEntry(
+  id: string,
+  payload: {
+    stage: TechRepairStage;
+    kind: "stage" | "substep";
+    title: string;
+    description?: string;
+    photoDataUrls?: string[];
+    at?: number;
+  }
+) {
+  return withStore((s) => {
+    const st = ensureTechState(s);
+    const repair = allRepairs(st).find((x) => x.id === id);
+    if (!repair) return null;
+    pushProgress(repair, payload);
     return repair;
   });
 }

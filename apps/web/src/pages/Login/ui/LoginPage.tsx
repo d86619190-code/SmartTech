@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { LoginForm } from "@/widgets/LoginForm";
 import { PageHeader } from "@/widgets/PageHeader";
 import { clearAuthSession, readAuthSession, saveAuthSession, type AuthSession } from "@/shared/lib/authSession";
@@ -28,6 +28,7 @@ function encodeSessionParam(session: AuthSession): string {
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mode, setMode] = React.useState<"login" | "register">("login");
   const [name, setName] = React.useState("");
   const [phone, setPhone] = React.useState("");
@@ -37,9 +38,14 @@ export const LoginPage: React.FC = () => {
   const { toast, showToast, closeToast } = useStatusToast();
   const isBrowser = typeof window !== "undefined";
   const isElectron = isBrowser ? /Electron/i.test(navigator.userAgent) : false;
-  const search = isBrowser ? new URLSearchParams(window.location.search) : null;
+  const search = React.useMemo(() => {
+    if (!isBrowser) return null;
+    return new URLSearchParams(location.search || window.location.search);
+  }, [isBrowser, location.search]);
   const electronCallback = search?.get("electronCallback");
   const electronBridge = isElectron && search?.get("electronBridge") === "1";
+  const nextPathRaw = search?.get("next") ?? "";
+  const nextPath = nextPathRaw.startsWith("/") ? nextPathRaw : "/profile";
 
   React.useEffect(() => {
     if (!isBrowser) return;
@@ -48,7 +54,7 @@ export const LoginPage: React.FC = () => {
       const restored = decodeSessionParam(incoming);
       if (restored) {
         saveAuthSession(restored);
-        navigate("/profile", { replace: true });
+        navigate(nextPath, { replace: true });
         return;
       }
     }
@@ -58,7 +64,7 @@ export const LoginPage: React.FC = () => {
     void (async () => {
       try {
         await getMe();
-        if (!cancelled) navigate("/profile", { replace: true });
+        if (!cancelled) navigate(nextPath, { replace: true });
       } catch {
         // Сессия в localStorage могла быть протухшей: очищаем и остаёмся на логине.
         clearAuthSession();
@@ -67,7 +73,7 @@ export const LoginPage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [isBrowser, isElectron, navigate, search]);
+  }, [isBrowser, isElectron, navigate, nextPath, search]);
 
   const handleSendCode = React.useCallback(async () => {
     try {
@@ -88,14 +94,14 @@ export const LoginPage: React.FC = () => {
       setIsSubmitting(true);
       await verifyPhoneCode(phone, code, mode === "register" ? name : undefined);
       showToast("success", mode === "register" ? "Регистрация выполнена" : "Вход выполнен");
-      navigate("/profile", { replace: true });
+      navigate(nextPath, { replace: true });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Не удалось войти по коду";
       showToast("error", msg);
     } finally {
       setIsSubmitting(false);
     }
-  }, [code, mode, name, navigate, phone, showToast]);
+  }, [code, mode, name, navigate, nextPath, phone, showToast]);
 
   const handleGoogleCredential = React.useCallback(async (credential: string) => {
     try {
@@ -107,14 +113,14 @@ export const LoginPage: React.FC = () => {
         return;
       }
       showToast("success", "Успешный вход через Google");
-      navigate("/profile", { replace: true });
+      navigate(nextPath, { replace: true });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Не удалось войти через Google";
       showToast("error", msg);
     } finally {
       setIsSubmitting(false);
     }
-  }, [electronBridge, electronCallback, isElectron, navigate, showToast]);
+  }, [electronBridge, electronCallback, isElectron, navigate, nextPath, showToast]);
 
   const handleGoogleOpenInBrowser = React.useCallback(() => {
     if (!isBrowser) return;

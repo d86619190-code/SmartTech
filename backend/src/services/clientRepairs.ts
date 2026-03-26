@@ -52,6 +52,26 @@ export type ClientOrderMeta = {
     repairDaysLabel?: string;
     priceRub: number;
   }>;
+  timeline?: Array<{
+    id: string;
+    stage: TechRepairStage;
+    kind: "stage" | "substep";
+    title: string;
+    description?: string;
+    at: number;
+    atLabel: string;
+    photoDataUrls: string[];
+  }>;
+  pricing?: {
+    totalRub: number;
+    items: Array<{
+      id: string;
+      type: "service" | "part";
+      name: string;
+      description?: string;
+      priceRub: number;
+    }>;
+  };
 };
 
 const DEFAULT_IMG: Record<"phone" | "tablet" | "laptop", string> = {
@@ -181,7 +201,7 @@ function buildQuoteOptionsFromTech(s: AppState, tech: TechRepairJob) {
   return [
     {
       id: "opt-current",
-      title: "Смета от мастера",
+      title: "Стоимость от мастера",
       subtitle: selected.length ? selected.map((p) => p.name).join(", ") : "Работы без деталей",
       availability: hasInStock ? ("in_stock" as const) : ("on_order" as const),
       orderLeadDays: hasInStock ? undefined : 2,
@@ -190,6 +210,38 @@ function buildQuoteOptionsFromTech(s: AppState, tech: TechRepairJob) {
       priceRub: basePrice,
     },
   ];
+}
+
+function buildPricingDetailsFromTech(s: AppState, tech: TechRepairJob) {
+  const options = tech.quoteOptions ?? [];
+  const primary = options[0];
+  const selectedPartIds = primary?.selectedPartIds ?? tech.selectedPartIds;
+  const parts = resolvePartRows(s, tech, selectedPartIds);
+  const serviceName = primary?.title?.trim() || "Работы мастера";
+  const serviceDescription =
+    primary?.repairDaysLabel
+      ? `Срок: ${primary.repairDaysLabel}`
+      : primary?.availability === "on_order"
+        ? "Детали под заказ"
+        : "Детали в наличии";
+  const items: Array<{ id: string; type: "service" | "part"; name: string; description?: string; priceRub: number }> = [
+    {
+      id: "svc-main",
+      type: "service",
+      name: serviceName,
+      description: serviceDescription,
+      priceRub: Math.max(0, Number(primary?.laborRub ?? tech.laborRub) || 0),
+    },
+    ...parts.map((p, idx) => ({
+      id: `part-${idx + 1}`,
+      type: "part" as const,
+      name: p.name,
+      description: `${p.oem ? "OEM" : "Аналог"} · ${p.inStock ? "В наличии" : "Под заказ"}`,
+      priceRub: Math.max(0, Number(p.priceRub) || 0),
+    })),
+  ];
+  const totalRub = items.reduce((sum, it) => sum + (Number(it.priceRub) || 0), 0);
+  return { totalRub, items };
 }
 
 export async function listClientRepairs(userId: string): Promise<ClientRepairDto[]> {
@@ -258,6 +310,8 @@ export async function getClientOrderMeta(userId: string, orderId: string): Promi
         counterpartOnline,
         diagnosticFeeRub: 990,
         quoteOptions,
+        timeline: [...(tech.progressLog ?? [])].sort((a, b) => a.at - b.at),
+        pricing: buildPricingDetailsFromTech(s, tech),
       };
     }
     const thread = s.techPanelMock?.threads.find((t) => t.repairId === orderId);

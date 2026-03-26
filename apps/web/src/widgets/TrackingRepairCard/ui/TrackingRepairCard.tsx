@@ -42,7 +42,11 @@ export const TrackingRepairCard: React.FC<TrackingRepairCardProps> = ({
   };
 
   const goContact = () => {
-    navigate("/contacts");
+    if (orderId) {
+      navigate(`/messages/${orderId}`);
+      return;
+    }
+    navigate("/messages");
   };
 
   return (
@@ -89,7 +93,7 @@ export const TrackingRepairCard: React.FC<TrackingRepairCardProps> = ({
           Статус ремонта
         </button>
         <button type="button" className={cls.btnSecondary} onClick={goContact}>
-          Связаться с поддержкой
+          Сообщения по заказу
         </button>
       </div>
     </article>

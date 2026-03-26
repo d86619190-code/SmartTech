@@ -70,6 +70,26 @@ export type ClientOrderMeta = {
     repairDaysLabel?: string;
     priceRub: number;
   }>;
+  timeline?: Array<{
+    id: string;
+    stage: "accepted" | "diagnostics" | "waiting_approval" | "repair" | "ready" | "completed";
+    kind: "stage" | "substep";
+    title: string;
+    description?: string;
+    at: number;
+    atLabel: string;
+    photoDataUrls: string[];
+  }>;
+  pricing?: {
+    totalRub: number;
+    items: Array<{
+      id: string;
+      type: "service" | "part";
+      name: string;
+      description?: string;
+      priceRub: number;
+    }>;
+  };
 };
 
 export type ClientRepairDto = {
@@ -93,6 +113,26 @@ export type CreateOrderPayload = {
   photoDataUrls: string[];
   needsConsultation?: boolean;
   bringInPerson?: boolean;
+};
+
+export type OrderDraftPayload = {
+  step: 1 | 2 | 3;
+  deviceCategory: "phone" | "tablet" | "laptop";
+  device: string;
+  issue: string;
+  contactPhone: string;
+  visitMode: "asap" | "slot";
+  slot: string;
+  bringInPerson: boolean;
+  needsConsultation: boolean;
+  photos: Array<{ name: string; dataUrl: string }>;
+};
+
+export type OrderDraftRow = {
+  id: string;
+  title: string;
+  saved_at: number;
+  payload: OrderDraftPayload;
 };
 
 type RefreshResponse = {
@@ -232,6 +272,29 @@ export async function createOrderApi(payload: CreateOrderPayload): Promise<{ inc
   });
   if (!res.ok) throw new Error(await parseError(res));
   return (await res.json()) as { incoming: { id: string; publicId: string } };
+}
+
+export async function getOrderDraftsApi(): Promise<OrderDraftRow[]> {
+  const res = await authorizedFetch("/api/v1/client/order-drafts");
+  if (!res.ok) throw new Error(await parseError(res));
+  const body = (await res.json()) as { rows: OrderDraftRow[] };
+  return body.rows;
+}
+
+export async function saveOrderDraftApi(payload: OrderDraftPayload, draftId?: string): Promise<OrderDraftRow> {
+  const res = await authorizedFetch("/api/v1/client/order-drafts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ draftId, payload }),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  const body = (await res.json()) as { row: OrderDraftRow };
+  return body.row;
+}
+
+export async function deleteOrderDraftApi(draftId: string): Promise<void> {
+  const res = await authorizedFetch(`/api/v1/client/order-drafts/${encodeURIComponent(draftId)}`, { method: "DELETE" });
+  if (!res.ok) throw new Error(await parseError(res));
 }
 
 export function openInboxSummaryStream(

@@ -1,7 +1,13 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { pickPhotos } from "@/shared/lib/deviceFiles";
-import { createOrderApi } from "@/shared/lib/clientInboxApi";
+import {
+  createOrderApi,
+  getOrderDraftsApi,
+  saveOrderDraftApi,
+  type OrderDraftPayload,
+} from "@/shared/lib/clientInboxApi";
+import { readAuthSession } from "@/shared/lib/authSession";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
 import { PageHeader } from "@/widgets/PageHeader";
 import { Button } from "@/shared/ui/Button/Button";
@@ -12,9 +18,61 @@ const MAX_BREAKAGE_PHOTOS = 5;
 
 type OrderPhoto = { id: string; name: string; dataUrl: string };
 type CreateOrderStep = 1 | 2 | 3;
+const PENDING_SUBMIT_KEY = "createOrder.pendingSubmit.v1";
+const LOCAL_PENDING_DRAFT_KEY = "createOrder.localPendingDraft.v1";
+const LOCAL_DRAFTS_KEY = "createOrder.localDrafts.v1";
+
+type LocalDraftRow = { id: string; title: string; saved_at: number; payload: OrderDraftPayload };
+
+function readLocalDraftRows(): LocalDraftRow[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_DRAFTS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as LocalDraftRow[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalDraftRows(rows: LocalDraftRow[]): void {
+  localStorage.setItem(LOCAL_DRAFTS_KEY, JSON.stringify(rows.slice(0, 20)));
+}
+
+function upsertLocalDraft(payload: OrderDraftPayload, id?: string): LocalDraftRow {
+  const nextId = id ?? crypto.randomUUID();
+  const title = payload.device?.trim()
+    ? `${payload.device.trim()}${payload.issue?.trim() ? ` — ${payload.issue.trim().slice(0, 38)}${payload.issue.trim().length > 38 ? "…" : ""}` : ""}`
+    : "Черновик заявки";
+  const row: LocalDraftRow = { id: nextId, title, saved_at: Date.now(), payload };
+  const rows = [row, ...readLocalDraftRows().filter((x) => x.id !== nextId)];
+  writeLocalDraftRows(rows);
+  return row;
+}
+
+async function syncLocalDraftRowsToServer(
+  saveFn: (payload: OrderDraftPayload, draftId?: string) => Promise<any>
+): Promise<void> {
+  const rows = readLocalDraftRows();
+  if (rows.length === 0) return;
+  const failed: LocalDraftRow[] = [];
+  for (const row of rows) {
+    try {
+      await saveFn(row.payload, row.id);
+    } catch {
+      failed.push(row);
+    }
+  }
+  if (failed.length > 0) {
+    writeLocalDraftRows(failed);
+    return;
+  }
+  localStorage.removeItem(LOCAL_DRAFTS_KEY);
+}
 
 export const CreateOrderPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [step, setStep] = React.useState<CreateOrderStep>(1);
   const [deviceCategory, setDeviceCategory] = React.useState<"phone" | "tablet" | "laptop">("phone");
   const [device, setDevice] = React.useState("");
@@ -27,7 +85,166 @@ export const CreateOrderPage: React.FC = () => {
   const [photos, setPhotos] = React.useState<OrderPhoto[]>([]);
   const [picking, setPicking] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
+  const [currentDraftId, setCurrentDraftId] = React.useState<string | null>(null);
   const toast = useStatusToast();
+  const autoSubmittedRef = React.useRef(false);
+
+  const readLocalPendingDraft = React.useCallback((): OrderDraftPayload | null => {
+    try {
+      const raw = localStorage.getItem(LOCAL_PENDING_DRAFT_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as OrderDraftPayload;
+      if (!parsed || typeof parsed !== "object") return null;
+      return parsed;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const captureDraftPayload = React.useCallback(
+    (): OrderDraftPayload => ({
+      step,
+      deviceCategory,
+      device: device.trim(),
+      issue: issue.trim(),
+      contactPhone: contactPhone.trim(),
+      visitMode,
+      slot,
+      bringInPerson,
+      needsConsultation,
+      photos: photos.map((p) => ({ name: p.name, dataUrl: p.dataUrl })),
+    }),
+    [step, deviceCategory, device, issue, contactPhone, visitMode, slot, bringInPerson, needsConsultation, photos],
+  );
+
+  const applyDraft = React.useCallback((d: { id: string; payload: OrderDraftPayload }) => {
+    setStep(d.payload.step);
+    setDeviceCategory(d.payload.deviceCategory);
+    setDevice(d.payload.device);
+    setIssue(d.payload.issue);
+    setContactPhone(d.payload.contactPhone || "+7 ");
+    setVisitMode(d.payload.visitMode);
+    setSlot(d.payload.slot);
+    setBringInPerson(d.payload.bringInPerson);
+    setNeedsConsultation(d.payload.needsConsultation);
+    setPhotos(
+      d.payload.photos.map((p) => ({
+        id: crypto.randomUUID(),
+        name: p.name,
+        dataUrl: p.dataUrl,
+      })),
+    );
+    setCurrentDraftId(d.id);
+  }, []);
+
+  const applyPayload = React.useCallback((payload: OrderDraftPayload) => {
+    setStep(payload.step);
+    setDeviceCategory(payload.deviceCategory);
+    setDevice(payload.device);
+    setIssue(payload.issue);
+    setContactPhone(payload.contactPhone || "+7 ");
+    setVisitMode(payload.visitMode);
+    setSlot(payload.slot);
+    setBringInPerson(payload.bringInPerson);
+    setNeedsConsultation(payload.needsConsultation);
+    setPhotos(
+      (payload.photos ?? []).map((p) => ({
+        id: crypto.randomUUID(),
+        name: p.name,
+        dataUrl: p.dataUrl,
+      })),
+    );
+  }, []);
+
+  const saveCurrentDraft = React.useCallback(
+    async (opts?: { markPendingSubmit?: boolean; redirectToDrafts?: boolean }) => {
+      try {
+        const row = await saveOrderDraftApi(captureDraftPayload(), currentDraftId ?? undefined);
+        setCurrentDraftId(row.id);
+        if (opts?.markPendingSubmit) {
+          localStorage.setItem(PENDING_SUBMIT_KEY, "1");
+        }
+        if (opts?.redirectToDrafts) {
+          navigate("/create-order/drafts");
+        }
+        toast.showToast("success", "Черновик сохранён");
+        return row;
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "Не удалось сохранить черновик";
+        const payload = captureDraftPayload();
+        const localRow = upsertLocalDraft(payload, currentDraftId ?? undefined);
+        setCurrentDraftId(localRow.id);
+        if (/авторизац|сессия|401|unauthorized/i.test(msg)) {
+          if (opts?.markPendingSubmit) localStorage.setItem(PENDING_SUBMIT_KEY, "1");
+          if (opts?.redirectToDrafts) {
+            navigate("/create-order/drafts");
+          } else {
+            navigate("/login?next=/create-order/drafts");
+          }
+          toast.showToast("success", "Черновик сохранён локально");
+          return { id: localRow.id } as any;
+        }
+        toast.showToast("success", "Черновик сохранён локально");
+        if (opts?.redirectToDrafts) {
+          navigate("/create-order/drafts");
+        }
+        return { id: localRow.id } as any;
+      }
+    },
+    [captureDraftPayload, currentDraftId, navigate, toast],
+  );
+
+  const clearCurrentForm = React.useCallback(() => {
+    setStep(1);
+    setDeviceCategory("phone");
+    setDevice("");
+    setIssue("");
+    setContactPhone("+7 ");
+    setVisitMode("asap");
+    setSlot("");
+    setBringInPerson(true);
+    setNeedsConsultation(false);
+    setPhotos([]);
+    setCurrentDraftId(null);
+  }, []);
+
+  React.useEffect(() => {
+    let mounted = true;
+    const query = new URLSearchParams(location.search);
+    const draftId = query.get("draft");
+    const autoPost = query.get("autopost") === "1";
+    const forceNew = query.get("new") === "1";
+    void (async () => {
+      try {
+        const localPending = readLocalPendingDraft();
+        if (localPending) {
+          applyPayload(localPending);
+        }
+        await syncLocalDraftRowsToServer(saveOrderDraftApi);
+        const rows = await getOrderDraftsApi();
+        if (!mounted) return;
+        if (draftId) {
+          const hit = rows.find((x) => x.id === draftId);
+          if (hit) {
+            applyDraft(hit);
+            return;
+          }
+        }
+        if (forceNew) return;
+        if (rows.length > 0 && !autoPost && localStorage.getItem(PENDING_SUBMIT_KEY) !== "1" && !localPending) {
+          navigate("/create-order/drafts", { replace: true });
+        }
+      } catch {
+        if (!draftId && !autoPost && !forceNew && localStorage.getItem(PENDING_SUBMIT_KEY) !== "1") {
+          const locals = readLocalDraftRows();
+          if (locals.length > 0) navigate("/create-order/drafts", { replace: true });
+        }
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [applyDraft, applyPayload, location.search, navigate, readLocalPendingDraft]);
 
   const submitOrder = async () => {
     if (step !== 3) return;
@@ -48,13 +265,46 @@ export const CreateOrderPage: React.FC = () => {
         "createOrderDraft.photos",
         JSON.stringify(photos.map((p) => ({ name: p.name, dataUrl: p.dataUrl }))),
       );
+      setCurrentDraftId(null);
+      localStorage.removeItem(PENDING_SUBMIT_KEY);
+      localStorage.removeItem(LOCAL_PENDING_DRAFT_KEY);
       navigate("/create-order/success");
     } catch (e) {
-      toast.showToast("error", e instanceof Error ? e.message : "Не удалось отправить заявку");
+      const msg = e instanceof Error ? e.message : "Не удалось отправить заявку";
+      if (/авторизац|сессия|401|unauthorized/i.test(msg)) {
+        const localPayload = captureDraftPayload();
+        localStorage.setItem(LOCAL_PENDING_DRAFT_KEY, JSON.stringify(localPayload));
+        const saved = await saveCurrentDraft({ markPendingSubmit: true });
+        localStorage.setItem(PENDING_SUBMIT_KEY, "1");
+        const next = saved?.id ? `/create-order?draft=${encodeURIComponent(saved.id)}&autopost=1` : "/create-order";
+        navigate(`/login?next=${encodeURIComponent(next)}`);
+      } else {
+        toast.showToast("error", msg);
+      }
     } finally {
       setSubmitting(false);
     }
   };
+
+  React.useEffect(() => {
+    if (autoSubmittedRef.current) return;
+    if (!readAuthSession()?.accessToken) return;
+    if (localStorage.getItem(PENDING_SUBMIT_KEY) !== "1") return;
+    if (step !== 3 || !contactPhone.trim() || (visitMode === "slot" && !slot) || photos.length === 0) {
+      // fallback: сохраняем в БД и открываем страницу черновиков
+      void (async () => {
+        const row = await saveCurrentDraft();
+        localStorage.removeItem(PENDING_SUBMIT_KEY);
+        localStorage.removeItem(LOCAL_PENDING_DRAFT_KEY);
+        if (row?.id) {
+          navigate("/create-order/drafts", { replace: true });
+        }
+      })();
+      return;
+    }
+    autoSubmittedRef.current = true;
+    void submitOrder();
+  }, [step, contactPhone, visitMode, slot, photos.length, navigate, saveCurrentDraft]);
 
   const onAddPhotos = async () => {
     if (photos.length >= MAX_BREAKAGE_PHOTOS) return;
@@ -292,22 +542,37 @@ export const CreateOrderPage: React.FC = () => {
                   Назад
                 </Button>
               ) : (
-                <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-                  Назад
-                </Button>
+                <div className={cls.actionsLeft}>
+                  <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+                    Назад
+                  </Button>
+                  <Button type="button" variant="ghost" onClick={clearCurrentForm}>
+                    Очистить
+                  </Button>
+                </div>
               )}
               {step < 3 ? (
                 <Button type="button" onClick={goNext} disabled={step === 1 ? !device.trim() || !issue.trim() : photos.length === 0}>
                   Далее
                 </Button>
               ) : (
-                <Button
-                  type="button"
-                  onClick={() => void submitOrder()}
-                  disabled={submitting || !contactPhone.trim() || (visitMode === "slot" && !slot) || photos.length === 0}
-                >
-                  {submitting ? "Отправка..." : "Отправить заявку"}
-                </Button>
+                <div className={cls.actionsRight}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => void saveCurrentDraft({ redirectToDrafts: true })}
+                    disabled={submitting}
+                  >
+                    Сохранить как черновик
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => void submitOrder()}
+                    disabled={submitting || !contactPhone.trim() || (visitMode === "slot" && !slot) || photos.length === 0}
+                  >
+                    {submitting ? "Отправка..." : "Отправить заявку"}
+                  </Button>
+                </div>
               )}
             </div>
           </form>

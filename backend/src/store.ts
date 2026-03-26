@@ -46,6 +46,23 @@ export type UserInboxRow = {
   messages: InboxMessageRow[];
   approvals: ApprovalRow[];
 };
+export type ClientOrderDraftRow = {
+  id: string;
+  title: string;
+  saved_at: number;
+  payload: {
+    step: 1 | 2 | 3;
+    deviceCategory: "phone" | "tablet" | "laptop";
+    device: string;
+    issue: string;
+    contactPhone: string;
+    visitMode: "asap" | "slot";
+    slot: string;
+    bringInPerson: boolean;
+    needsConsultation: boolean;
+    photos: Array<{ name: string; dataUrl: string }>;
+  };
+};
 export type AdminOrderStatus = "new" | "diagnostics" | "approval" | "in_progress" | "ready" | "completed" | "cancelled";
 export type AdminOrderRow = {
   id: string;
@@ -138,6 +155,16 @@ export type AdminPanelMockState = {
   };
 };
 export type TechRepairStage = "accepted" | "diagnostics" | "waiting_approval" | "repair" | "ready" | "completed";
+export type TechProgressEntry = {
+  id: string;
+  stage: TechRepairStage;
+  kind: "stage" | "substep";
+  title: string;
+  description?: string;
+  at: number;
+  atLabel: string;
+  photoDataUrls: string[];
+};
 export type TechIncomingStatus = "pending" | "accepted" | "declined";
 export type TechIncomingRequest = {
   id: string;
@@ -199,6 +226,8 @@ export type TechRepairJob = {
   }>;
   /** Свои позиции мастера (не из общего каталога) */
   customParts?: TechPart[];
+  /** Подробная хронология этапов и подпунктов с фото */
+  progressLog?: TechProgressEntry[];
 };
 export type TechPart = {
   id: string;
@@ -278,6 +307,7 @@ export type AppState = {
   otp: Record<string, OtpRow>;
   refreshById: Record<string, RefreshRow>;
   inboxByUserId: Record<string, UserInboxRow>;
+  orderDraftsByUserId: Record<string, ClientOrderDraftRow[]>;
   adminPanelMock?: AdminPanelMockState;
   techPanelMock?: TechPanelMockState;
 };
@@ -289,6 +319,7 @@ const emptyState = (): AppState => ({
   otp: {},
   refreshById: {},
   inboxByUserId: {},
+  orderDraftsByUserId: {},
 });
 
 const mutex = new Mutex();
@@ -341,6 +372,7 @@ function normalizeState(parsed: AppState): AppState {
     otp: parsed.otp ?? {},
     refreshById: parsed.refreshById ?? {},
     inboxByUserId: parsed.inboxByUserId ?? {},
+    orderDraftsByUserId: parsed.orderDraftsByUserId ?? {},
   };
   for (const user of Object.values(next.usersById)) {
     if (!user.role) user.role = "client";

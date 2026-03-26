@@ -5,7 +5,7 @@ import AppLayout from "./app/AppLayout";
 import { RouteLoading } from "./app/RouteLoading";
 import "./app/index.css";
 import { ContactsPage } from "./pages/Contacts";
-import { CreateOrderPage, CreateOrderSuccessPage } from "./pages/CreateOrder";
+import { CreateOrderDraftsPage, CreateOrderPage, CreateOrderSuccessPage } from "./pages/CreateOrder";
 import { LoginPage } from "./pages/Login";
 import { OrderHistoryPage } from "./pages/OrderHistory";
 import { OrderRepairApprovalPage } from "./pages/OrderRepairApproval";
@@ -89,6 +89,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="repairs" element={<Navigate to="/history" replace />} />
           <Route path="history" element={<OrderHistoryPage />} />
           <Route path="create-order" element={<CreateOrderPage />} />
+          <Route path="create-order/drafts" element={<CreateOrderDraftsPage />} />
           <Route path="create-order/success" element={<CreateOrderSuccessPage />} />
           <Route path="orders/:orderId/approval" element={<OrderRepairApprovalPage />} />
           <Route path="orders/:orderId/pickup" element={<OrderPickupPage />} />

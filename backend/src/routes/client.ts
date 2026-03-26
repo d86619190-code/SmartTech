@@ -9,6 +9,11 @@ import {
   recordClientTypingForOrder,
 } from "../services/clientRepairs.js";
 import {
+  deleteClientOrderDraft,
+  listClientOrderDrafts,
+  saveClientOrderDraft,
+} from "../services/clientOrderDrafts.js";
+import {
   getInboxSummary,
   getOrderMessages,
   markThreadRead,
@@ -47,6 +52,21 @@ const createOrderBody = z.object({
   photoDataUrls: z.array(z.string().max(6_000_000)).max(5).default([]),
   needsConsultation: z.boolean().optional(),
   bringInPerson: z.boolean().optional(),
+});
+const orderDraftBody = z.object({
+  draftId: z.string().optional(),
+  payload: z.object({
+    step: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+    deviceCategory: z.enum(["phone", "tablet", "laptop"]),
+    device: z.string().max(1000),
+    issue: z.string().max(4000),
+    contactPhone: z.string().max(64),
+    visitMode: z.enum(["asap", "slot"]),
+    slot: z.string().max(100).optional().default(""),
+    bringInPerson: z.boolean(),
+    needsConsultation: z.boolean(),
+    photos: z.array(z.object({ name: z.string().max(255), dataUrl: z.string().max(6_000_000) })).max(8),
+  }),
 });
 
 export const clientRouter = Router();
@@ -239,6 +259,30 @@ clientRouter.get("/inbox", async (req, res) => {
   }
   const summary = await getInboxSummary(userId);
   res.status(200).json(summary);
+});
+
+clientRouter.get("/order-drafts", async (req, res) => {
+  const userId = req.auth?.userId;
+  if (!userId) return res.status(401).json({ error: "Требуется авторизация" });
+  const rows = await listClientOrderDrafts(userId);
+  return res.status(200).json({ rows });
+});
+
+clientRouter.post("/order-drafts", async (req, res) => {
+  const userId = req.auth?.userId;
+  if (!userId) return res.status(401).json({ error: "Требуется авторизация" });
+  const parsed = orderDraftBody.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "Некорректные данные", details: parsed.error.flatten() });
+  const row = await saveClientOrderDraft(userId, parsed.data.payload, parsed.data.draftId);
+  return res.status(200).json({ row });
+});
+
+clientRouter.delete("/order-drafts/:draftId", async (req, res) => {
+  const userId = req.auth?.userId;
+  if (!userId) return res.status(401).json({ error: "Требуется авторизация" });
+  const ok = await deleteClientOrderDraft(userId, req.params.draftId);
+  if (!ok) return res.status(404).json({ error: "Черновик не найден" });
+  return res.status(200).json({ ok: true });
 });
 
 clientRouter.get("/messages/:orderId", async (req, res) => {

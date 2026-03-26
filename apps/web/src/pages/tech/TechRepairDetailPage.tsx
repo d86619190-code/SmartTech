@@ -71,7 +71,7 @@ export const TechRepairDetailPage: React.FC = () => {
           Диагностика
         </NavLink>
         <NavLink className={({ isActive }) => [cls.subLink, isActive && cls.subLinkActive].filter(Boolean).join(" ")} to={`${base}/price`}>
-          Смета
+          Стоимость
         </NavLink>
         <NavLink className={({ isActive }) => [cls.subLink, isActive && cls.subLinkActive].filter(Boolean).join(" ")} to={`${base}/approval`}>
           Согласование

@@ -15,9 +15,9 @@ export const ProcessSteps: React.FC<ProcessStepsProps> = ({ steps, variant = "de
       aria-labelledby="process-heading"
     >
       <h2 id="process-heading" className={cls.title}>
-        Наши процессы абсолютно прозрачны для вас
+        Наши процессы абсолютно прозрачны
       </h2>
-      <p className={cls.intro}>Пошагово — без скрытых платежей и сюрпризов.</p>
+      <p className={cls.intro}>без скрытых платежей и сорванных сроков.</p>
       <ol className={cls.track}>
         {steps.map((s) => (
           <li key={s.n} className={cls.step}>

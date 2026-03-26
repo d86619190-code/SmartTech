@@ -39,7 +39,7 @@ export const TechApprovalSendPage: React.FC = () => {
     try {
       const res = await techApi.sendApproval(job.id);
       setJob(res.repair);
-      showToast("success", "Смета отправлена клиенту на согласование");
+      showToast("success", "Стоимость отправлена клиенту на согласование");
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Не удалось отправить";
       showToast("error", msg);

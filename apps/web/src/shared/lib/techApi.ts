@@ -50,6 +50,17 @@ export const techApi = {
     patchJson<{ repair: any }>(`/api/v1/tech/repairs/${id}/pricing`, { laborRub, selectedPartIds }),
   sendApproval: (id: string) => postJson<{ repair: any }>(`/api/v1/tech/repairs/${id}/send-approval`),
   saveStage: (id: string, stage: string) => patchJson<{ repair: any }>(`/api/v1/tech/repairs/${id}/stage`, { stage }),
+  addProgressEntry: (
+    id: string,
+    payload: {
+      stage: "accepted" | "diagnostics" | "waiting_approval" | "repair" | "ready" | "completed";
+      kind: "stage" | "substep";
+      title: string;
+      description?: string;
+      photoDataUrls?: string[];
+      at?: number;
+    }
+  ) => postJson<{ repair: any }>(`/api/v1/tech/repairs/${id}/progress`, payload),
   savePartsSelection: (id: string, selectedPartIds: string[]) => patchJson<{ repair: any }>(`/api/v1/tech/repairs/${id}/parts`, { selectedPartIds }),
   saveQuoteOptions: (
     id: string,

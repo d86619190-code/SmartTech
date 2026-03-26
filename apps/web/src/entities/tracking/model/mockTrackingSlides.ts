@@ -25,7 +25,7 @@ export const mockTrackingSlides: TrackingCardData[] = [
     issueLabel: "Иван Петров · согласование",
     imageUrl: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=400&fit=crop&q=80",
     progressPercent: 48,
-    estimateLabel: "Смета",
+    estimateLabel: "Стоимость",
     orderId: "r-user",
   },
 ];
