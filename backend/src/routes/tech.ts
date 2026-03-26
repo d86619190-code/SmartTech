@@ -38,27 +38,37 @@ const diagnosticsBody = z.object({
 const pricingBody = z.object({ laborRub: z.number(), selectedPartIds: z.array(z.string()) });
 const stageBody = z.object({ stage: z.enum(["accepted", "diagnostics", "waiting_approval", "repair", "ready", "completed"]) });
 const partsBody = z.object({ selectedPartIds: z.array(z.string()) });
+const rubIn = z.preprocess((v) => {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}, z.number().min(0));
+
+const quoteOptionIn = z.object({
+  id: z.string(),
+  title: z.string().max(120),
+  laborRub: rubIn,
+  selectedPartIds: z.array(z.string()),
+  availability: z.enum(["in_stock", "on_order"]),
+  orderLeadDays: z.preprocess((v) => {
+    if (v == null || v === "") return undefined;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : undefined;
+  }, z.number().min(0).max(30).optional()),
+  isOriginal: z.preprocess((v) => Boolean(v), z.boolean()),
+  repairDaysLabel: z.preprocess(
+    (v) => (v == null ? undefined : String(v)),
+    z.string().max(40).optional(),
+  ),
+});
+
 const quoteOptionsBody = z.object({
-  options: z
-    .array(
-      z.object({
-        id: z.string(),
-        title: z.string().max(120),
-        laborRub: z.number().min(0),
-        selectedPartIds: z.array(z.string()),
-        availability: z.enum(["in_stock", "on_order"]),
-        orderLeadDays: z.number().min(0).max(30).optional(),
-        isOriginal: z.boolean(),
-        repairDaysLabel: z.string().max(40).optional(),
-      })
-    )
-    .max(6),
+  options: z.array(quoteOptionIn).max(6),
   customParts: z
     .array(
       z.object({
         id: z.string(),
         name: z.string().max(200),
-        priceRub: z.number().min(0),
+        priceRub: rubIn,
       })
     )
     .max(24)

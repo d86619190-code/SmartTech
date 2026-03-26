@@ -30,20 +30,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       });
     });
 
-    /* Бенто: каскад */
-    const bentoCells = q(`[data-gsap="bento"]`);
-    const benefitsSec = root.querySelector<HTMLElement>(`.${cls.benefits}`);
-    if (bentoCells.length && benefitsSec) {
-      gsap.from(bentoCells, {
-        scrollTrigger: { trigger: benefitsSec, start: "top 78%" },
-        y: 36,
-        opacity: 0,
-        scale: 0.97,
-        stagger: 0.07,
-        duration: 0.65,
-        ease: "power2.out",
-      });
-    }
+    /* Бенто: только CSS + IntersectionObserver (.inView), без GSAP — иначе инлайн opacity ломала отображение */
 
     /* Процесс: лёгкий параллакс заголовка */
     const processScene = root.querySelector<HTMLElement>(`.${cls.processScene}`);

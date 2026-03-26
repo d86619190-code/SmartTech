@@ -239,10 +239,12 @@ export async function resolveApproval(
         const selected = (optionId ? options.find((o) => o.id === optionId) : undefined) ?? options[0];
         if (selected) {
           const partsCatalog = s.techPanelMock?.partsCatalog ?? [];
+          const customParts = tech.customParts ?? [];
           const uniqPartIds = [...new Set(selected.selectedPartIds)];
-          const partsSum = partsCatalog
-            .filter((p) => uniqPartIds.includes(p.id))
-            .reduce((sum, p) => sum + p.priceRub, 0);
+          const partsSum = uniqPartIds.reduce((sum, id) => {
+            const p = partsCatalog.find((x) => x.id === id) ?? customParts.find((x) => x.id === id);
+            return sum + (p ? Math.max(0, p.priceRub || 0) : 0);
+          }, 0);
           tech.selectedPartIds = uniqPartIds;
           tech.laborRub = Math.max(0, selected.laborRub || 0);
           tech.partsRub = Math.max(0, partsSum);

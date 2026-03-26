@@ -126,8 +126,8 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: linear-gradient(155deg, rgba(15, 23, 42, 0.55) 0%, rgba(2, 6, 18, 0.92) 100%);
   overflow: hidden;
-  opacity: 0;
-  transform: translateY(24px) rotateX(6deg);
+  opacity: 1;
+  transform: translateY(0) rotateX(0deg);
   transform-style: preserve-3d;
   transition:
     opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
@@ -138,8 +138,20 @@
 }
 
 .inView .bentoCell {
-  opacity: 1;
-  transform: translateY(0) rotateX(0deg);
+  animation: bentoPop 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 0.055s);
+}
+
+@keyframes bentoPop {
+  from {
+    opacity: 0.85;
+    transform: translateY(16px) rotateX(0deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+  }
 }
 
 .bentoCell::before {
@@ -155,6 +167,251 @@
 .bentoCell:hover {
   border-color: rgba(255, 255, 255, 0.14);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45), 0 0 48px var(--glow, rgba(56, 189, 248, 0.08));
+}
+
+/* Тематические фоны + мини-молнии при hover */
+.bentoFx {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.bentoCell:hover .bentoFx {
+  opacity: 1;
+}
+
+.bentoSparks {
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  color: rgba(186, 230, 253, 0.95);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  mix-blend-mode: screen;
+}
+
+.bentoCell:hover .bentoSparks {
+  opacity: 1;
+}
+
+.bentoSparkSvg {
+  position: absolute;
+  width: 42%;
+  height: 72%;
+  right: 6%;
+  bottom: 8%;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.65));
+}
+
+.bentoSparkPath,
+.bentoSparkPath2 {
+  stroke-dasharray: 18 120;
+  stroke-dashoffset: 0;
+}
+
+.bentoCell:hover .bentoSparkPath {
+  animation: bentoSparkDash 2.8s ease-in-out infinite;
+}
+
+.bentoCell:hover .bentoSparkPath2 {
+  animation: bentoSparkDash 3.4s ease-in-out infinite;
+  animation-delay: 0.55s;
+}
+
+@keyframes bentoSparkDash {
+  0%,
+  88%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 0;
+  }
+
+  89% {
+    opacity: 1;
+  }
+
+  93% {
+    opacity: 0.35;
+    stroke-dashoffset: -40;
+  }
+}
+
+.bentoCell:nth-child(2) .bentoSparkPath {
+  animation-delay: 0.2s;
+}
+
+.bentoCell:nth-child(3) .bentoSparkPath {
+  animation-delay: 0.4s;
+}
+
+.bentoCell:nth-child(4) .bentoSparkPath {
+  animation-delay: 0.1s;
+}
+
+.bentoCell:nth-child(5) .bentoSparkPath {
+  animation-delay: 0.65s;
+}
+
+.bentoCell:nth-child(6) .bentoSparkPath {
+  animation-delay: 0.3s;
+}
+
+.bentoCell:nth-child(7) .bentoSparkPath {
+  animation-delay: 0.5s;
+}
+
+/* 1 — диагностика: сканирующая линия */
+.bentoTheme_diagnostic .bentoFx {
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(56, 189, 248, 0.12) 48%, rgba(56, 189, 248, 0.22) 50%, rgba(56, 189, 248, 0.12) 52%, transparent 100%),
+    radial-gradient(ellipse 90% 60% at 50% 50%, rgba(14, 165, 233, 0.15), transparent 60%);
+  background-size: 100% 220%, 100% 100%;
+  background-position: 0 0, center;
+  animation: bentoScanSweep 2.4s ease-in-out infinite;
+}
+
+@keyframes bentoScanSweep {
+  0%,
+  100% {
+    background-position: 0 0%, center;
+  }
+
+  50% {
+    background-position: 0 100%, center;
+  }
+}
+
+/* 2 — мастерство: тёплый «искристый» шиммер */
+.bentoTheme_craft .bentoFx {
+  background:
+    radial-gradient(circle at 20% 30%, rgba(251, 191, 36, 0.2) 0%, transparent 35%),
+    radial-gradient(circle at 78% 65%, rgba(167, 139, 250, 0.18) 0%, transparent 40%),
+    conic-gradient(from 120deg at 50% 50%, transparent 0deg, rgba(251, 191, 36, 0.08) 60deg, transparent 120deg);
+  animation: bentoCraftPulse 3.2s ease-in-out infinite;
+}
+
+@keyframes bentoCraftPulse {
+  0%,
+  100% {
+    filter: hue-rotate(0deg);
+    transform: scale(1);
+  }
+
+  50% {
+    filter: hue-rotate(12deg);
+    transform: scale(1.02);
+  }
+}
+
+/* 3 — оплата по факту: мягкий «успех»-пульс */
+.bentoTheme_pay .bentoFx {
+  background: radial-gradient(circle at 50% 50%, rgba(52, 211, 153, 0.28) 0%, transparent 55%);
+  animation: bentoPayRipple 2.6s ease-out infinite;
+}
+
+@keyframes bentoPayRipple {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.85;
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.35);
+    opacity: 0.5;
+  }
+}
+
+/* 4 — 24/7: кольца как часы */
+.bentoTheme_track .bentoFx {
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg 8deg, rgba(56, 189, 248, 0.06) 8deg 9deg),
+    radial-gradient(circle at 50% 50%, transparent 30%, rgba(125, 211, 252, 0.12) 31%, transparent 32%);
+  animation: bentoTrackSpin 12s linear infinite;
+}
+
+@keyframes bentoTrackSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 5 — запчасти: движущаяся сетка */
+.bentoTheme_parts .bentoFx {
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(167, 139, 250, 0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
+  animation: bentoGridDrift 4s linear infinite;
+}
+
+@keyframes bentoGridDrift {
+  to {
+    background-position: 22px 22px;
+  }
+}
+
+/* 6 — данные + гарантия: щитовой градиент */
+.bentoTheme_shield .bentoFx {
+  background:
+    radial-gradient(ellipse 70% 85% at 50% 100%, rgba(52, 211, 153, 0.18), transparent 55%),
+    radial-gradient(ellipse 50% 50% at 50% 35%, rgba(56, 189, 248, 0.2), transparent 50%);
+  clip-path: polygon(50% 6%, 92% 32%, 78% 88%, 22% 88%, 8% 32%);
+  animation: bentoShieldGlow 2.8s ease-in-out infinite;
+}
+
+@keyframes bentoShieldGlow {
+  0%,
+  100% {
+    opacity: 0.9;
+    filter: brightness(1);
+  }
+
+  50% {
+    opacity: 1;
+    filter: brightness(1.15);
+  }
+}
+
+/* 7 — прозрачная цена: «столбики» */
+.bentoTheme_pricing .bentoFx {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(56, 189, 248, 0.12) 12%,
+    transparent 12% 18%,
+    rgba(167, 139, 250, 0.1) 30%,
+    transparent 30% 38%,
+    rgba(56, 189, 248, 0.14) 52%,
+    transparent 52% 60%,
+    rgba(125, 211, 252, 0.1) 74%,
+    transparent 74% 82%,
+    rgba(232, 121, 249, 0.08) 94%,
+    transparent 94%
+  );
+  background-size: 200% 100%;
+  animation: bentoBarsMove 2.2s ease-in-out infinite;
+}
+
+@keyframes bentoBarsMove {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .accent_cyan {
@@ -235,6 +492,8 @@
 }
 
 .bentoIx {
+  position: relative;
+  z-index: 2;
   display: block;
   margin-bottom: 12px;
   font-size: clamp(36px, 8vw, 56px);
@@ -247,6 +506,7 @@
 
 .bentoText {
   position: relative;
+  z-index: 2;
   margin: 0;
   font-size: 15px;
   line-height: 1.5;
@@ -1139,6 +1399,10 @@
     transition: none;
   }
 
+  .inView .bentoCell {
+    animation: none;
+  }
+
   .processMassive {
     animation: none;
   }
@@ -1168,5 +1432,14 @@
   .inView .blockLead,
   .inView .kicker {
     animation: none;
+  }
+
+  .bentoFx,
+  .bentoSparks {
+    display: none;
+  }
+
+  .bentoCell:hover .bentoFx {
+    opacity: 0;
   }
 }

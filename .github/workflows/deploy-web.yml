@@ -1,0 +1,53 @@
+# Сборка `apps/web` и публикация на GitHub Pages (ветка gh-pages).
+# После первого успешного запуска: Settings → Pages → Source: Deploy from branch → gh-pages / root.
+# Кастомный домен: Settings → Pages → Custom domain + DNS у регистратора (см. README в ответе ассистента).
+
+name: Deploy web to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/deploy-web.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install & build (apps/web)
+        working-directory: apps/web
+        run: |
+          bun install --frozen-lockfile || bun install
+          bun run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

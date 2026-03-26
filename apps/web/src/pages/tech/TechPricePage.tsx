@@ -23,6 +23,17 @@ type QuoteOptionDraft = {
 
 type CustomPartDraft = { id: string; name: string; priceRub: number };
 
+function newLocalId(prefix: string): string {
+  try {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return `${prefix}-${crypto.randomUUID()}`;
+    }
+  } catch {
+    // noop
+  }
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
 export const TechPricePage: React.FC = () => {
   const { repairId } = useParams();
   const [job, setJob] = React.useState<any | null>(null);
@@ -30,52 +41,80 @@ export const TechPricePage: React.FC = () => {
   const [customParts, setCustomParts] = React.useState<CustomPartDraft[]>([]);
   const [options, setOptions] = React.useState<QuoteOptionDraft[]>([]);
   const [saving, setSaving] = React.useState(false);
+  const [loadError, setLoadError] = React.useState<string | null>(null);
   const { toast, showToast, closeToast } = useStatusToast();
 
   React.useEffect(() => {
     if (!repairId) return;
+    setLoadError(null);
+    setJob(null);
     void (async () => {
-      const [repairRes, partsRes] = await Promise.all([techApi.getRepairById(repairId), techApi.getParts()]);
-      setJob(repairRes.repair);
-      setPartsCatalog(partsRes.rows);
-      const cp = Array.isArray(repairRes.repair.customParts) ? repairRes.repair.customParts : [];
-      setCustomParts(
-        cp.map((p: any) => ({
-          id: p.id,
-          name: String(p.name ?? ""),
-          priceRub: Number(p.priceRub) || 0,
-        })),
-      );
-      const existing = Array.isArray(repairRes.repair.quoteOptions) ? repairRes.repair.quoteOptions : [];
-      if (existing.length > 0) {
-        setOptions(
-          existing.map((o: any, i: number) => ({
-            id: o.id || `opt-${i + 1}`,
-            title: o.title || `Вариант ${i + 1}`,
-            laborRub: o.laborRub ?? 0,
-            selectedPartIds: o.selectedPartIds ?? [],
-            availability: o.availability === "on_order" ? "on_order" : "in_stock",
-            orderLeadDays: o.orderLeadDays,
-            isOriginal: Boolean(o.isOriginal),
-            repairDaysLabel: o.repairDaysLabel ?? (o.availability === "on_order" ? "2-4 дня" : "1-2 дня"),
-          }))
+      try {
+        const [repairRes, partsRes] = await Promise.all([techApi.getRepairById(repairId), techApi.getParts()]);
+        const repair = repairRes?.repair;
+        if (!repair) {
+          throw new Error("Ремонт не найден");
+        }
+        setJob(repair);
+        setPartsCatalog(Array.isArray(partsRes?.rows) ? partsRes.rows : []);
+        const cp = Array.isArray(repair.customParts) ? repair.customParts : [];
+        setCustomParts(
+          cp.map((p: any) => ({
+            id: String(p.id ?? newLocalId("c")),
+            name: String(p.name ?? ""),
+            priceRub: Number(p.priceRub) || 0,
+          })),
         );
-      } else {
-        setOptions([
-          {
-            id: "base",
-            title: "Вариант 1",
-            laborRub: repairRes.repair.laborRub ?? 0,
-            selectedPartIds: repairRes.repair.selectedPartIds ?? [],
-            availability: "in_stock",
-            isOriginal: false,
-            repairDaysLabel: "1-2 дня",
-          },
-        ]);
+        const existing = Array.isArray(repair.quoteOptions) ? repair.quoteOptions : [];
+        if (existing.length > 0) {
+          setOptions(
+            existing.map((o: any, i: number) => ({
+              id: o.id || `opt-${i + 1}`,
+              title: o.title || `Вариант ${i + 1}`,
+              laborRub: Number(o.laborRub) || 0,
+              selectedPartIds: Array.isArray(o.selectedPartIds) ? o.selectedPartIds : [],
+              availability: o.availability === "on_order" ? "on_order" : "in_stock",
+              orderLeadDays: o.orderLeadDays != null ? Number(o.orderLeadDays) : undefined,
+              isOriginal: Boolean(o.isOriginal),
+              repairDaysLabel: o.repairDaysLabel ?? (o.availability === "on_order" ? "2-4 дня" : "1-2 дня"),
+            })),
+          );
+        } else {
+          setOptions([
+            {
+              id: "base",
+              title: "Вариант 1",
+              laborRub: Number(repair.laborRub) || 0,
+              selectedPartIds: Array.isArray(repair.selectedPartIds) ? repair.selectedPartIds : [],
+              availability: "in_stock",
+              isOriginal: false,
+              repairDaysLabel: "1-2 дня",
+            },
+          ]);
+        }
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "Не удалось загрузить смету";
+        setLoadError(msg);
+        setJob(null);
       }
     })();
   }, [repairId]);
   if (!repairId) return <Navigate to="/tech/tasks" replace />;
+  if (loadError) {
+    return (
+      <>
+        <TechPageHeader title="Смета" subtitle="Ошибка загрузки" />
+        <TechCard style={{ padding: 20 }}>
+          <p className={cls.p} style={{ marginBottom: 16 }}>
+            {loadError}
+          </p>
+          <Link className={cls.link} to="/tech/tasks">
+            ← К задачам
+          </Link>
+        </TechCard>
+      </>
+    );
+  }
   if (!job) {
     return (
       <>
@@ -104,7 +143,7 @@ export const TechPricePage: React.FC = () => {
   const addOption = () => {
     setOptions((prev) => {
       const next: QuoteOptionDraft = {
-        id: `opt-${crypto.randomUUID()}`,
+        id: newLocalId("opt"),
         title: `Вариант ${prev.length + 1}`,
         laborRub: 0,
         selectedPartIds: [],
@@ -136,7 +175,7 @@ export const TechPricePage: React.FC = () => {
   );
 
   const addCustomPart = () => {
-    setCustomParts((prev) => [...prev, { id: `c-${crypto.randomUUID()}`, name: "", priceRub: 0 }]);
+    setCustomParts((prev) => [...prev, { id: newLocalId("c"), name: "", priceRub: 0 }]);
   };
 
   const updateCustomPart = (id: string, patch: Partial<CustomPartDraft>) => {
@@ -191,7 +230,7 @@ export const TechPricePage: React.FC = () => {
       <div style={{ display: "grid", gap: 14, marginBottom: 14 }}>
         {options.map((opt, idx) => {
           const selectedParts = mergedCatalog.filter((p: any) => opt.selectedPartIds.includes(p.id));
-          const partsSum = selectedParts.reduce((s: number, p: any) => s + p.priceRub, 0);
+          const partsSum = selectedParts.reduce((s: number, p: any) => s + (Number(p?.priceRub) || 0), 0);
           const total = (Number(opt.laborRub) || 0) + partsSum;
           return (
             <TechCard key={opt.id} style={{ padding: 0 }}>

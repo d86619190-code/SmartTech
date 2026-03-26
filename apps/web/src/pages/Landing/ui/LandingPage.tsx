@@ -100,6 +100,41 @@ export const LandingPage: React.FC = () => {
       <div className={cls.bgNoise} aria-hidden />
       <div className={cls.bgScan} aria-hidden />
 
+      <div className={cls.globalLightning} aria-hidden>
+        <div className={cls.ambientBolt} data-n="1" />
+        <div className={cls.ambientBolt} data-n="2" />
+        <div className={cls.ambientBolt} data-n="3" />
+        <div className={cls.ambientBolt} data-n="4" />
+        <div className={cls.scrollBoltTrack} aria-hidden>
+          <svg className={cls.scrollBoltSvg} viewBox="0 0 64 420" preserveAspectRatio="xMidYMin slice">
+            <defs>
+              <linearGradient id="scroll-bolt-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.95" />
+                <stop offset="45%" stopColor="#e0f2fe" stopOpacity="1" />
+                <stop offset="100%" stopColor="#a78bfa" stopOpacity="0.85" />
+              </linearGradient>
+              <filter id="scroll-bolt-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="b" />
+                <feMerge>
+                  <feMergeNode in="b" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <path
+              className={cls.scrollBoltPath}
+              d="M32 8 L26 120 L38 132 L22 260 L36 272 L18 412"
+              fill="none"
+              stroke="url(#scroll-bolt-grad)"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              filter="url(#scroll-bolt-glow)"
+            />
+          </svg>
+        </div>
+      </div>
+
       {FLOAT_ORBS.map((o) => (
         <span
           key={o.k}

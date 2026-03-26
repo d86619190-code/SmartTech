@@ -36,6 +36,17 @@ function useInView<T extends HTMLElement>(): React.RefObject<T | null> {
 
 const BENEFIT_ACCENTS = ["cyan", "violet", "emerald", "amber", "rose", "sky", "fuchsia"] as const;
 
+/** Тема фоновой анимации при hover (см. CSS bentoTheme_*) */
+const BENEFIT_THEMES = [
+  "diagnostic",
+  "craft",
+  "pay",
+  "track",
+  "parts",
+  "shield",
+  "pricing",
+] as const;
+
 export const LandingBelowFold: React.FC = () => {
   const navigate = useNavigate();
   const belowRootRef = React.useRef<HTMLDivElement>(null);
@@ -71,9 +82,35 @@ export const LandingBelowFold: React.FC = () => {
               <article
                 key={text}
                 data-gsap="bento"
-                className={[cls.bentoCell, cls[`accent_${BENEFIT_ACCENTS[i % BENEFIT_ACCENTS.length]}`]].join(" ")}
+                className={[
+                  cls.bentoCell,
+                  cls[`accent_${BENEFIT_ACCENTS[i % BENEFIT_ACCENTS.length]}`],
+                  cls[`bentoTheme_${BENEFIT_THEMES[i]}`],
+                ].join(" ")}
                 style={{ "--i": i } as React.CSSProperties}
               >
+                <div className={cls.bentoFx} aria-hidden />
+                <div className={cls.bentoSparks} aria-hidden>
+                  <svg className={cls.bentoSparkSvg} viewBox="0 0 120 80" preserveAspectRatio="none">
+                    <path
+                      className={cls.bentoSparkPath}
+                      d="M58 4 L52 28 L64 32 L48 76"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      className={cls.bentoSparkPath2}
+                      d="M88 12 L82 44 L96 52 L90 78"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      opacity="0.85"
+                    />
+                  </svg>
+                </div>
                 <span className={cls.bentoIx} aria-hidden>
                   {String(i + 1).padStart(2, "0")}
                 </span>

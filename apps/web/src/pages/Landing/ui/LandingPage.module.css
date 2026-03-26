@@ -54,6 +54,120 @@
   mix-blend-mode: overlay;
 }
 
+/* Фоновые молнии + «направляющая» молния по скроллу */
+.globalLightning {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambientBolt {
+  position: absolute;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(186, 230, 253, 0.55) 35%,
+    rgba(224, 242, 254, 0.95) 50%,
+    rgba(167, 139, 250, 0.45) 65%,
+    transparent 100%
+  );
+  filter: blur(0.6px);
+  box-shadow:
+    0 0 14px rgba(56, 189, 248, 0.45),
+    0 0 28px rgba(167, 139, 250, 0.2);
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.ambientBolt[data-n="1"] {
+  left: 6%;
+  top: 12%;
+  height: min(32vh, 240px);
+  animation: ambientFlash 9.5s ease-in-out infinite;
+}
+
+.ambientBolt[data-n="2"] {
+  right: 14%;
+  top: 38%;
+  height: min(26vh, 200px);
+  animation: ambientFlash 11.2s ease-in-out infinite;
+  animation-delay: 2.1s;
+}
+
+.ambientBolt[data-n="3"] {
+  left: 22%;
+  bottom: 18%;
+  height: min(28vh, 220px);
+  animation: ambientFlash 8.4s ease-in-out infinite;
+  animation-delay: 4.6s;
+}
+
+.ambientBolt[data-n="4"] {
+  right: 8%;
+  top: 8%;
+  height: min(22vh, 180px);
+  transform-origin: 50% 0%;
+  animation: ambientFlash 10s ease-in-out infinite;
+  animation-delay: 1.3s;
+}
+
+@keyframes ambientFlash {
+  0%,
+  91%,
+  100% {
+    opacity: 0;
+    transform: scaleY(0.92);
+  }
+
+  93% {
+    opacity: 0.55;
+    transform: scaleY(1);
+  }
+
+  96% {
+    opacity: 0.12;
+  }
+}
+
+.scrollBoltTrack {
+  position: absolute;
+  right: max(10px, env(safe-area-inset-right));
+  top: 0;
+  width: min(56px, 8vw);
+  height: 100vh;
+  height: 100dvh;
+}
+
+.scrollBoltSvg {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 100%;
+  height: min(36vh, 260px);
+  transform: translate(
+    -50%,
+    calc(var(--landing-progress, 0) * (100dvh - min(36vh, 260px) - 48px))
+  );
+  opacity: 0.42;
+  filter: drop-shadow(0 0 14px rgba(56, 189, 248, 0.55));
+  will-change: transform;
+}
+
+.scrollBoltPath {
+  stroke-dasharray: 28 200;
+  animation: scrollBoltShimmer 2.8s linear infinite;
+}
+
+@keyframes scrollBoltShimmer {
+  to {
+    stroke-dashoffset: -228;
+  }
+}
+
 .floatOrb {
   position: fixed;
   z-index: 0;
@@ -523,8 +637,14 @@
   .lightningPath,
   .lightningPath2,
   .floatOrb,
-  .ctaSparks::before {
+  .ctaSparks::before,
+  .ambientBolt,
+  .scrollBoltPath {
     animation: none;
+  }
+
+  .globalLightning {
+    display: none;
   }
 
   .topNav {
