@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import { config } from "../config.js";
 import { withStore, type AppState } from "../store.js";
 import { sha256Hex, timingEqual } from "./crypto.js";
+import { sendOtpEmail } from "./email.js";
 import { sendOtpSms } from "./sms.js";
 
 const MAX_ATTEMPTS = 5;
@@ -10,8 +11,8 @@ function otpPepper(): string {
   return sha256Hex(`${config.jwtSecret}:otp`);
 }
 
-function hashOtp(phone: string, code: string): string {
-  return sha256Hex(`${otpPepper()}:${phone}:${code}`);
+function hashOtp(key: string, code: string): string {
+  return sha256Hex(`${otpPepper()}:${key}:${code}`);
 }
 
 function generateCode(): string {
@@ -19,25 +20,21 @@ function generateCode(): string {
   return String(n).padStart(6, "0");
 }
 
-function setOtp(s: AppState, phone: string, codeHash: string, expiresAt: number): void {
-  s.otp[phone] = { code_hash: codeHash, expires_at: expiresAt, attempts: 0 };
+function setOtp(s: AppState, key: string, codeHash: string, expiresAt: number): void {
+  s.otp[key] = { code_hash: codeHash, expires_at: expiresAt, attempts: 0 };
 }
 
-export async function sendCode(phone: string): Promise<{ devCode?: string }> {
+export async function sendCode(key: string, channel: "phone" | "email"): Promise<void> {
   const code = generateCode();
-  const codeHash = hashOtp(phone, code);
+  const codeHash = hashOtp(key, code);
   const expiresAt = Date.now() + config.otpTtlSec * 1000;
 
   await withStore((s) => {
-    setOtp(s, phone, codeHash, expiresAt);
+    setOtp(s, key, codeHash, expiresAt);
   });
 
-  await sendOtpSms(phone, code);
-
-  if (config.otpDevPlaintext) {
-    return { devCode: code };
-  }
-  return {};
+  if (channel === "phone") await sendOtpSms(key, code);
+  if (channel === "email") await sendOtpEmail(key, code);
 }
 
 export async function verifyCode(phone: string, code: string): Promise<boolean> {

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { useLocation, useOutlet } from "react-router-dom";
 import { getRouteNavOrder } from "@/shared/lib/navigation/routeNavOrder";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
+import { setLastAuthRoute } from "@/shared/lib/authRedirect";
 import cls from "./PageTransition.module.css";
 
 const SLIDE_MS = 680;
@@ -126,6 +127,11 @@ export function PageTransition() {
     }
     prevOutletRef.current = outlet;
   }, [location.pathname, outlet, isDesktop]);
+
+  useEffect(() => {
+    // For auth-missing cases we need to restore where the user was.
+    setLastAuthRoute(`${location.pathname}${location.search}`);
+  }, [location.pathname, location.search]);
 
   const clearSlide = useCallback(() => {
     setTransition(null);

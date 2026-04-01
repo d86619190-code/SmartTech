@@ -1,15 +1,24 @@
 import { apiOrigin } from "@/shared/config/api";
 import { readAuthSession } from "./authSession";
 import { refreshSessionOrNull } from "./authApi";
+import { normalizeAuthRequiredMessage, redirectToLoginForAuthMissing, isAuthRequiredMessage } from "./authRedirect";
 
 async function parseError(res: Response): Promise<string> {
   const body = (await res.json().catch(() => ({}))) as { error?: string };
-  return body.error ?? `Ошибка ${res.status}`;
+  const base = body.error ?? `Ошибка ${res.status}`;
+  if (isAuthRequiredMessage(base)) {
+    redirectToLoginForAuthMissing();
+    return normalizeAuthRequiredMessage(base);
+  }
+  return base;
 }
 
 async function authFetch(path: string, init?: RequestInit): Promise<Response> {
   let session = readAuthSession();
-  if (!session) throw new Error("Требуется авторизация");
+  if (!session) {
+    redirectToLoginForAuthMissing();
+    throw new Error("Нужна авторизация");
+  }
   let res = await fetch(`${apiOrigin}${path}`, {
     ...init,
     headers: { ...(init?.headers ?? {}), Authorization: `Bearer ${session.accessToken}` },

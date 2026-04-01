@@ -16,6 +16,24 @@ export async function findUserById(id: string): Promise<UserRow | undefined> {
   return withStore((s) => s.usersById[id]);
 }
 
+export async function getOrCreateUserByEmail(emailRaw: string): Promise<UserRow> {
+  const email = emailRaw.trim().toLowerCase();
+  return withStore((s) => {
+    const existingId = s.userIdByEmail[email];
+    if (existingId) {
+      const u = s.usersById[existingId];
+      if (u) return u;
+    }
+    const id = crypto.randomUUID();
+    const createdAt = Date.now();
+    const role: UserRow["role"] = config.bossEmails.includes(email) ? "boss" : "client";
+    const row: UserRow = { id, role, email, name: "Пользователь", created_at: createdAt };
+    s.usersById[id] = row;
+    s.userIdByEmail[email] = id;
+    return row;
+  });
+}
+
 export async function getOrCreateUserByPhone(phone: string): Promise<UserRow> {
   return withStore((s) => {
     const existingId = s.userIdByPhone[phone];
@@ -44,6 +62,7 @@ export async function getOrCreateUserByGoogle(
       const u = s.usersById[existingId];
       if (u) {
         if (u.email !== email) u.email = email;
+        s.userIdByEmail[email.toLowerCase()] = u.id;
         if (config.bossEmails.includes(email.toLowerCase())) u.role = "boss";
         if (!u.name && name) u.name = name;
         if (!u.avatar_url && avatarUrl) u.avatar_url = avatarUrl;
@@ -64,13 +83,14 @@ export async function getOrCreateUserByGoogle(
     };
     s.usersById[id] = row;
     s.userIdByGoogleSub[googleSub] = id;
+    s.userIdByEmail[email.toLowerCase()] = id;
     return row;
   });
 }
 
 export async function updateUserProfile(
   id: string,
-  patch: { name?: string; avatarUrl?: string }
+  patch: { name?: string; avatarUrl?: string; phone?: string }
 ): Promise<UserRow | undefined> {
   return withStore((s) => {
     const user = s.usersById[id];
@@ -80,6 +100,17 @@ export async function updateUserProfile(
     }
     if (patch.avatarUrl !== undefined) {
       user.avatar_url = patch.avatarUrl;
+    }
+    if (patch.phone !== undefined) {
+      const ownerId = s.userIdByPhone[patch.phone];
+      if (ownerId && ownerId !== id) {
+        throw new Error("Этот номер уже привязан к другому аккаунту");
+      }
+      if (user.phone && user.phone !== patch.phone) {
+        delete s.userIdByPhone[user.phone];
+      }
+      user.phone = patch.phone;
+      s.userIdByPhone[patch.phone] = id;
     }
     return user;
   });

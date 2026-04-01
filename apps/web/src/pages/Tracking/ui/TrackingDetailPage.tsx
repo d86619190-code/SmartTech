@@ -113,19 +113,7 @@ export const TrackingDetailPage: React.FC = () => {
   }
 
   if (!auth?.accessToken) {
-    return (
-      <div className={cls.shell}>
-        <div className={cls.inner}>
-          <PageHeader embedded title="Отслеживание" />
-          <p className={cls.loginHint}>
-            Войдите в аккаунт, чтобы видеть статус ремонта.{" "}
-            <Link className={cls.loginLink} to="/login">
-              Вход
-            </Link>
-          </p>
-        </div>
-      </div>
-    );
+    return <Navigate to={`/login?next=${encodeURIComponent(`/tracking/${orderId}`)}`} replace />;
   }
 
   if (metaLoading) {
@@ -145,7 +133,7 @@ export const TrackingDetailPage: React.FC = () => {
       <div className={cls.shell}>
         <PageHeader maxWidth="narrow" title="Заказ" />
         <div className={cls.body}>
-          <p className={cls.mutedLead}>Заказ не найден или нет доступа.</p>
+          <p className={cls.emptyState}>Заказ не найден или нет доступа.</p>
           <Button type="button" variant="outline" onClick={() => navigate("/tracking")}>
             К отслеживанию
           </Button>
@@ -200,7 +188,7 @@ export const TrackingDetailPage: React.FC = () => {
 
         <section className={cls.card} aria-label="Этапы заказа">
           <h2 className={cls.cardHeading}>Статус</h2>
-          <OrderTimeline currentStep={meta.clientStep} variant={isNarrow ? "horizontal" : "vertical"} />
+          <OrderTimeline currentStep={meta.clientStep} variant="horizontal" />
         </section>
 
         {meta.needsApproval ? (
@@ -249,28 +237,112 @@ export const TrackingDetailPage: React.FC = () => {
         <section className={cls.card}>
           <h2 className={cls.cardHeading}>История работ</h2>
           {meta.timeline?.length ? (
-            <div style={{ display: "grid", gap: 10 }}>
-              {[...meta.timeline].reverse().map((item) => (
-                <article key={item.id} style={{ border: "1px solid var(--color-order-row-border)", borderRadius: 10, padding: 12 }}>
-                  <p className={cls.meta} style={{ margin: 0 }}>
-                    <strong>{item.title}</strong> · {item.atLabel}
-                  </p>
-                  <p className={cls.mutedSmall}>
-                    {item.kind === "stage" ? "Этап" : "Подпункт"} · {item.stage}
-                  </p>
-                  {item.description ? <p className={cls.meta} style={{ marginTop: 6 }}>{item.description}</p> : null}
-                  {item.photoDataUrls?.length ? (
-                    <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(84px,1fr))", gap: 8 }}>
-                      {item.photoDataUrls.map((src, idx) => (
-                        <img key={`${item.id}-${idx}`} src={src} alt="" style={{ width: "100%", aspectRatio: "1 / 1", objectFit: "cover", borderRadius: 8 }} />
-                      ))}
+            <div style={{ display: "grid", gap: 16 }}>
+              {(["diagnostics", "repair"] as const).map((stageKey) => {
+                const items = meta.timeline?.filter((t) => t.stage === stageKey) ?? [];
+                if (!items.length) return null;
+                const title = stageKey === "diagnostics" ? "Диагностика — подпункты" : "Работа / ремонт — подпункты";
+                return (
+                  <details key={stageKey} className={cls.detailsGroup} open>
+                    <summary className={cls.detailsSummary}>{title}</summary>
+                    <div className={cls.detailsBody}>
+                      <div style={{ display: "grid", gap: 10 }}>
+                        {[...items].reverse().map((item) => (
+                          <article
+                            key={item.id}
+                            style={{ border: "1px solid var(--color-order-row-border)", borderRadius: 10, padding: 12 }}
+                          >
+                            <p className={cls.meta} style={{ margin: 0 }}>
+                              <strong>{item.title}</strong> · {item.atLabel}
+                            </p>
+                            <p className={cls.mutedSmall}>
+                              {item.kind === "stage" ? "Этап" : "Подпункт"} · {item.stage}
+                            </p>
+                            {item.description ? <p className={cls.meta} style={{ marginTop: 6 }}>{item.description}</p> : null}
+                            {item.photoDataUrls?.length ? (
+                              <div
+                                style={{
+                                  marginTop: 8,
+                                  display: "grid",
+                                  gridTemplateColumns: "repeat(auto-fill,minmax(84px,1fr))",
+                                  gap: 8,
+                                }}
+                              >
+                                {item.photoDataUrls.map((src, idx) => (
+                                  <img
+                                    key={`${item.id}-${idx}`}
+                                    src={src}
+                                    alt=""
+                                    style={{
+                                      width: "100%",
+                                      aspectRatio: "1 / 1",
+                                      objectFit: "cover",
+                                      borderRadius: 8,
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            ) : null}
+                          </article>
+                        ))}
+                      </div>
                     </div>
-                  ) : null}
-                </article>
-              ))}
+                  </details>
+                );
+              })}
+              {meta.timeline.some((t) => t.stage !== "diagnostics" && t.stage !== "repair") ? (
+                <details className={cls.detailsGroup}>
+                  <summary className={cls.detailsSummary}>Другие этапы</summary>
+                  <div className={cls.detailsBody}>
+                    <div style={{ display: "grid", gap: 10 }}>
+                      {[...meta.timeline]
+                        .filter((t) => t.stage !== "diagnostics" && t.stage !== "repair")
+                        .reverse()
+                        .map((item) => (
+                          <article
+                            key={item.id}
+                            style={{ border: "1px solid var(--color-order-row-border)", borderRadius: 10, padding: 12 }}
+                          >
+                            <p className={cls.meta} style={{ margin: 0 }}>
+                              <strong>{item.title}</strong> · {item.atLabel}
+                            </p>
+                            <p className={cls.mutedSmall}>
+                              {item.kind === "stage" ? "Этап" : "Подпункт"} · {item.stage}
+                            </p>
+                            {item.description ? <p className={cls.meta} style={{ marginTop: 6 }}>{item.description}</p> : null}
+                            {item.photoDataUrls?.length ? (
+                              <div
+                                style={{
+                                  marginTop: 8,
+                                  display: "grid",
+                                  gridTemplateColumns: "repeat(auto-fill,minmax(84px,1fr))",
+                                  gap: 8,
+                                }}
+                              >
+                                {item.photoDataUrls.map((src, idx) => (
+                                  <img
+                                    key={`${item.id}-${idx}`}
+                                    src={src}
+                                    alt=""
+                                    style={{
+                                      width: "100%",
+                                      aspectRatio: "1 / 1",
+                                      objectFit: "cover",
+                                      borderRadius: 8,
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            ) : null}
+                          </article>
+                        ))}
+                    </div>
+                  </div>
+                </details>
+              ) : null}
             </div>
           ) : (
-            <p className={cls.mutedSmall}>Мастер ещё не добавил подробную хронологию.</p>
+            <p className={cls.emptyState}>Мастер ещё не добавил подробную хронологию.</p>
           )}
         </section>
 

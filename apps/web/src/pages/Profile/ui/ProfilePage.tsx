@@ -130,7 +130,7 @@ export const ProfilePage: React.FC = () => {
   const onSave = async () => {
     try {
       setIsSaving(true);
-      const updated = await updateMe(name, avatarUrl);
+      const updated = await updateMe(name, avatarUrl, phone);
       setRole(updated.role);
       setName(updated.name ?? "Пользователь");
       setAvatarUrl(updated.avatarUrl ?? "");
@@ -291,10 +291,16 @@ export const ProfilePage: React.FC = () => {
               </label>
               <label className={cls.label}>
                 Телефон
-                <input className={cls.input} value={phone} inputMode="tel" readOnly />
+                <input
+                  className={cls.input}
+                  value={phone}
+                  inputMode="tel"
+                  placeholder="+7 999 123-45-67"
+                  onChange={(e) => setPhone(e.target.value)}
+                />
               </label>
               {email ? <p className={cls.meta}>Google: {email}</p> : null}
-              <p className={cls.hint}>Телефон пока только для чтения. Имя сохраняется на сервере.</p>
+              <p className={cls.hint}>Имя и телефон сохраняются на сервере.</p>
               <Button type="submit" variant="outline" disabled={isSaving || name.trim().length < 2}>
                 {isSaving ? "Сохраняем..." : "Сохранить изменения"}
               </Button>

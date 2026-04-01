@@ -99,6 +99,19 @@ export const HomePage: React.FC = () => {
           </div>
         </section>
 
+        <section className={cls.card} aria-labelledby="model3d-heading">
+          <div className={cls.modelWrap}>
+            <iframe
+              title="3D-анимация Vectary"
+              src="https://app.vectary.com/p/3n4dvAeNEGUrapY8qBsuCq"
+              className={cls.modelFrame}
+              loading="lazy"
+              allow="fullscreen; xr-spatial-tracking"
+              referrerPolicy="strict-origin-when-cross-origin"
+            />
+          </div>
+        </section>
+
         <section className={cls.section}>
           <ProcessSteps steps={PROCESS_STEPS} />
         </section>

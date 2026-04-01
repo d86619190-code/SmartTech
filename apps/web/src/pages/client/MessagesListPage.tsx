@@ -62,12 +62,10 @@ export const MessagesListPage: React.FC = () => {
     <div className={cls.shell}>
       <PageHeader title="Сообщения" subtitle="Переписка с сервисом по вашим заказам." />
       <div className={cls.body}>
-        <section className={cls.card}>
-          <h2 className={cls.h2}>Нужно ваше решение</h2>
-          <p className={cls.streamStatus}>{streamUpdatesLabel(streamStatus)}</p>
-          {approvals.length === 0 ? (
-            <p className={cls.lead}>Новых согласований сейчас нет. Когда понадобится ваш выбор, мы покажем его здесь.</p>
-          ) : (
+        {approvals.length > 0 ? (
+          <section className={cls.card}>
+            <h2 className={cls.h2}>Нужно ваше решение</h2>
+            <p className={cls.streamStatus}>{streamUpdatesLabel(streamStatus)}</p>
             <div className={cls.approvalsList}>
               {approvals.map((item) => (
                 <article key={item.id} className={cls.approvalRow}>
@@ -88,8 +86,8 @@ export const MessagesListPage: React.FC = () => {
                 </article>
               ))}
             </div>
-          )}
-        </section>
+          </section>
+        ) : null}
 
         <section className={cls.card} style={{ padding: 0 }}>
           {loading ? (
@@ -97,7 +95,7 @@ export const MessagesListPage: React.FC = () => {
               Загрузка диалогов…
             </p>
           ) : threads.length === 0 ? (
-            <p className={cls.lead} style={{ padding: 24 }}>
+            <p className={cls.emptyState} style={{ padding: 24 }}>
               Нет активных диалогов.
             </p>
           ) : (

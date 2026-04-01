@@ -16,9 +16,26 @@
   padding: max(20px, env(safe-area-inset-top)) var(--content-pad-x-sm) max(40px, env(safe-area-inset-bottom));
 }
 
+.authColumn {
+  width: 100%;
+  max-width: 420px;
+}
+
+.title {
+  margin: 0 0 14px;
+  font-size: 42px;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+}
+
 @media (max-width: 767px) {
   .center {
     align-items: flex-start;
     padding-top: max(12px, env(safe-area-inset-top));
+  }
+
+  .title {
+    font-size: 34px;
   }
 }

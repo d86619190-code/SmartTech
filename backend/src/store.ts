@@ -303,6 +303,7 @@ export type TechPanelMockState = {
 export type AppState = {
   usersById: Record<string, UserRow>;
   userIdByPhone: Record<string, string>;
+  userIdByEmail: Record<string, string>;
   userIdByGoogleSub: Record<string, string>;
   otp: Record<string, OtpRow>;
   refreshById: Record<string, RefreshRow>;
@@ -315,6 +316,7 @@ export type AppState = {
 const emptyState = (): AppState => ({
   usersById: {},
   userIdByPhone: {},
+  userIdByEmail: {},
   userIdByGoogleSub: {},
   otp: {},
   refreshById: {},
@@ -368,6 +370,7 @@ function normalizeState(parsed: AppState): AppState {
     ...parsed,
     usersById: parsed.usersById ?? {},
     userIdByPhone: parsed.userIdByPhone ?? {},
+    userIdByEmail: parsed.userIdByEmail ?? {},
     userIdByGoogleSub: parsed.userIdByGoogleSub ?? {},
     otp: parsed.otp ?? {},
     refreshById: parsed.refreshById ?? {},

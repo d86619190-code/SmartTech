@@ -3,18 +3,22 @@ import { NavLink } from "react-router-dom";
 import { Button } from "@/shared/ui/Button/Button";
 import { Card } from "@/shared/ui/Card/Card";
 import { Input } from "@/shared/ui/Input/Input";
-import { IconLock, IconPhone } from "@/shared/ui/Icon/NavAndAuthIcons";
+import { IconPhone } from "@/shared/ui/Icon/NavAndAuthIcons";
 import { GoogleSignInButton } from "./GoogleSignInButton";
 import cls from "./LoginForm.module.css";
 
 type LoginFormProps = {
   mode: "login" | "register";
+  authMethod: "phone" | "email";
   name: string;
   phone: string;
+  email: string;
   code: string;
+  codeTone?: "idle" | "success" | "error";
   isSubmitting?: boolean;
-  devCode?: string | null;
+  onAuthMethodChange: (method: "phone" | "email") => void;
   onPhoneChange: (value: string) => void;
+  onEmailChange: (value: string) => void;
   onCodeChange: (value: string) => void;
   onNameChange: (value: string) => void;
   onModeChange: (mode: "login" | "register") => void;
@@ -26,12 +30,16 @@ type LoginFormProps = {
 
 export const LoginForm: React.FC<LoginFormProps> = ({
   mode,
+  authMethod,
   name,
   phone,
+  email,
   code,
+  codeTone = "idle",
   isSubmitting,
-  devCode,
+  onAuthMethodChange,
   onPhoneChange,
+  onEmailChange,
   onCodeChange,
   onNameChange,
   onModeChange,
@@ -41,6 +49,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onGoogleOpenInBrowser,
 }) => {
   const onGoogle = onGoogleCredential ?? (async () => {});
+  const contactReady = authMethod === "phone" ? phone.trim().length >= 8 : email.trim().includes("@");
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const codeDigits = React.useMemo(() => {
+    const padded = `${code}`.replace(/\D/g, "").slice(0, 6).padEnd(6, " ");
+    return padded.split("");
+  }, [code]);
 
   return (
     <Card>
@@ -52,6 +66,22 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         }}
         noValidate
       >
+        <div className={cls.methodTabs} role="tablist" aria-label="Способ входа">
+          <button
+            type="button"
+            className={[cls.methodTab, authMethod === "email" ? cls.methodTabActive : ""].join(" ")}
+            onClick={() => onAuthMethodChange("email")}
+          >
+            Email
+          </button>
+          <button
+            type="button"
+            className={[cls.methodTab, authMethod === "phone" ? cls.methodTabActive : ""].join(" ")}
+            onClick={() => onAuthMethodChange("phone")}
+          >
+            Телефон (опционально)
+          </button>
+        </div>
         <div className={cls.fields}>
           {mode === "register" ? (
             <Input
@@ -65,32 +95,63 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               aria-label="Имя"
             />
           ) : null}
-          <Input
-            type="tel"
-            name="phone"
-            autoComplete="tel"
-            placeholder="+7 999 123-45-67"
-            value={phone}
-            onChange={(e) => onPhoneChange(e.target.value)}
-            icon={<IconPhone size={18} />}
-            required
-            aria-label="Телефон"
-          />
-          <Input
-            type="text"
-            name="otp"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={6}
-            placeholder="Код из SMS"
-            value={code}
-            onChange={(e) => onCodeChange(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            icon={<IconLock size={18} />}
-            aria-label="Код подтверждения"
-          />
+          {authMethod === "phone" ? (
+            <Input
+              type="tel"
+              name="phone"
+              autoComplete="tel"
+              placeholder="+7 999 123-45-67"
+              value={phone}
+              onChange={(e) => onPhoneChange(e.target.value)}
+              icon={<IconPhone size={18} />}
+              required
+              aria-label="Телефон"
+            />
+          ) : null}
+          {authMethod === "email" ? (
+            <Input
+              type="email"
+              name="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => onEmailChange(e.target.value)}
+              required
+              aria-label="Email"
+            />
+          ) : null}
+          <div className={cls.otpBlock}>
+            <p className={cls.otpLabel}>{authMethod === "phone" ? "Код из SMS" : "Код из email"}</p>
+            <div
+              className={[
+                cls.otpGrid,
+                codeTone === "error" ? cls.otpGridError : "",
+                codeTone === "success" ? cls.otpGridSuccess : "",
+              ].join(" ")}
+              onClick={() => inputRef.current?.focus()}
+            >
+              {codeDigits.map((digit, idx) => (
+                <span key={idx} className={[cls.otpCell, digit.trim() ? cls.otpCellFilled : ""].join(" ")}>
+                  {digit.trim() ? digit : ""}
+                </span>
+              ))}
+              <input
+                ref={inputRef}
+                className={cls.otpHiddenInput}
+                type="text"
+                name="otp"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9]*"
+                maxLength={6}
+                value={code}
+                onChange={(e) => onCodeChange(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                aria-label="Код подтверждения"
+              />
+            </div>
+          </div>
         </div>
-        {devCode ? <p className={cls.devCode}>Dev-код: {devCode}</p> : null}
-        <Button type="button" variant="outline" fullWidth disabled={isSubmitting || phone.trim().length < 8} onClick={() => void onSendCode()}>
+        <Button type="button" variant="outline" fullWidth disabled={isSubmitting || !contactReady} onClick={() => void onSendCode()}>
           Отправить код
         </Button>
         <Button type="submit" fullWidth disabled={isSubmitting || code.length !== 6 || (mode === "register" && name.trim().length < 2)}>

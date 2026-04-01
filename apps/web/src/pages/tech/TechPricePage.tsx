@@ -44,6 +44,21 @@ export const TechPricePage: React.FC = () => {
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const { toast, showToast, closeToast } = useStatusToast();
 
+  const mergedCatalog = React.useMemo(
+    () => [
+      ...partsCatalog,
+      ...customParts.map((p) => ({
+        id: p.id,
+        name: p.name.trim() || "Своя позиция",
+        oem: false,
+        inStock: true,
+        priceRub: p.priceRub,
+        deviceHint: "Своё",
+      })),
+    ],
+    [partsCatalog, customParts],
+  );
+
   React.useEffect(() => {
     if (!repairId) return;
     setLoadError(null);
@@ -158,21 +173,6 @@ export const TechPricePage: React.FC = () => {
   const removeOption = (idx: number) => {
     setOptions((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== idx)));
   };
-
-  const mergedCatalog = React.useMemo(
-    () => [
-      ...partsCatalog,
-      ...customParts.map((p) => ({
-        id: p.id,
-        name: p.name.trim() || "Своя позиция",
-        oem: false,
-        inStock: true,
-        priceRub: p.priceRub,
-        deviceHint: "Своё",
-      })),
-    ],
-    [partsCatalog, customParts],
-  );
 
   const addCustomPart = () => {
     setCustomParts((prev) => [...prev, { id: newLocalId("c"), name: "", priceRub: 0 }]);

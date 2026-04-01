@@ -165,29 +165,69 @@ export const TechTrackingPage: React.FC = () => {
         </div>
       </TechCard>
       <TechCard style={{ padding: 20, marginBottom: 20 }}>
-        <h3 className={cls.sectionTitle}>Хронология работ</h3>
+        <h3 className={cls.sectionTitle}>Хронология работ по этапам</h3>
         {progressLog.length === 0 ? (
           <p className={cls.p}>Записей пока нет.</p>
         ) : (
-          <div style={{ display: "grid", gap: 10 }}>
-            {progressLog.map((item: any) => (
-              <div key={item.id} style={{ border: "1px solid var(--color-order-row-border)", borderRadius: 12, padding: 12 }}>
-                <p className={cls.p}>
-                  <strong>{item.title}</strong> · {item.atLabel}
-                </p>
-                <p className={cls.muted}>
-                  {item.kind === "stage" ? "Этап" : "Подпункт"} · {item.stage}
-                </p>
-                {item.description ? <p className={cls.p} style={{ marginTop: 6 }}>{item.description}</p> : null}
-                {Array.isArray(item.photoDataUrls) && item.photoDataUrls.length ? (
-                  <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(88px,1fr))", gap: 8 }}>
-                    {item.photoDataUrls.map((src: string, i: number) => (
-                      <img key={`${item.id}-${i}`} src={src} alt="" style={{ width: "100%", aspectRatio: "1 / 1", objectFit: "cover", borderRadius: 8 }} />
+          <div style={{ display: "grid", gap: 14 }}>
+            {(["accepted", "diagnostics", "repair", "ready", "completed"] as const).map((stageKey) => {
+              const items = progressLog.filter((x: any) => x.stage === stageKey);
+              if (!items.length) return null;
+              const titleMap: Record<string, string> = {
+                accepted: "Принято",
+                diagnostics: "Диагностика — подпункты",
+                repair: "Работа / ремонт — подпункты",
+                ready: "Готово",
+                completed: "Выдано",
+              };
+              return (
+                <details key={stageKey} open>
+                  <summary className={cls.p}>
+                    <strong>{titleMap[stageKey] ?? stageKey}</strong>
+                  </summary>
+                  <div style={{ marginTop: 8, display: "grid", gap: 10 }}>
+                    {items.map((item: any) => (
+                      <div
+                        key={item.id}
+                        style={{ border: "1px solid var(--color-order-row-border)", borderRadius: 12, padding: 12 }}
+                      >
+                        <p className={cls.p}>
+                          <strong>{item.title}</strong> · {item.atLabel}
+                        </p>
+                        <p className={cls.muted}>
+                          {item.kind === "stage" ? "Этап" : "Подпункт"} · {item.stage}
+                        </p>
+                        {item.description ? <p className={cls.p} style={{ marginTop: 6 }}>{item.description}</p> : null}
+                        {Array.isArray(item.photoDataUrls) && item.photoDataUrls.length ? (
+                          <div
+                            style={{
+                              marginTop: 8,
+                              display: "grid",
+                              gridTemplateColumns: "repeat(auto-fill,minmax(88px,1fr))",
+                              gap: 8,
+                            }}
+                          >
+                            {item.photoDataUrls.map((src: string, i: number) => (
+                              <img
+                                key={`${item.id}-${i}`}
+                                src={src}
+                                alt=""
+                                style={{
+                                  width: "100%",
+                                  aspectRatio: "1 / 1",
+                                  objectFit: "cover",
+                                  borderRadius: 8,
+                                }}
+                              />
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
                     ))}
                   </div>
-                ) : null}
-              </div>
-            ))}
+                </details>
+              );
+            })}
           </div>
         )}
       </TechCard>

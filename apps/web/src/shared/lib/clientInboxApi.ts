@@ -2,6 +2,7 @@ import { apiOrigin } from "@/shared/config/api";
 import { clearAuthSession, readAuthSession, saveAuthSession, type AuthSession } from "./authSession";
 import { getStreamToken } from "./authApi";
 import { openSseStream, type StreamStatus } from "./realtime/openSseStream";
+import { normalizeAuthRequiredMessage, redirectToLoginForAuthMissing, isAuthRequiredMessage } from "./authRedirect";
 
 export type { StreamStatus } from "./realtime/openSseStream";
 
@@ -143,12 +144,20 @@ type RefreshResponse = {
 
 async function parseError(res: Response): Promise<string> {
   const body = (await res.json().catch(() => ({}))) as { error?: string };
-  return body.error ?? `Ошибка ${res.status}`;
+  const base = body.error ?? `Ошибка ${res.status}`;
+  if (isAuthRequiredMessage(base)) {
+    redirectToLoginForAuthMissing();
+    return normalizeAuthRequiredMessage(base);
+  }
+  return base;
 }
 
 async function refreshSessionOrThrow(): Promise<AuthSession> {
   const current = readAuthSession();
-  if (!current) throw new Error("Требуется авторизация");
+  if (!current) {
+    redirectToLoginForAuthMissing();
+    throw new Error("Нужна авторизация");
+  }
   const res = await fetch(`${apiOrigin}/api/v1/auth/refresh`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -170,7 +179,10 @@ async function refreshSessionOrThrow(): Promise<AuthSession> {
 
 async function authorizedFetch(path: string, init?: RequestInit): Promise<Response> {
   let session = readAuthSession();
-  if (!session) throw new Error("Требуется авторизация");
+  if (!session) {
+    redirectToLoginForAuthMissing();
+    throw new Error("Нужна авторизация");
+  }
   let res = await fetch(`${apiOrigin}${path}`, {
     ...init,
     headers: {

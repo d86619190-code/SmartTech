@@ -1,5 +1,6 @@
 import { apiOrigin } from "@/shared/config/api";
 import { clearAuthSession, readAuthSession, saveAuthSession, type AuthSession } from "./authSession";
+import { normalizeAuthRequiredMessage, redirectToLoginForAuthMissing, isAuthRequiredMessage } from "./authRedirect";
 
 type ApiUser = {
   id: string;
@@ -26,6 +27,13 @@ function toSession(data: AuthResponse): AuthSession {
 async function parseError(res: Response): Promise<string> {
   const body = (await res.json().catch(() => ({}))) as { error?: string };
   const base = body.error ?? `Ошибка ${res.status}`;
+  if (/unexpected socket close|connection closed|socket disconnected|tls|network/i.test(base)) {
+    return "Что-то не так с сетью. Если у вас включен VPN, попробуйте отключить его и повторить.";
+  }
+  if (isAuthRequiredMessage(base)) {
+    redirectToLoginForAuthMissing();
+    return normalizeAuthRequiredMessage(base);
+  }
   if (res.status === 400 && /google|oauth|origin|credential/i.test(base)) {
     return `${base}. Попробуйте открыть сайт в обычном Chrome/Safari (не во встроенном браузере), затем повторите вход.`;
   }
@@ -45,14 +53,22 @@ export async function loginWithGoogleCredential(credential: string): Promise<Aut
   return session;
 }
 
-export async function sendPhoneCode(phone: string): Promise<{ devCode?: string }> {
+export async function sendPhoneCode(phone: string): Promise<void> {
   const res = await fetch(`${apiOrigin}/api/v1/auth/phone/send-code`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ phone }),
   });
   if (!res.ok) throw new Error(await parseError(res));
-  return (await res.json()) as { devCode?: string };
+}
+
+export async function sendEmailCode(email: string): Promise<void> {
+  const res = await fetch(`${apiOrigin}/api/v1/auth/email/send-code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
 }
 
 export async function verifyPhoneCode(phone: string, code: string, name?: string): Promise<AuthSession> {
@@ -60,6 +76,19 @@ export async function verifyPhoneCode(phone: string, code: string, name?: string
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ phone, code, name: name?.trim() || undefined }),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  const data = (await res.json()) as AuthResponse;
+  const session = toSession(data);
+  saveAuthSession(session);
+  return session;
+}
+
+export async function verifyEmailCode(email: string, code: string, name?: string): Promise<AuthSession> {
+  const res = await fetch(`${apiOrigin}/api/v1/auth/email/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, code, name: name?.trim() || undefined }),
   });
   if (!res.ok) throw new Error(await parseError(res));
   const data = (await res.json()) as AuthResponse;
@@ -88,7 +117,10 @@ export async function refreshSessionOrNull(): Promise<AuthSession | null> {
 
 export async function getMe(): Promise<ApiUser> {
   let session = readAuthSession();
-  if (!session) throw new Error("Требуется авторизация");
+  if (!session) {
+    redirectToLoginForAuthMissing();
+    throw new Error("Нужна авторизация");
+  }
 
   let res = await fetch(`${apiOrigin}/api/v1/auth/me`, {
     headers: { Authorization: `Bearer ${session.accessToken}` },
@@ -107,16 +139,19 @@ export async function getMe(): Promise<ApiUser> {
   return body.user;
 }
 
-export async function updateMe(name: string, avatarUrl?: string): Promise<ApiUser> {
+export async function updateMe(name: string, avatarUrl?: string, phone?: string): Promise<ApiUser> {
   let session = readAuthSession();
-  if (!session) throw new Error("Требуется авторизация");
+  if (!session) {
+    redirectToLoginForAuthMissing();
+    throw new Error("Нужна авторизация");
+  }
   let res = await fetch(`${apiOrigin}/api/v1/auth/me`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${session.accessToken}`,
     },
-    body: JSON.stringify({ name, avatarUrl: avatarUrl?.trim() || undefined }),
+    body: JSON.stringify({ name, phone: phone?.trim() || undefined, avatarUrl: avatarUrl?.trim() || undefined }),
   });
   if (res.status === 401) {
     session = await refreshSessionOrNull();
@@ -127,7 +162,7 @@ export async function updateMe(name: string, avatarUrl?: string): Promise<ApiUse
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.accessToken}`,
       },
-      body: JSON.stringify({ name, avatarUrl: avatarUrl?.trim() || undefined }),
+      body: JSON.stringify({ name, phone: phone?.trim() || undefined, avatarUrl: avatarUrl?.trim() || undefined }),
     });
   }
   if (!res.ok) throw new Error(await parseError(res));
@@ -152,7 +187,10 @@ export async function logoutCurrentSession(): Promise<void> {
 
 export async function getStreamToken(): Promise<string> {
   let session = readAuthSession();
-  if (!session) throw new Error("Требуется авторизация");
+  if (!session) {
+    redirectToLoginForAuthMissing();
+    throw new Error("Нужна авторизация");
+  }
   let res = await fetch(`${apiOrigin}/api/v1/auth/stream-token`, {
     method: "POST",
     headers: { Authorization: `Bearer ${session.accessToken}` },

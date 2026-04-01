@@ -36,4 +36,10 @@ export const config = {
   /** OAuth 2.0 Client ID (Web) — тот же, что на фронте для Google Identity Services */
   googleClientId: process.env.GOOGLE_CLIENT_ID ?? "",
   bossEmails: parseBossEmails(process.env.BOSS_EMAILS ?? "98y7tbnb@gmail.com,shostak-aleshka@mail.ru"),
+  smtpHost: process.env.SMTP_HOST ?? "",
+  smtpPort: Number(process.env.SMTP_PORT ?? 587),
+  smtpSecure: process.env.SMTP_SECURE === "1",
+  smtpUser: process.env.SMTP_USER ?? "",
+  smtpPass: process.env.SMTP_PASS ?? "",
+  smtpFrom: process.env.SMTP_FROM ?? "no-reply@example.com",
 };

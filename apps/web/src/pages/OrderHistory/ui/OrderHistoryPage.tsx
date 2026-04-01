@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import type { RepairOrder } from "@/entities/repair-order";
 import { getClientRepairsApi, type ClientRepairDto } from "@/shared/lib/clientInboxApi";
 import { readAuthSession } from "@/shared/lib/authSession";
@@ -63,9 +63,7 @@ export const OrderHistoryPage: React.FC = () => {
           subtitle="Заказы из вашего аккаунта (данные с сервера)."
         />
         {!auth?.accessToken ? (
-          <p className={cls.hint}>
-            Войдите, чтобы видеть историю. <Link to="/login">Вход</Link>
-          </p>
+          <Navigate to="/login?next=/history" replace />
         ) : loading ? (
           <SkeletonOrderRows count={4} />
         ) : orders.length === 0 ? (

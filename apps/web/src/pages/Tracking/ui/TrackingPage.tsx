@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { clientRepairToTrackingCard } from "@/entities/tracking";
 import { getClientRepairsApi } from "@/shared/lib/clientInboxApi";
 import { readAuthSession } from "@/shared/lib/authSession";
@@ -51,19 +51,7 @@ export const TrackingPage: React.FC = () => {
   const cards = React.useMemo(() => repairs.map(clientRepairToTrackingCard), [repairs]);
 
   if (!auth?.accessToken) {
-    return (
-      <div className={cls.shell}>
-        <div className={cls.inner}>
-          <PageHeader embedded title="Отслеживание" />
-          <p className={cls.loginHint}>
-            Войдите в аккаунт, чтобы видеть статусы ремонтов.{" "}
-            <Link className={cls.loginLink} to="/login">
-              Вход
-            </Link>
-          </p>
-        </div>
-      </div>
-    );
+    return <Navigate to="/login?next=/tracking" replace />;
   }
 
   return (

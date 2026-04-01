@@ -1,9 +1,15 @@
 import * as React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LoginForm } from "@/widgets/LoginForm";
-import { PageHeader } from "@/widgets/PageHeader";
 import { clearAuthSession, readAuthSession, saveAuthSession, type AuthSession } from "@/shared/lib/authSession";
-import { getMe, loginWithGoogleCredential, sendPhoneCode, verifyPhoneCode } from "@/shared/lib/authApi";
+import {
+  getMe,
+  loginWithGoogleCredential,
+  sendEmailCode,
+  sendPhoneCode,
+  verifyEmailCode,
+  verifyPhoneCode,
+} from "@/shared/lib/authApi";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
 import cls from "./LoginPage.module.css";
@@ -32,8 +38,10 @@ export const LoginPage: React.FC = () => {
   const [mode, setMode] = React.useState<"login" | "register">("login");
   const [name, setName] = React.useState("");
   const [phone, setPhone] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [authMethod, setAuthMethod] = React.useState<"phone" | "email">("email");
   const [code, setCode] = React.useState("");
-  const [devCode, setDevCode] = React.useState<string | null>(null);
+  const [codeTone, setCodeTone] = React.useState<"idle" | "success" | "error">("idle");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { toast, showToast, closeToast } = useStatusToast();
   const isBrowser = typeof window !== "undefined";
@@ -78,30 +86,46 @@ export const LoginPage: React.FC = () => {
   const handleSendCode = React.useCallback(async () => {
     try {
       setIsSubmitting(true);
-      const res = await sendPhoneCode(phone);
-      setDevCode(res.devCode ?? null);
-      showToast("success", "Код отправлен. Проверьте SMS.");
+      if (authMethod === "phone") {
+        await sendPhoneCode(phone);
+      } else {
+        await sendEmailCode(email.trim().toLowerCase());
+      }
+      setCode("");
+      setCodeTone("idle");
+      showToast(
+        "success",
+        authMethod === "phone"
+          ? "Код отправлен. Проверьте SMS."
+          : "Код отправлен. Проверьте email."
+      );
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Не удалось отправить код";
       showToast("error", msg);
     } finally {
       setIsSubmitting(false);
     }
-  }, [phone, showToast]);
+  }, [authMethod, email, phone, showToast]);
 
   const handleVerifyCode = React.useCallback(async () => {
     try {
       setIsSubmitting(true);
-      await verifyPhoneCode(phone, code, mode === "register" ? name : undefined);
+      if (authMethod === "phone") {
+        await verifyPhoneCode(phone, code, mode === "register" ? name : undefined);
+      } else {
+        await verifyEmailCode(email.trim().toLowerCase(), code, mode === "register" ? name : undefined);
+      }
+      setCodeTone("success");
       showToast("success", mode === "register" ? "Регистрация выполнена" : "Вход выполнен");
       navigate(nextPath, { replace: true });
     } catch (e) {
+      setCodeTone("error");
       const msg = e instanceof Error ? e.message : "Не удалось войти по коду";
       showToast("error", msg);
     } finally {
       setIsSubmitting(false);
     }
-  }, [code, mode, name, navigate, nextPath, phone, showToast]);
+  }, [authMethod, code, email, mode, name, navigate, nextPath, phone, showToast]);
 
   const handleGoogleCredential = React.useCallback(async (credential: string) => {
     try {
@@ -132,24 +156,33 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className={cls.shell}>
-      <PageHeader title="Вход" />
       <div className={cls.center}>
-        <LoginForm
-          mode={mode}
-          name={name}
-          phone={phone}
-          code={code}
-          devCode={devCode}
-          isSubmitting={isSubmitting}
-          onPhoneChange={setPhone}
-          onCodeChange={setCode}
-          onNameChange={setName}
-          onModeChange={setMode}
-          onSendCode={handleSendCode}
-          onVerifyCode={handleVerifyCode}
-          onGoogleCredential={handleGoogleCredential}
-          onGoogleOpenInBrowser={handleGoogleOpenInBrowser}
-        />
+        <div className={cls.authColumn}>
+          <h1 className={cls.title}>Вход</h1>
+          <LoginForm
+            mode={mode}
+            name={name}
+            phone={phone}
+            email={email}
+            authMethod={authMethod}
+            code={code}
+            codeTone={codeTone}
+            isSubmitting={isSubmitting}
+            onPhoneChange={setPhone}
+            onEmailChange={setEmail}
+            onAuthMethodChange={setAuthMethod}
+            onCodeChange={(value) => {
+              setCode(value);
+              if (codeTone !== "idle") setCodeTone("idle");
+            }}
+            onNameChange={setName}
+            onModeChange={setMode}
+            onSendCode={handleSendCode}
+            onVerifyCode={handleVerifyCode}
+            onGoogleCredential={handleGoogleCredential}
+            onGoogleOpenInBrowser={handleGoogleOpenInBrowser}
+          />
+        </div>
       </div>
       {toast ? <StatusToast tone={toast.tone} message={toast.message} onClose={closeToast} /> : null}
     </div>

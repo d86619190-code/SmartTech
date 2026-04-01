@@ -97,7 +97,7 @@ export const TechDashboardPage: React.FC = () => {
                 </div>
               </>
             ) : (
-              <p className={cls.p}>Нет активных ремонтов в очереди.</p>
+              <p className={cls.emptyState}>Нет активных ремонтов в очереди.</p>
             )}
           </TechCard>
         </div>
