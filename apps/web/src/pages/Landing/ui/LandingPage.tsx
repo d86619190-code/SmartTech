@@ -1,9 +1,9 @@
 import * as React from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { HERO } from "@/shared/config/marketing";
 import phoneAfter1 from "@/shared/assets/phone-after-1.jpg";
 import phoneBrokenHq from "@/shared/assets/phone-broken-hq.jpg";
-import { Button } from "@/shared/ui/Button/Button";
+import btnCls from "@/shared/ui/Button/Button.module.css";
+import { LandingLink, useLandingExitNav } from "@/pages/Landing/lib/LandingExitNav";
 import { PortalBeforeAfter, TechIntroOverlay } from "@/widgets/HomeCinematic";
 import { LandingBelowFold } from "./LandingBelowFold";
 import cls from "./LandingPage.module.css";
@@ -38,39 +38,16 @@ function useReveal<T extends HTMLElement>(): React.RefObject<T | null> {
 }
 
 export const LandingPage: React.FC = () => {
-  const navigate = useNavigate();
+  const { isExiting } = useLandingExitNav();
   const [showIntro, setShowIntro] = React.useState(true);
   const [introKey, setIntroKey] = React.useState(0);
   const [showBackTop, setShowBackTop] = React.useState(false);
-  const tiltRef = React.useRef<HTMLDivElement>(null);
   const rootRef = React.useRef<HTMLDivElement>(null);
 
   const heroReveal = useReveal<HTMLElement>();
 
   const onIntroDone = React.useCallback(() => {
     setShowIntro(false);
-  }, []);
-
-  const replayIntro = React.useCallback(() => {
-    setIntroKey((k) => k + 1);
-    setShowIntro(true);
-  }, []);
-
-  const onTiltMove = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const el = tiltRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - 0.5;
-    const y = (e.clientY - r.top) / r.height - 0.5;
-    el.style.setProperty("--rx", `${y * -14}deg`);
-    el.style.setProperty("--ry", `${x * 14}deg`);
-  }, []);
-
-  const onTiltLeave = React.useCallback(() => {
-    const el = tiltRef.current;
-    if (!el) return;
-    el.style.setProperty("--rx", "0deg");
-    el.style.setProperty("--ry", "0deg");
   }, []);
 
   React.useLayoutEffect(() => {
@@ -93,7 +70,7 @@ export const LandingPage: React.FC = () => {
   }, []);
 
   return (
-    <div ref={rootRef} className={cls.root}>
+    <div ref={rootRef} className={[cls.root, isExiting ? cls.rootExiting : ""].filter(Boolean).join(" ")}>
       {showIntro ? <TechIntroOverlay key={introKey} onDone={onIntroDone} /> : null}
 
       <div className={cls.bgMesh} aria-hidden />
@@ -154,18 +131,15 @@ export const LandingPage: React.FC = () => {
           TECH
         </span>
         <nav className={cls.topLinks} aria-label="Навигация лендинга">
-          <Link className={cls.navLink} to="/">
+          <LandingLink className={cls.navLink} to="/">
             В приложение
-          </Link>
-          <Link className={cls.navLink} to="/create-order">
+          </LandingLink>
+          <LandingLink className={cls.navLink} to="/create-order">
             Новая заявка
-          </Link>
-          <Link className={cls.navLink} to="/tracking">
+          </LandingLink>
+          <LandingLink className={cls.navLink} to="/tracking">
             Отслеживание
-          </Link>
-          <button type="button" className={cls.navLinkBtn} onClick={replayIntro} disabled={showIntro}>
-            Повторить заставку
-          </button>
+          </LandingLink>
         </nav>
       </header>
 
@@ -214,13 +188,8 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <div className={cls.heroInner}>
-            <div
-              ref={tiltRef}
-              className={cls.tiltCard}
-              onMouseMove={onTiltMove}
-              onMouseLeave={onTiltLeave}
-            >
-              <div className={cls.tiltCardInner}>
+            <div className={cls.heroCard}>
+              <div className={cls.heroCardInner}>
                 <p className={cls.heroKicker}>Первое впечатление · без сайдбара · только шоу</p>
                 <h1 id="landing-hero-title" className={cls.heroTitle}>
                   {HERO.title}
@@ -228,13 +197,13 @@ export const LandingPage: React.FC = () => {
                 <p className={cls.heroSub}>{HERO.subtitle}</p>
                 <div className={cls.heroCta}>
                   <span className={cls.ctaSparks}>
-                    <Button type="button" variant="primary" onClick={() => navigate("/create-order")}>
+                    <LandingLink to="/create-order" className={[btnCls.root, btnCls.primary].join(" ")}>
                       Оставить заявку
-                    </Button>
+                    </LandingLink>
                   </span>
-                  <Link className={cls.ctaGhost} to="/">
+                  <LandingLink className={cls.ctaGhost} to="/">
                     Перейти в приложение
-                  </Link>
+                  </LandingLink>
                 </div>
               </div>
             </div>
