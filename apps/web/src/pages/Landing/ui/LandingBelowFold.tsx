@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { LandingLink, useLandingExitNav } from "@/pages/Landing/lib/LandingExitNav";
 import {
   BENEFITS,
   FAQ_ITEMS,
@@ -48,7 +48,7 @@ const BENEFIT_THEMES = [
 ] as const;
 
 export const LandingBelowFold: React.FC = () => {
-  const navigate = useNavigate();
+  const { navigateWithTransition } = useLandingExitNav();
   const belowRootRef = React.useRef<HTMLDivElement>(null);
   const benefitsRef = useInView<HTMLElement>();
   const guaranteeRef = useInView<HTMLElement>();
@@ -184,7 +184,7 @@ export const LandingBelowFold: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              <Button type="button" variant="outline" onClick={() => navigate("/create-order")}>
+              <Button type="button" variant="outline" onClick={() => navigateWithTransition("/create-order")}>
                 Оставить заявку
               </Button>
             </div>
@@ -291,7 +291,7 @@ export const LandingBelowFold: React.FC = () => {
                   <span className={cls.leadH2B}>ответим</span>
                 </h2>
                 <p className={cls.leadHint}>Заявка уходит в ту же систему — только обёртка другая.</p>
-                <LeadForm variant="dark" />
+                <LeadForm variant="dark" navigateTo={navigateWithTransition} />
               </div>
             </div>
           </div>
@@ -310,12 +310,12 @@ export const LandingBelowFold: React.FC = () => {
             <p className={cls.footerNote}>Готово к работе? Сайдбар и все разделы — в приложении.</p>
           </div>
           <div className={[cls.footerCol, cls.footerActions, cls.footerReveal].join(" ")}>
-            <Link className={cls.footerLink} to="/">
+            <LandingLink className={cls.footerLink} to="/">
               Открыть приложение
-            </Link>
-            <Link className={cls.footerLink} to="/login">
+            </LandingLink>
+            <LandingLink className={cls.footerLink} to="/login">
               Войти
-            </Link>
+            </LandingLink>
           </div>
         </div>
       </footer>

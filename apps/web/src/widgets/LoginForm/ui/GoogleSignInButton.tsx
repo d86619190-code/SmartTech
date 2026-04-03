@@ -68,8 +68,11 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCreden
   const isInAppWebView = /(FBAN|FBAV|Instagram|Line|Telegram|wv;|WebView|MiuiBrowser|YaApp_Android)/i.test(ua);
   const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
 
+  // Не завязываем эффект на `disabled` / isSubmitting: иначе при «Отправить код» GSI
+  // переинициализируется, в консоли сыпятся COOP/postMessage от accounts.google.com, возможны гонки.
+  // Блокировка кликов — через `data-disabled` + CSS (pointer-events: none).
   React.useEffect(() => {
-    if (!googleClientId || disabled || !googleUiSupported) return;
+    if (!googleClientId || !googleUiSupported) return;
 
     let cancelled = false;
 
@@ -140,7 +143,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCreden
     return () => {
       cancelled = true;
     };
-  }, [disabled, googleUiSupported]);
+  }, [googleUiSupported]);
 
   if (!googleClientId) {
     return (
@@ -184,6 +187,11 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCreden
         aria-hidden={!ready}
         data-disabled={disabled ? "true" : undefined}
       />
+      {onOpenInBrowser && isMobile && !isElectron ? (
+        <button type="button" className={cls.googleAltBtn} onClick={onOpenInBrowser} disabled={disabled}>
+          Войти через Google в браузере
+        </button>
+      ) : null}
     </div>
   );
 };

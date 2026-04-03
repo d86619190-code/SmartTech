@@ -24,6 +24,25 @@ function toSession(data: AuthResponse): AuthSession {
   };
 }
 
+const AUTH_FETCH_TIMEOUT_MS = 30_000;
+
+async function authPostJson(path: string, body: unknown): Promise<Response> {
+  try {
+    return await fetch(`${apiOrigin}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(AUTH_FETCH_TIMEOUT_MS),
+    });
+  } catch (e: unknown) {
+    const name = e instanceof DOMException ? e.name : e instanceof Error ? e.name : "";
+    if (name === "AbortError" || name === "TimeoutError") {
+      throw new Error("Сервер не ответил вовремя. Проверьте сеть и попробуйте снова.");
+    }
+    throw e;
+  }
+}
+
 async function parseError(res: Response): Promise<string> {
   const body = (await res.json().catch(() => ({}))) as { error?: string };
   const base = body.error ?? `Ошибка ${res.status}`;
@@ -53,22 +72,18 @@ export async function loginWithGoogleCredential(credential: string): Promise<Aut
   return session;
 }
 
-export async function sendPhoneCode(phone: string): Promise<void> {
-  const res = await fetch(`${apiOrigin}/api/v1/auth/phone/send-code`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone }),
-  });
+export async function sendPhoneCode(phone: string): Promise<{ devCode?: string }> {
+  const res = await authPostJson("/api/v1/auth/phone/send-code", { phone });
   if (!res.ok) throw new Error(await parseError(res));
+  const data = (await res.json().catch(() => ({}))) as { devCode?: string };
+  return { devCode: typeof data.devCode === "string" ? data.devCode : undefined };
 }
 
-export async function sendEmailCode(email: string): Promise<void> {
-  const res = await fetch(`${apiOrigin}/api/v1/auth/email/send-code`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
+export async function sendEmailCode(email: string): Promise<{ devCode?: string }> {
+  const res = await authPostJson("/api/v1/auth/email/send-code", { email });
   if (!res.ok) throw new Error(await parseError(res));
+  const data = (await res.json().catch(() => ({}))) as { devCode?: string };
+  return { devCode: typeof data.devCode === "string" ? data.devCode : undefined };
 }
 
 export async function verifyPhoneCode(phone: string, code: string, name?: string): Promise<AuthSession> {

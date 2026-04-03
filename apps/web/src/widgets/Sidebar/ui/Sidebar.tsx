@@ -1,6 +1,7 @@
 import * as React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useMobileNavOptional } from "@/app/mobileNavContext";
+import { useLandingExitNav } from "@/pages/Landing/lib/LandingExitNav";
 import { getInboxSummaryApi, type InboxSummary } from "@/shared/lib/clientInboxApi";
 import { useInboxSummarySse } from "@/shared/lib/realtime/useSseStreams";
 import { readAuthSession } from "@/shared/lib/authSession";
@@ -11,6 +12,7 @@ import cls from "./Sidebar.module.css";
 export const Sidebar: React.FC = () => {
   const mobileNav = useMobileNavOptional();
   const location = useLocation();
+  const { navigateWithTransition } = useLandingExitNav();
   const closeMenu = () => mobileNav?.closeMobileNav();
   const auth = readAuthSession();
   const [badgeCount, setBadgeCount] = React.useState(0);
@@ -47,23 +49,42 @@ export const Sidebar: React.FC = () => {
   return (
     <aside id="app-sidebar" className={cls.root} aria-label="Разделы приложения">
       <nav className={cls.nav} aria-label="Основное меню">
-        {primarySidebarItems.map((item) => (
-          <NavLink
-            key={item.key}
-            to={item.to}
-            end={item.to === "/"}
-            onClick={closeMenu}
-            className={({ isActive }) => [cls.item, isActive && cls.active].filter(Boolean).join(" ")}
-          >
-            <span className={cls.icon}>
-              <item.Icon />
-            </span>
-            <span className={cls.itemLabel}>
-              {item.label}
-              {item.key === "messages" && badgeCount > 0 ? <span className={cls.badge}>{badgeCount}</span> : null}
-            </span>
-          </NavLink>
-        ))}
+        {primarySidebarItems.map((item) =>
+          item.to === "/landing" ? (
+            <NavLink
+              key={item.key}
+              to={item.to}
+              end={false}
+              onClick={(e) => {
+                e.preventDefault();
+                closeMenu();
+                navigateWithTransition(item.to);
+              }}
+              className={({ isActive }) => [cls.item, isActive && cls.active].filter(Boolean).join(" ")}
+            >
+              <span className={cls.icon}>
+                <item.Icon />
+              </span>
+              <span className={cls.itemLabel}>{item.label}</span>
+            </NavLink>
+          ) : (
+            <NavLink
+              key={item.key}
+              to={item.to}
+              end={item.to === "/"}
+              onClick={closeMenu}
+              className={({ isActive }) => [cls.item, isActive && cls.active].filter(Boolean).join(" ")}
+            >
+              <span className={cls.icon}>
+                <item.Icon />
+              </span>
+              <span className={cls.itemLabel}>
+                {item.label}
+                {item.key === "messages" && badgeCount > 0 ? <span className={cls.badge}>{badgeCount}</span> : null}
+              </span>
+            </NavLink>
+          ),
+        )}
       </nav>
       <div className={cls.spacer} aria-hidden />
       <div className={cls.divider} role="separator" />

@@ -20,6 +20,7 @@ export function getRouteNavOrder(pathname: string): number {
     "/contacts": 4,
     "/profile": 5,
     "/account/settings": 5.3,
+    "/login/electron": 6,
     "/login": 6,
   };
 

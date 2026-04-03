@@ -91,8 +91,8 @@ authRouter.post("/phone/send-code", sendCodeLimiter, async (req, res) => {
     return;
   }
   try {
-    await sendCode(parsed.data.phone, "phone");
-    res.status(200).json({ ok: true });
+    const out = await sendCode(parsed.data.phone, "phone");
+    res.status(200).json(out.devCode ? { ok: true, devCode: out.devCode } : { ok: true });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Ошибка отправки кода";
     res.status(500).json({ error: msg });
@@ -136,8 +136,8 @@ authRouter.post("/email/send-code", sendCodeLimiter, async (req, res) => {
   }
   const email = parsed.data.email.trim().toLowerCase();
   try {
-    await sendCode(email, "email");
-    res.status(200).json({ ok: true });
+    const out = await sendCode(email, "email");
+    res.status(200).json(out.devCode ? { ok: true, devCode: out.devCode } : { ok: true });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Ошибка отправки кода";
     res.status(500).json({ error: msg });

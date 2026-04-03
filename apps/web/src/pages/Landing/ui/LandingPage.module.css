@@ -8,6 +8,17 @@
   background: #020203;
   color: #e2e8f0;
   overflow-x: clip;
+  transition: filter 0.45s ease;
+}
+
+.rootExiting {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rootExiting {
+    transition: none;
+  }
 }
 
 .bgMesh {
@@ -197,7 +208,7 @@
 .scrollFog {
   position: fixed;
   inset: 0;
-  z-index: 3;
+  z-index: 2;
   pointer-events: none;
   background:
     radial-gradient(ellipse 130% 100% at 50% 65%, rgba(56, 189, 248, 0.09), transparent 58%),
@@ -363,7 +374,8 @@
 
 .scroll {
   position: relative;
-  z-index: 1;
+  /* Выше декоративных fixed-слоёв (тот же stacking root, что и scrollFog), чтобы клики стабильно попадали в ссылки/кнопки */
+  z-index: 4;
   padding: 0 0 48px;
   scroll-behavior: smooth;
 }
@@ -461,14 +473,11 @@
   max-width: 920px;
 }
 
-.tiltCard {
-  perspective: 1200px;
-  transform-style: preserve-3d;
+.heroCard {
+  position: relative;
 }
 
-.tiltCardInner {
-  transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transition: transform 0.12s ease-out;
+.heroCardInner {
   padding: clamp(28px, 5vw, 44px);
   border-radius: 28px;
   border: 1px solid rgba(56, 189, 248, 0.28);
@@ -498,7 +507,11 @@
   letter-spacing: -0.045em;
   line-height: 1.1;
   color: #f8fafc;
-  text-shadow: 0 0 40px rgba(56, 189, 248, 0.15);
+  /* Лёгкий «объём» только у текста, без transform */
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 24px rgba(56, 189, 248, 0.12),
+    0 0 48px rgba(56, 189, 248, 0.1);
 }
 
 .heroSub {
@@ -511,10 +524,13 @@
 }
 
 .heroCta {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   gap: 12px 16px;
   align-items: center;
+  pointer-events: auto;
 }
 
 .ctaSparks {
@@ -560,6 +576,10 @@
 }
 
 .ctaGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
   font-size: 14px;
   font-weight: 700;
   color: rgba(148, 163, 184, 0.95);
@@ -568,6 +588,7 @@
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
   transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
@@ -662,10 +683,6 @@
     transform: none;
     filter: none;
     transition: none;
-  }
-
-  .tiltCardInner {
-    transform: none !important;
   }
 
   .portalHeroInner {

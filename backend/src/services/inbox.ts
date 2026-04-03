@@ -25,6 +25,13 @@ export type InboxThreadItem = {
   unreadCount: number;
   /** Мастер недавно активен — зелёный индикатор в списке */
   counterpartOnline?: boolean;
+  /** Имя мастера для списка чатов */
+  counterpartName?: string;
+  counterpartAvatarUrl?: string;
+  /** Публичный номер заказа, если есть */
+  orderPublicId?: string;
+  /** Кратко: проблема (из карточки заказа) */
+  issueSummary?: string;
 };
 
 export type InboxSummary = {
@@ -112,11 +119,35 @@ function mapApproval(a: ApprovalRow): InboxApprovalItem {
   return { id: a.id, orderId: a.order_id, label: a.label, createdAt: a.created_at };
 }
 
-function toThreadTitle(s: AppState, orderId: string): string {
+function techJobForOrder(s: AppState, orderId: string) {
   const techJobs = [...(s.techPanelMock?.repairs ?? []), ...(s.techPanelMock?.completed ?? [])];
-  const job = techJobs.find((j) => j.id === orderId);
+  return techJobs.find((j) => j.id === orderId);
+}
+
+function toThreadTitle(s: AppState, orderId: string): string {
+  const job = techJobForOrder(s, orderId);
   if (job) return job.device;
   return "Заказ";
+}
+
+function counterpartForThread(
+  s: AppState,
+  orderId: string,
+  orderMessages: InboxMessageRow[]
+): { name: string; avatarUrl?: string } {
+  const svc = serviceSenderForOrder(s, orderId);
+  if (svc?.name) {
+    return { name: svc.name, avatarUrl: svc.avatarUrl };
+  }
+  const profile = s.techPanelMock?.profile;
+  const lastSvc = [...orderMessages].filter((m) => m.from === "service").pop();
+  const name =
+    lastSvc?.service_sender_name?.trim() ||
+    profile?.name?.trim() ||
+    "Мастер";
+  const avatar =
+    lastSvc?.service_sender_avatar_url?.trim() || profile?.avatar_url;
+  return { name, avatarUrl: avatar || undefined };
 }
 
 const MASTER_TTL_MS = 6000;
@@ -147,6 +178,9 @@ export async function getInboxSummary(userId: string): Promise<InboxSummary> {
         const sorted = [...list].sort((a, b) => a.at - b.at);
         const last = sorted[sorted.length - 1];
         const unreadCount = sorted.filter((m) => !m.read_by_user && m.from === "service").length;
+        const cp = counterpartForThread(s, orderId, sorted);
+        const job = techJobForOrder(s, orderId);
+        const issue = job?.issue?.trim();
         return {
           orderId,
           title: toThreadTitle(s, orderId),
@@ -154,6 +188,10 @@ export async function getInboxSummary(userId: string): Promise<InboxSummary> {
           lastAt: last?.at ?? 0,
           unreadCount,
           counterpartOnline: masterLooksOnlineForOrder(s, orderId, sorted),
+          counterpartName: cp.name,
+          counterpartAvatarUrl: cp.avatarUrl ?? dicebearAvatar(cp.name),
+          orderPublicId: job?.publicId,
+          issueSummary: issue ? (issue.length > 90 ? `${issue.slice(0, 87)}…` : issue) : undefined,
         };
       })
       .sort((a, b) => b.lastAt - a.lastAt);

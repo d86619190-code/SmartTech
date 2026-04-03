@@ -8,20 +8,23 @@ import cls from "./LeadForm.module.css";
 type LeadFormProps = {
   className?: string;
   variant?: "default" | "dark";
+  /** Если задано (например анимированный выход с лендинга), вызывается вместо navigate */
+  navigateTo?: (path: string) => void;
 };
 
-export const LeadForm: React.FC<LeadFormProps> = ({ className, variant = "default" }) => {
+export const LeadForm: React.FC<LeadFormProps> = ({ className, variant = "default", navigateTo }) => {
   const navigate = useNavigate();
+  const go = navigateTo ?? ((path: string) => navigate(path));
   const [name, setName] = React.useState("");
   const [phone, setPhone] = React.useState("");
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isElectronApp()) {
-      navigate("/create-order");
+      go("/create-order");
       return;
     }
-    navigate("/sign-up");
+    go("/sign-up");
   };
 
   return (

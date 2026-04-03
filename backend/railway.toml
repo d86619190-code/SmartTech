@@ -1,0 +1,8 @@
+# API (Express + tsc). Переменные JWT, SMTP и т.д. — в Railway → Variables.
+[build]
+builder = "nixpacks"
+# Только tsc: `npm ci` уже в фазе install у Nixpacks — повторный `npm ci` ломает билд (EBUSY на .cache).
+buildCommand = "npm run build"
+
+[deploy]
+startCommand = "npm start"

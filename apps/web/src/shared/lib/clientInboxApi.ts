@@ -20,6 +20,10 @@ export type InboxThread = {
   lastAt: number;
   unreadCount: number;
   counterpartOnline?: boolean;
+  counterpartName?: string;
+  counterpartAvatarUrl?: string;
+  orderPublicId?: string;
+  issueSummary?: string;
 };
 
 export type InboxSummary = {

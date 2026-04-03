@@ -36,6 +36,7 @@ import {
   AdminUserDetailPage,
   AdminUsersPage,
 } from "./pages/admin";
+import { LandingExitNavProvider } from "@/pages/Landing/lib/LandingExitNav";
 import { TechLayout } from "@/widgets/technician";
 import {
   TechApprovalSendPage,
@@ -66,6 +67,7 @@ function OrdersToTrackingRedirect() {
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <HashRouter>
+      <LandingExitNavProvider>
       <Routes>
         <Route
           path="landing"
@@ -102,6 +104,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="messages" element={<MessagesListPage />} />
           <Route path="messages/:orderId" element={<ClientChatPage />} />
           <Route path="account/settings" element={<AccountSettingsPage />} />
+          <Route path="login/electron" element={<LoginPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route
             path="forgot-password"
@@ -149,6 +152,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="settings" element={<TechSettingsPage />} />
         </Route>
       </Routes>
+      </LandingExitNavProvider>
     </HashRouter>
   </React.StrictMode>
 );

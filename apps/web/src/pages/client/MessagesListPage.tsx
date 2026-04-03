@@ -8,6 +8,24 @@ import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
 import { PageHeader } from "@/widgets/PageHeader";
 import cls from "./clientPages.module.css";
 
+function formatThreadLastTime(ts: number): string {
+  if (!ts) return "";
+  const d = new Date(ts);
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const startMsg = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const diffDays = Math.round((startToday - startMsg) / 86400000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const hm = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if (diffDays === 0) return hm;
+  if (diffDays === 1) return `вчера ${hm}`;
+  if (diffDays < 7) {
+    const w = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"];
+    return `${w[d.getDay()]} ${hm}`;
+  }
+  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}`;
+}
+
 export const MessagesListPage: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const [approvals, setApprovals] = React.useState<Awaited<ReturnType<typeof getInboxSummaryApi>>["approvals"]>([]);
@@ -101,19 +119,53 @@ export const MessagesListPage: React.FC = () => {
           ) : (
             <div className={cls.threadList}>
               {threads.map((thread) => {
+                const name = thread.counterpartName?.trim() || "Мастер";
+                const avatar = thread.counterpartAvatarUrl?.trim();
+                const timeLabel = formatThreadLastTime(thread.lastAt);
                 return (
                   <Link key={thread.orderId} className={cls.threadRow} to={`/messages/${thread.orderId}`}>
-                    <span
-                      className={cls.threadOnlineDot}
-                      data-visible={thread.counterpartOnline ? "true" : "false"}
-                      aria-hidden
-                    />
+                    <div className={cls.threadAvatarWrap} aria-hidden>
+                      {avatar ? (
+                        <img className={cls.threadAvatar} src={avatar} alt="" decoding="async" />
+                      ) : (
+                        <div className={cls.threadAvatarFallback}>{name.slice(0, 1).toUpperCase()}</div>
+                      )}
+                      <span
+                        className={cls.threadOnlineOnAvatar}
+                        data-visible={thread.counterpartOnline ? "true" : "false"}
+                      />
+                    </div>
                     <div className={cls.threadRowMain}>
                       <div className={cls.threadHead}>
-                        <div className={cls.threadTitle}>{thread.title}</div>
-                        {thread.unreadCount > 0 ? <span className={cls.threadUnread}>{thread.unreadCount}</span> : null}
+                        <div className={cls.threadTitleCol}>
+                          <div className={cls.threadCounterpartRow}>
+                            <span className={cls.threadCounterpartName}>{name}</span>
+                            <span className={cls.threadDeviceName}>{thread.title}</span>
+                          </div>
+                          {thread.orderPublicId || thread.issueSummary ? (
+                            <div className={cls.threadSubMeta}>
+                              {thread.orderPublicId ? (
+                                <span className={cls.threadOrderId}>№ {thread.orderPublicId}</span>
+                              ) : null}
+                              {thread.orderPublicId && thread.issueSummary ? (
+                                <span className={cls.threadSubMetaSep} aria-hidden>
+                                  ·
+                                </span>
+                              ) : null}
+                              {thread.issueSummary ? (
+                                <span className={cls.threadIssue} title={thread.issueSummary}>
+                                  {thread.issueSummary}
+                                </span>
+                              ) : null}
+                            </div>
+                          ) : null}
+                        </div>
+                        <div className={cls.threadHeadRight}>
+                          {timeLabel ? <span className={cls.threadTime}>{timeLabel}</span> : null}
+                          {thread.unreadCount > 0 ? <span className={cls.threadUnread}>{thread.unreadCount}</span> : null}
+                        </div>
                       </div>
-                      <div className={cls.threadMeta}>{thread.preview}</div>
+                      <div className={cls.threadPreviewLine}>{thread.preview || "Нет сообщений"}</div>
                     </div>
                   </Link>
                 );
