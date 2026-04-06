@@ -1,0 +1,28 @@
+image: node:20
+
+pipelines:
+  branches:
+    main:
+      - step:
+          name: Build and deploy web to Majordomo
+          caches:
+            - node
+          script:
+            - corepack enable
+            - npm i -g bun
+            - apt-get update && apt-get install -y lftp
+            - cd apps/web
+            - bun install --frozen-lockfile || bun install
+            - bun run build
+            - cd ../..
+            - test -n "$MAJORDOMO_SFTP_HOST"
+            - test -n "$MAJORDOMO_SFTP_USER"
+            - test -n "$MAJORDOMO_SFTP_PASSWORD"
+            - test -n "$MAJORDOMO_REMOTE_DIR"
+            - >
+              lftp -u "$MAJORDOMO_SFTP_USER","$MAJORDOMO_SFTP_PASSWORD"
+              "sftp://$MAJORDOMO_SFTP_HOST:${MAJORDOMO_SFTP_PORT:-22}" -e
+              "set ssl:verify-certificate no;
+               set sftp:auto-confirm yes;
+               mirror -R --delete --verbose apps/web/dist $MAJORDOMO_REMOTE_DIR;
+               bye"
