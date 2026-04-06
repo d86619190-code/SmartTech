@@ -59,25 +59,25 @@ export const TechTasksPage: React.FC = () => {
 
   return (
     <>
-      <TechPageHeader title="Все задачи" subtitle="Входящие и назначенные ремонты: поиск и фильтры." />
+      <TechPageHeader title="All tasks" subtitle="Incoming and assigned repairs: search and filters." />
       <FilterBar>
-        <AdminInput placeholder="Поиск…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <AdminInput placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} />
         <AdminSelect value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="all">Все</option>
-          <option value="incoming">Только входящие</option>
-          <option value="repair">Только ремонты</option>
+          <option value="all">All</option>
+          <option value="incoming">Inbox only</option>
+          <option value="repair">Repairs only</option>
         </AdminSelect>
       </FilterBar>
       <TechCard style={{ padding: 0 }}>
         <AdminTable>
           <thead>
             <tr>
-              <AdminTh>Заказ</AdminTh>
-              <AdminTh>Устройство</AdminTh>
-              <AdminTh>Клиент</AdminTh>
-              <AdminTh>Статус</AdminTh>
-              <AdminTh>Сумма</AdminTh>
-              <AdminTh style={{ width: 52 }} aria-label="Открыть" />
+              <AdminTh>Order</AdminTh>
+              <AdminTh>Device</AdminTh>
+              <AdminTh>Client</AdminTh>
+              <AdminTh>Status</AdminTh>
+              <AdminTh>Sum</AdminTh>
+              <AdminTh style={{ width: 52 }} aria-label="Open" />
             </tr>
           </thead>
           <tbody>
@@ -107,11 +107,11 @@ export const TechTasksPage: React.FC = () => {
                     </span>
                   </AdminTd>
                   <AdminTd>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-muted)" }}>Входящая</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-muted)" }}>Inbox</span>
                   </AdminTd>
                   <AdminTd>—</AdminTd>
                   <AdminTd>
-                    <span className={cls.taskGo} title="Открыть заявку">
+                    <span className={cls.taskGo} title="Open an application">
                       <ArrowGoIcon />
                     </span>
                   </AdminTd>
@@ -140,7 +140,7 @@ export const TechTasksPage: React.FC = () => {
                   </AdminTd>
                   <AdminTd>{formatRub(row.laborRub + row.partsRub)}</AdminTd>
                   <AdminTd>
-                    <span className={cls.taskGo} title="Открыть карточку">
+                    <span className={cls.taskGo} title="Open card">
                       <ArrowGoIcon />
                     </span>
                   </AdminTd>

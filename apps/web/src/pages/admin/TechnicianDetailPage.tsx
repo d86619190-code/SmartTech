@@ -26,7 +26,7 @@ export const AdminTechnicianDetailPage: React.FC = () => {
   if (!tech) {
     return (
       <>
-        <AdminPageHeader title="Карточка мастера" subtitle="Загрузка…" />
+        <AdminPageHeader title="Master Card" subtitle="Loading…" />
         <SkeletonCard rows={5} />
       </>
     );
@@ -36,46 +36,46 @@ export const AdminTechnicianDetailPage: React.FC = () => {
     <>
       <AdminPageHeader
         title={tech.name}
-        subtitle="Детализация нагрузки и назначений (демо-данные)."
+        subtitle="Detailed load and assignments (demo data)."
         actions={
           <>
             <Button type="button" variant="outline">
-              Снять с заказов
+              Remove from orders
             </Button>
-            <Button type="button">Назначить на заказ</Button>
+            <Button type="button">Assign to order</Button>
           </>
         }
       />
       <div className={cls.detailGrid}>
         <AdminCard>
-          <p className={cls.blockTitle}>Показатели</p>
+          <p className={cls.blockTitle}>Indicators</p>
           <p className={cls.p}>
-            Активных заказов: <strong>{tech.activeOrders}</strong>
+            Active orders: <strong>{tech.activeOrders}</strong>
             <br />
-            Рейтинг: <strong>{tech.rating.toFixed(1)}</strong>
+            Rating: <strong>{tech.rating.toFixed(1)}</strong>
             <br />
-            Завершено работ: <strong>{tech.completed}</strong>
+            Completed work: <strong>{tech.completed}</strong>
           </p>
         </AdminCard>
         <AdminCard>
-          <p className={cls.blockTitle}>Финансы</p>
+          <p className={cls.blockTitle}>Finance</p>
           <p className={cls.p}>
-            Накопленная выручка (оценка): <strong>{formatRub(tech.revenueRub)}</strong>
+            Accumulated revenue (estimate): <strong>{formatRub(tech.revenueRub)}</strong>
           </p>
         </AdminCard>
         <AdminCard>
-          <p className={cls.blockTitle}>Специализация</p>
+          <p className={cls.blockTitle}>Specialization</p>
           <p className={cls.p}>{tech.specialty}</p>
         </AdminCard>
       </div>
       <AdminCard>
-        <p className={cls.blockTitle}>Текущие назначения</p>
+        <p className={cls.blockTitle}>Current appointments</p>
         <p className={cls.p}>
-          В демо-режиме назначения можно связать с заказами по полю «Мастер» в разделе «Заказы». Подключите API для живых данных.
+          In demo mode, assignments can be linked to orders using the “Master” field in the “Orders” section. Connect API for live data.
         </p>
       </AdminCard>
       <Link to="/admin/technicians" className={cls.link} style={{ display: "inline-block", marginTop: 16 }}>
-        ← К списку мастеров
+        ← To the list of masters
       </Link>
     </>
   );

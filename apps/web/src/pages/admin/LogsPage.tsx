@@ -19,12 +19,12 @@ export const AdminLogsPage: React.FC = () => {
 
   return (
     <>
-      <AdminPageHeader title="Журнал и события" subtitle="Системные логи, действия по заказам и уведомления." />
+      <AdminPageHeader title="Magazine and events" subtitle="System logs, order actions and notifications." />
       <FilterBar>
-        <AdminInput placeholder="Поиск по тексту или времени…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <AdminInput placeholder="Search by text or time..." value={q} onChange={(e) => setQ(e.target.value)} />
       </FilterBar>
       <AdminCard>
-        <ActivityFeed title="Лента событий" items={items} />
+        <ActivityFeed title="Event feed" items={items} />
       </AdminCard>
     </>
   );

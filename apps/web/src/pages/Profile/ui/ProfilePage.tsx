@@ -11,13 +11,13 @@ import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
 import cls from "./ProfilePage.module.css";
 
 const MAX_AVATAR_SIDE = 720;
-const MAX_AVATAR_BYTES = 220 * 1024; // безопасно ниже серверного лимита
+const MAX_AVATAR_BYTES = 220 * 1024; // safe below server limit
 
 function hasCyrillic(s: string): boolean {
   return /[\u0400-\u04FF]/.test(s);
 }
 
-/** Имя выглядит как написанное латиницей (без кириллицы) — для русскоязычного сервиса просим указать имя по-русски. */
+/** The name looks like it is written in Latin (without Cyrillic) - for a Russian-language service, please indicate the name in Russian. */
 function looksLikeLatinOnlyName(s: string): boolean {
   const t = s.trim();
   if (t.length < 2) return false;
@@ -40,7 +40,7 @@ function loadImageFromFile(file: File): Promise<HTMLImageElement> {
     };
     img.onerror = () => {
       URL.revokeObjectURL(objectUrl);
-      reject(new Error("Не удалось прочитать изображение"));
+      reject(new Error("Could not read image"));
     };
     img.src = objectUrl;
   });
@@ -56,10 +56,10 @@ async function compressAvatarToDataUrl(file: File): Promise<string> {
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas недоступен");
+  if (!ctx) throw new Error("Canvas unavailable");
   ctx.drawImage(img, 0, 0, width, height);
 
-  // Несколько попыток с постепенным снижением качества.
+  // Several attempts with a gradual decrease in quality.
   const qualities = [0.9, 0.82, 0.74, 0.66, 0.58];
   let best = canvas.toDataURL("image/jpeg", qualities[0]);
   for (const q of qualities) {
@@ -103,11 +103,11 @@ export const ProfilePage: React.FC = () => {
         setEmail(me.email ?? "");
       } catch (e) {
         const msg = e instanceof Error ? e.message : t("errors.loadProfile");
-        const isAuthError = /требуется авторизация|сессия истекла|401/i.test(msg);
+        const isAuthError = /authorization required|session expired|401/i.test(msg);
         if (isAuthError) {
           navigate("/login", { replace: true });
         } else {
-          // Не уводим на логин при временной ошибке API, чтобы не создавать цикл.
+          // We do not direct you to login when there is a temporary API error, so as not to create a cycle.
           showToast("error", msg);
         }
       } finally {
@@ -206,7 +206,7 @@ export const ProfilePage: React.FC = () => {
   }, [name]);
 
   const trimmedName = name.trim();
-  const isGenericName = /^(пользователь|user|user\d*)$/i.test(trimmedName) || trimmedName.length < 4;
+  const isGenericName = /^(user|user|user\d*)$/i.test(trimmedName) || trimmedName.length < 4;
   const isLatinOnlyName = looksLikeLatinOnlyName(name);
   const showNameReminder = !hideNameReminder && (isGenericName || isLatinOnlyName);
   const nameReminderText = isGenericName ? t("profile.realNameHint") : t("profile.realNameLatinHint");

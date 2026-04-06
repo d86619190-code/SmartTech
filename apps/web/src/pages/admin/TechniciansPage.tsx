@@ -24,19 +24,19 @@ export const AdminTechniciansPage: React.FC = () => {
 
   return (
     <>
-      <AdminPageHeader title="Мастера" subtitle="Нагрузка, рейтинг и производительность сервисных инженеров." />
+      <AdminPageHeader title="Masters" subtitle="Workload, rating and productivity of service engineers." />
       <FilterBar>
-        <AdminInput placeholder="Поиск по имени или специализации…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <AdminInput placeholder="Search by name or specialization..." value={q} onChange={(e) => setQ(e.target.value)} />
       </FilterBar>
       <AdminTable>
         <thead>
           <tr>
-            <AdminTh>Мастер</AdminTh>
-            <AdminTh>Специализация</AdminTh>
-            <AdminTh>В работе</AdminTh>
-            <AdminTh>Рейтинг</AdminTh>
-            <AdminTh>Завершено</AdminTh>
-            <AdminTh>Выручка (всего)</AdminTh>
+            <AdminTh>Master</AdminTh>
+            <AdminTh>Specialization</AdminTh>
+            <AdminTh>In progress</AdminTh>
+            <AdminTh>Rating</AdminTh>
+            <AdminTh>Completed</AdminTh>
+            <AdminTh>Revenue (total)</AdminTh>
             <AdminTh />
           </tr>
         </thead>
@@ -53,7 +53,7 @@ export const AdminTechniciansPage: React.FC = () => {
               <AdminTd>{formatRub(t.revenueRub)}</AdminTd>
               <AdminTd>
                 <Link className={cls.link} to={`/admin/technicians/${t.id}`}>
-                  Подробнее
+                  More details
                 </Link>
               </AdminTd>
             </tr>

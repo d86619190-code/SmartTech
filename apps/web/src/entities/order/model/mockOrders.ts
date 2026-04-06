@@ -1,33 +1,33 @@
 import type { ServiceOrder } from "./types";
 
-/** Демо-заказы под трёх мастеров (синхрон с бэкендом: r-ff / r-alex / r-user). */
+/** Demo orders for three masters (synchronized with backend: r-ff / r-alex / r-user). */
 export const mockOrders: Record<string, ServiceOrder> = {
   "r-ff": {
     id: "r-ff",
     deviceLabel: "iPhone 13 mini",
-    issueSummary: "Замена дисплея — мастер ff ddd (ff6690473@gmail.com)",
+    issueSummary: "Replacing the display - ff ddd wizard (ff6690473@gmail.com)",
     step: "in_repair",
-    createdAtLabel: "24 марта 2026",
-    updatedAtLabel: "24 марта 2026",
+    createdAtLabel: "24 March 2026",
+    updatedAtLabel: "24 March 2026",
     visitMode: "slot",
-    visitSlotLabel: "25 марта 2026, 12:00–14:00",
+    visitSlotLabel: "25 March 2026, 12:00–14:00",
     bringInPerson: true,
     needsConsultation: false,
     photoUrls: [],
     warrantyDays: 365,
     selectedQuoteId: "o1",
     finalPriceRub: 15490,
-    diagnosisProblem: "Повреждён модуль дисплея.",
-    diagnosisDetail: "Ремонт в процессе у мастера ff ddd.",
+    diagnosisProblem: "The display module is damaged.",
+    diagnosisDetail: "Repair in progress by the master ff ddd.",
     diagnosticFeeRub: 0,
     quoteOptions: [
       {
         id: "o1",
-        title: "Оригинальный модуль",
+        title: "Original module",
         subtitle: "OEM",
         priceRub: 15490,
         isOriginal: true,
-        repairDaysLabel: "1 день",
+        repairDaysLabel: "1 day",
         availability: "in_stock",
       },
     ],
@@ -35,25 +35,25 @@ export const mockOrders: Record<string, ServiceOrder> = {
   "r-alex": {
     id: "r-alex",
     deviceLabel: "Samsung Galaxy S21",
-    issueSummary: "Диагностика АКБ — мастер Алексей (+79789195542)",
+    issueSummary: "Battery diagnostics - master Alexey (+79789195542)",
     step: "diagnostics",
-    createdAtLabel: "24 марта 2026",
-    updatedAtLabel: "24 марта 2026",
+    createdAtLabel: "24 March 2026",
+    updatedAtLabel: "24 March 2026",
     visitMode: "asap",
     bringInPerson: false,
     needsConsultation: true,
     photoUrls: [],
     warrantyDays: 180,
-    diagnosisProblem: "Тест батареи — деградация ёмкости.",
-    diagnosisDetail: "Мастер Алексей готовит смету на замену АКБ.",
+    diagnosisProblem: "Battery test - capacity degradation.",
+    diagnosisDetail: "Master Alexey is preparing an estimate for replacing the battery.",
     diagnosticFeeRub: 500,
     quoteOptions: [
       {
         id: "bat1",
-        title: "Аккумулятор оригинал",
+        title: "Battery original",
         priceRub: 5300,
         isOriginal: true,
-        repairDaysLabel: "2–3 часа",
+        repairDaysLabel: "2–3 hours",
         availability: "in_stock",
       },
     ],
@@ -61,35 +61,35 @@ export const mockOrders: Record<string, ServiceOrder> = {
   "r-user": {
     id: "r-user",
     deviceLabel: "MacBook Air M2",
-    issueSummary: "Плата после залития — мастер Иван Петров (98y7tbnb97t@gmail.com)",
+    issueSummary: "Board after pouring - master Ivan Petrov (98y7tbnb97t@gmail.com)",
     step: "awaiting_approval",
-    createdAtLabel: "23 марта 2026",
-    updatedAtLabel: "24 марта 2026",
+    createdAtLabel: "23 March 2026",
+    updatedAtLabel: "24 March 2026",
     visitMode: "asap",
     bringInPerson: true,
     needsConsultation: false,
     photoUrls: [],
     warrantyDays: 180,
-    diagnosisProblem: "Коррозия платы, требуется согласование варианта.",
-    diagnosisDetail: "Мастер Иван Петров подготовил варианты восстановления.",
+    diagnosisProblem: "Board corrosion, variant approval required.",
+    diagnosisDetail: "Master Ivan Petrov prepared restoration options.",
     diagnosticFeeRub: 1500,
     quoteOptions: [
       {
         id: "mb1",
-        title: "Восстановление платы (ультразвук + чистка)",
-        subtitle: "Если целостность дорожек OK",
+        title: "Board restoration (ultrasound + cleaning)",
+        subtitle: "If track integrity is OK",
         priceRub: 18500,
         isOriginal: false,
-        repairDaysLabel: "3–5 дней",
+        repairDaysLabel: "3–5 days",
         availability: "in_stock",
       },
       {
         id: "mb2",
-        title: "Замена платы (б/у проверенная)",
-        subtitle: "Быстрее, дороже",
+        title: "Board replacement (used, tested)",
+        subtitle: "Faster, more expensive",
         priceRub: 42000,
         isOriginal: false,
-        repairDaysLabel: "1–2 дня",
+        repairDaysLabel: "1–2 day",
         availability: "on_order",
         orderLeadDays: 5,
       },
@@ -98,16 +98,16 @@ export const mockOrders: Record<string, ServiceOrder> = {
 };
 
 const STEP_LABELS: Record<string, string> = {
-  created: "Создана",
-  awaiting_device: "Ожидает передачи",
-  diagnostics: "Диагностика",
-  awaiting_approval: "Нужно согласование",
-  in_repair: "В работе",
-  ready: "Готово к выдаче",
-  completed: "Выдано",
+  created: "Created",
+  awaiting_device: "Awaiting transmission",
+  diagnostics: "Diagnostics",
+  awaiting_approval: "Approval required",
+  in_repair: "In progress",
+  ready: "Ready for pickup",
+  completed: "Issued",
 };
 
-/** Карточка «текущий заказ» на главной */
+/** “Current order” card on the main page */
 export function getActiveOrderPreview(): { id: string; deviceLabel: string; stepLabel: string } | null {
   const o = mockOrders["r-ff"];
   if (!o || o.step === "completed") return null;
@@ -118,9 +118,9 @@ export function getOrderById(id: string): ServiceOrder | undefined {
   return mockOrders[id];
 }
 
-/** Заказы на этапе согласования */
+/** Orders at the approval stage */
 export function getOrdersNeedingApproval(): { id: string; label: string }[] {
   return Object.values(mockOrders)
     .filter((o) => o.step === "awaiting_approval")
-    .map((o) => ({ id: o.id, label: `${o.deviceLabel} — выберите вариант ремонта` }));
+    .map((o) => ({ id: o.id, label: `${o.deviceLabel} — select repair option` }));
 }

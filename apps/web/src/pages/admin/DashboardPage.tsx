@@ -27,7 +27,7 @@ export const AdminDashboardPage: React.FC = () => {
   if (!data) {
     return (
       <>
-        <AdminPageHeader title="Дашборд" subtitle="Загрузка данных…" />
+        <AdminPageHeader title="Dashboard" subtitle="Loading data..." />
         <SkeletonKpiGrid count={5} />
         <SkeletonCard rows={6} />
       </>
@@ -35,33 +35,33 @@ export const AdminDashboardPage: React.FC = () => {
   }
   return (
     <>
-      <AdminPageHeader title="Дашборд" subtitle="Быстрый обзор сервиса и ключевые метрики." />
+      <AdminPageHeader title="Dashboard" subtitle="Quick overview of the service and key metrics." />
       <div className={cls.kpiGrid}>
-        <KpiCard label="Выручка (мес.)" value={formatRub(data.kpi.revenueRub)} />
-        <KpiCard label="Активные ремонты" value={String(data.kpi.activeRepairs)} />
-        <KpiCard label="Завершено заказов" value={String(data.kpi.completedMonth)} hint="Текущий месяц" />
-        <KpiCard label="Средний чек" value={formatRub(data.kpi.avgCheckRub)} />
-        <KpiCard label="Ожидают согласования" value={String(data.kpi.pendingApprovals)} hint="Требуют действия" />
+        <KpiCard label="Revenue (month)" value={formatRub(data.kpi.revenueRub)} />
+        <KpiCard label="Active repairs" value={String(data.kpi.activeRepairs)} />
+        <KpiCard label="Completed orders" value={String(data.kpi.completedMonth)} hint="Current month" />
+        <KpiCard label="Average bill" value={formatRub(data.kpi.avgCheckRub)} />
+        <KpiCard label="Awaiting approval" value={String(data.kpi.pendingApprovals)} hint="Requires action" />
       </div>
       <div className={cls.twoCol}>
         <AdminCard>
-          <ChartPlaceholder title="Динамика выручки (тыс. ₽)" data={data.revenueSeries} />
+          <ChartPlaceholder title="Revenue dynamics (RUB thousand)" data={data.revenueSeries} />
         </AdminCard>
         <AdminCard>
-          <ActivityFeed title="События и уведомления" items={data.logs} />
+          <ActivityFeed title="Events and notifications" items={data.logs} />
         </AdminCard>
       </div>
       <div className={cls.section}>
-        <h2 className={cls.h2}>Недавние заказы</h2>
+        <h2 className={cls.h2}>Recent orders</h2>
         <AdminCard>
           <AdminTable>
             <thead>
               <tr>
                 <AdminTh>№</AdminTh>
-                <AdminTh>Устройство</AdminTh>
-                <AdminTh>Клиент</AdminTh>
-                <AdminTh>Статус</AdminTh>
-                <AdminTh>Сумма</AdminTh>
+                <AdminTh>Device</AdminTh>
+                <AdminTh>Client</AdminTh>
+                <AdminTh>Status</AdminTh>
+                <AdminTh>Sum</AdminTh>
                 <AdminTh />
               </tr>
             </thead>
@@ -79,7 +79,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <AdminTd>{formatRub(o.totalRub)}</AdminTd>
                   <AdminTd>
                     <Link className={cls.link} to={`/admin/orders/${o.id}`}>
-                      Открыть
+                      Open
                     </Link>
                   </AdminTd>
                 </tr>
@@ -89,14 +89,14 @@ export const AdminDashboardPage: React.FC = () => {
         </AdminCard>
       </div>
       <div className={cls.section}>
-        <h2 className={cls.h2}>Загрузка мастеров</h2>
+        <h2 className={cls.h2}>Loading masters</h2>
         <AdminCard>
           <div className={cls.techList}>
             {data.techActivity.map((t: any) => (
               <div key={t.name} className={cls.techRow}>
                 <span className={cls.techName}>{t.name}</span>
                 <span className={cls.techMeta}>
-                  В работе: <strong>{t.inWork}</strong> · За неделю: <strong>{t.done}</strong>
+                  In work: <strong>{t.inWork}</strong> · For the week: <strong>{t.done}</strong>
                 </span>
               </div>
             ))}

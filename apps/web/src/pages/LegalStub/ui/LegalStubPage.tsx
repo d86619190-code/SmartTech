@@ -12,8 +12,8 @@ export const LegalStubPage: React.FC<LegalStubPageProps> = ({ title }) => {
       <PageHeader title={title} />
       <div className={cls.body}>
         <p className={cls.p}>
-          Здесь будет размещён актуальный текст документа в соответствии с законодательством РФ. Для уточнений
-          свяжитесь с сервисом.
+          The current text of the document will be posted here in accordance with the legislation of the Russian Federation. For clarification
+          contact service.
         </p>
       </div>
     </div>

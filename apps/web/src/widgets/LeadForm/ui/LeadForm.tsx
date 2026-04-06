@@ -8,7 +8,7 @@ import cls from "./LeadForm.module.css";
 type LeadFormProps = {
   className?: string;
   variant?: "default" | "dark";
-  /** Если задано (например анимированный выход с лендинга), вызывается вместо navigate */
+  /** If specified (for example, an animated exit from the landing page), it is called instead of navigate */
   navigateTo?: (path: string) => void;
 };
 
@@ -33,15 +33,15 @@ export const LeadForm: React.FC<LeadFormProps> = ({ className, variant = "defaul
       aria-labelledby="lead-heading"
     >
       <h2 id="lead-heading" className={cls.heading}>
-        Всегда на связи
+        Always in touch
       </h2>
-      <p className={cls.sub}>Оставьте заявку — расскажем детали и подскажем лучший вариант ремонта.</p>
+      <p className={cls.sub}>Leave a request - we will tell you the details and suggest the best repair option.</p>
       <form className={cls.form} onSubmit={onSubmit}>
         <Input
           name="name"
           type="text"
           autoComplete="name"
-          placeholder="Имя"
+          placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -49,12 +49,12 @@ export const LeadForm: React.FC<LeadFormProps> = ({ className, variant = "defaul
           name="phone"
           type="tel"
           autoComplete="tel"
-          placeholder="Телефон"
+          placeholder="Telephone"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
         />
         <Button type="submit" fullWidth className={cls.cta}>
-          Оставить заявку
+          Leave a request
         </Button>
       </form>
     </section>

@@ -30,9 +30,9 @@ export const TechIncomingPage: React.FC = () => {
 
   return (
     <>
-      <TechPageHeader title="Входящие заявки" subtitle="Новые обращения: просмотр и решение принять или отклонить." />
+      <TechPageHeader title="Incoming applications" subtitle="New requests: review and decide to accept or reject." />
       <FilterBar>
-        <AdminInput placeholder="Поиск…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <AdminInput placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} />
       </FilterBar>
       <div className={cls.grid2}>
         {rows.map((req) => (
@@ -51,7 +51,7 @@ export const TechIncomingPage: React.FC = () => {
                 </p>
                 {req.priority === "high" ? (
                   <p className={cls.muted} style={{ color: "var(--badge-progress-fg)" }}>
-                    Высокий приоритет
+                    High priority
                   </p>
                 ) : null}
                 <p className={cls.p} style={{ marginTop: 8 }}>
@@ -66,7 +66,7 @@ export const TechIncomingPage: React.FC = () => {
             <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" }}>
               <Link to={`/tech/incoming/${req.id}`}>
                 <Button type="button" variant="outline">
-                  Подробнее
+                  More details
                 </Button>
               </Link>
             </div>

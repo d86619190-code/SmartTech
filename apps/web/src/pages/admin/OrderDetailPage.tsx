@@ -27,7 +27,7 @@ export const AdminOrderDetailPage: React.FC = () => {
   if (!order) {
     return (
       <>
-        <AdminPageHeader title="Карточка заказа" subtitle="Загрузка…" />
+        <AdminPageHeader title="Order card" subtitle="Loading…" />
         <SkeletonCard rows={6} />
       </>
     );
@@ -36,34 +36,34 @@ export const AdminOrderDetailPage: React.FC = () => {
   return (
     <>
       <AdminPageHeader
-        title={`Заказ ${order.publicId}`}
-        subtitle="Полная карточка заявки: устройство, клиент, статус и стоимость."
+        title={`Order ${order.publicId}`}
+        subtitle="Full application card: device, client, status and cost."
         actions={
           <>
             <Button variant="outline" type="button">
-              Назначить мастера
+              Appoint a master
             </Button>
-            <Button type="button">Обновить статус</Button>
+            <Button type="button">Update status</Button>
           </>
         }
       />
       <div className={cls.detailGrid}>
         <AdminCard>
-          <p className={cls.blockTitle}>Устройство</p>
+          <p className={cls.blockTitle}>Device</p>
           <p className={cls.p}>
             <strong>{order.device}</strong>
             <br />
-            Тип: {order.deviceType === "phone" ? "Телефон" : order.deviceType === "tablet" ? "Планшет" : "Ноутбук"}
+            Type: {order.deviceType ==="phone" ? "Telephone" : order.deviceType === "tablet" ? "Tablet" : "Laptop"}
           </p>
         </AdminCard>
         <AdminCard>
-          <p className={cls.blockTitle}>Статус</p>
+          <p className={cls.blockTitle}>Status</p>
           <p className={cls.p}>
             <AdminStatusBadge status={order.status} />
           </p>
         </AdminCard>
         <AdminCard>
-          <p className={cls.blockTitle}>Клиент</p>
+          <p className={cls.blockTitle}>Client</p>
           <p className={cls.p}>
             {order.customer}
             <br />
@@ -73,15 +73,15 @@ export const AdminOrderDetailPage: React.FC = () => {
           </p>
         </AdminCard>
         <AdminCard>
-          <p className={cls.blockTitle}>Мастер</p>
-          <p className={cls.p}>{order.technician ?? "Не назначен"}</p>
+          <p className={cls.blockTitle}>Master</p>
+          <p className={cls.p}>{order.technician ?? "Not assigned"}</p>
         </AdminCard>
       </div>
       <AdminCard style={{ marginBottom: 20 }}>
-        <p className={cls.blockTitle}>Описание проблемы</p>
+        <p className={cls.blockTitle}>Description of the problem</p>
         <p className={cls.p}>{order.issue}</p>
         <p className={cls.p} style={{ marginTop: 12 }}>
-          Фото от клиента: <strong>{order.photos}</strong>
+          Photo from the client: <strong>{order.photos}</strong>
         </p>
         {Array.isArray(order.photoUrls) && order.photoUrls.length > 0 ? (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(112px, 1fr))", gap: 10, marginTop: 12 }}>
@@ -94,7 +94,7 @@ export const AdminOrderDetailPage: React.FC = () => {
                   const ext = mimeFromDataUrl(u).includes("png") ? "png" : "jpg";
                   downloadDataUrl(u, `order-${order.publicId}-${i + 1}.${ext}`);
                 }}
-                title="Скачать фото"
+                title="Download photo"
               >
                 <img src={u} alt="" style={{ width: "100%", height: 88, objectFit: "cover", borderRadius: 8, display: "block" }} />
               </button>
@@ -104,23 +104,23 @@ export const AdminOrderDetailPage: React.FC = () => {
       </AdminCard>
       <div className={cls.detailGrid}>
         <AdminCard>
-          <p className={cls.blockTitle}>Выбранный вариант ремонта</p>
+          <p className={cls.blockTitle}>Selected repair option</p>
           <p className={cls.p}>{order.repairOption}</p>
         </AdminCard>
         <AdminCard>
-          <p className={cls.blockTitle}>Стоимость</p>
+          <p className={cls.blockTitle}>Price</p>
           <p className={cls.p}>
-            Работа: <strong>{formatRub(order.laborRub)}</strong>
+            Job: <strong>{formatRub(order.laborRub)}</strong>
             <br />
-            Запчасти: <strong>{formatRub(order.partsRub)}</strong>
+            Spare parts: <strong>{formatRub(order.partsRub)}</strong>
             <br />
-            Итого: <strong>{formatRub(order.laborRub + order.partsRub)}</strong>
+            Total: <strong>{formatRub(order.laborRub + order.partsRub)}</strong>
           </p>
         </AdminCard>
       </div>
       <div className={cls.twoCol}>
         <AdminCard>
-          <p className={cls.blockTitle}>Хронология</p>
+          <p className={cls.blockTitle}>Chronology</p>
           <ul className={cls.noteList}>
             {order.timeline.map((t: { at: string; label: string }) => (
               <li key={t.at + t.label}>
@@ -130,7 +130,7 @@ export const AdminOrderDetailPage: React.FC = () => {
           </ul>
         </AdminCard>
         <AdminCard>
-          <p className={cls.blockTitle}>Заметки и история</p>
+          <p className={cls.blockTitle}>Notes and history</p>
           <ul className={cls.noteList}>
             {order.notes.map((n: string) => (
               <li key={n}>{n}</li>
@@ -140,10 +140,10 @@ export const AdminOrderDetailPage: React.FC = () => {
       </div>
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
         <Button variant="outline" type="button">
-          Редактировать детали
+          Edit details
         </Button>
         <Link to="/admin/orders" className={cls.link} style={{ alignSelf: "center" }}>
-          ← К списку заказов
+          ← To the list of orders
         </Link>
       </div>
     </>

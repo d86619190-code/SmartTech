@@ -18,32 +18,32 @@ export const ContactsPage: React.FC = () => {
 
   return (
     <div className={cls.shell}>
-      <PageHeader title="Контакты и вопросы" />
+      <PageHeader title="Contacts and questions" />
       <div className={cls.body}>
         <section className={cls.section} aria-labelledby="faq-c">
           <h2 id="faq-c" className={cls.h2}>
-            Частые вопросы
+            Frequently asked questions
           </h2>
           <FaqAccordion items={FAQ_ITEMS} idPrefix="contacts-faq" />
         </section>
 
         <section className={cls.section} aria-labelledby="contacts-row">
           <h2 id="contacts-row" className={cls.h2}>
-            Связь и график
+            Communication and schedule
           </h2>
           <div className={cls.triplet}>
             <div className={cls.tripletItem}>
-              <span className={cls.tripletLabel}>Телефон</span>
+              <span className={cls.tripletLabel}>Telephone</span>
               <a className={cls.phone} href={`tel:${SITE.phoneTel}`}>
                 {SITE.phoneDisplay}
               </a>
             </div>
             <div className={cls.tripletItem}>
-              <span className={cls.tripletLabel}>График работы</span>
+              <span className={cls.tripletLabel}>Work schedule</span>
               <span className={cls.tripletVal}>{SITE.workingHoursLines[0]}</span>
             </div>
             <div className={cls.tripletItem}>
-              <span className={cls.tripletLabel}>Адрес</span>
+              <span className={cls.tripletLabel}>Address</span>
               <span className={cls.tripletVal}>{SITE.address}</span>
             </div>
           </div>
@@ -51,12 +51,12 @@ export const ContactsPage: React.FC = () => {
 
         <section className={cls.mapSection} aria-labelledby="map-heading">
           <h2 id="map-heading" className={cls.h2}>
-            Как нас найти
+            How to find us
           </h2>
           <div className={cls.mapRow}>
             <div className={cls.mapFrame}>
               <iframe
-                title="Карта — сервисный центр"
+                title="Map - service center"
                 src={SITE.yandexMapEmbedUrl}
                 className={cls.iframe}
                 loading="lazy"
@@ -66,17 +66,17 @@ export const ContactsPage: React.FC = () => {
           </div>
           <div className={cls.mapActions}>
             <Button type="button" onClick={() => window.open(`tel:${SITE.phoneTel}`)}>
-              Позвонить
+              Call
             </Button>
             <Button type="button" variant="outline" onClick={() => window.open(SITE.telegramUrl, "_blank")}>
-              Написать в ТГ
+              Write to TG
             </Button>
             <Button type="button" variant="outline" onClick={goLead}>
-              Оставить заявку
+              Leave a request
             </Button>
           </div>
           <Button type="button" variant="outline" onClick={() => window.open(SITE.mapsUrl, "_blank")}>
-            Открыть в Яндекс.Картах
+            Open in Yandex.Maps
           </Button>
         </section>
       </div>

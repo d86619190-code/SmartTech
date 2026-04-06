@@ -32,7 +32,7 @@ export const TechModal: React.FC<TechModalProps> = ({ title, open, onClose, chil
           <h2 id="tech-modal-title" className={cls.title}>
             {title}
           </h2>
-          <button type="button" className={cls.close} onClick={onClose} aria-label="Закрыть">
+          <button type="button" className={cls.close} onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>

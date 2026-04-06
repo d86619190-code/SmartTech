@@ -43,7 +43,7 @@ function upsertLocalDraft(payload: OrderDraftPayload, id?: string): LocalDraftRo
   const nextId = id ?? crypto.randomUUID();
   const title = payload.device?.trim()
     ? `${payload.device.trim()}${payload.issue?.trim() ? ` — ${payload.issue.trim().slice(0, 38)}${payload.issue.trim().length > 38 ? "…" : ""}` : ""}`
-    : "Черновик заявки";
+    : "Draft application";
   const row: LocalDraftRow = { id: nextId, title, saved_at: Date.now(), payload };
   const rows = [row, ...readLocalDraftRows().filter((x) => x.id !== nextId)];
   writeLocalDraftRows(rows);
@@ -167,24 +167,24 @@ export const CreateOrderPage: React.FC = () => {
         if (opts?.redirectToDrafts) {
           navigate("/create-order/drafts");
         }
-        toast.showToast("success", "Черновик сохранён");
+        toast.showToast("success", "Draft saved");
         return row;
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Не удалось сохранить черновик";
+        const msg = e instanceof Error ? e.message : "Failed to save draft";
         const payload = captureDraftPayload();
         const localRow = upsertLocalDraft(payload, currentDraftId ?? undefined);
         setCurrentDraftId(localRow.id);
-        if (/авторизац|сессия|401|unauthorized/i.test(msg)) {
+        if (/authorization|session|401|unauthorized/i.test(msg)) {
           if (opts?.markPendingSubmit) localStorage.setItem(PENDING_SUBMIT_KEY, "1");
           if (opts?.redirectToDrafts) {
             navigate("/create-order/drafts");
           } else {
             navigate("/login?next=/create-order/drafts");
           }
-          toast.showToast("success", "Черновик сохранён локально");
+          toast.showToast("success", "Draft saved locally");
           return { id: localRow.id } as any;
         }
-        toast.showToast("success", "Черновик сохранён локально");
+        toast.showToast("success", "Draft saved locally");
         if (opts?.redirectToDrafts) {
           navigate("/create-order/drafts");
         }
@@ -270,8 +270,8 @@ export const CreateOrderPage: React.FC = () => {
       localStorage.removeItem(LOCAL_PENDING_DRAFT_KEY);
       navigate("/create-order/success");
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось отправить заявку";
-      if (/авторизац|сессия|401|unauthorized/i.test(msg)) {
+      const msg = e instanceof Error ? e.message : "Failed to submit application";
+      if (/authorization|session|401|unauthorized/i.test(msg)) {
         const localPayload = captureDraftPayload();
         localStorage.setItem(LOCAL_PENDING_DRAFT_KEY, JSON.stringify(localPayload));
         const saved = await saveCurrentDraft({ markPendingSubmit: true });
@@ -291,7 +291,7 @@ export const CreateOrderPage: React.FC = () => {
     if (!readAuthSession()?.accessToken) return;
     if (localStorage.getItem(PENDING_SUBMIT_KEY) !== "1") return;
     if (step !== 3 || !contactPhone.trim() || (visitMode === "slot" && !slot) || photos.length === 0) {
-      // fallback: сохраняем в БД и открываем страницу черновиков
+      // fallback: save to the database and open the drafts page
       void (async () => {
         const row = await saveCurrentDraft();
         localStorage.removeItem(PENDING_SUBMIT_KEY);
@@ -332,7 +332,7 @@ export const CreateOrderPage: React.FC = () => {
     setPhotos((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const stepTitle = step === 1 ? "Данные устройства" : step === 2 ? "Фото поломки" : "Контакты и отправка";
+  const stepTitle = step === 1 ? "Device data" : step === 2 ? "Photo of the breakdown" : "Contacts and shipping";
 
   const goNext = () => {
     if (step === 1) {
@@ -348,23 +348,23 @@ export const CreateOrderPage: React.FC = () => {
 
   return (
     <div className={cls.shell}>
-      <PageHeader title="Новая заявка" />
+      <PageHeader title="New application" />
       <div className={cls.body}>
         <section className={cls.hero}>
           <div className={cls.heroText}>
-            <h2 className={cls.heroTitle}>Оформление ремонта</h2>
+            <h2 className={cls.heroTitle}>Registration of repair</h2>
             <p className={cls.lead}>
-              Заполните короткую форму. Чем точнее описание, тем быстрее мастер подготовит диагностику.
+              Fill out the short form. The more accurate the description, the faster the technician will prepare a diagnosis.
             </p>
             <div className={cls.stepsRow}>
-              <span className={[cls.stepPill, step >= 1 && cls.stepPillActive].filter(Boolean).join(" ")}>1. Устройство</span>
-              <span className={[cls.stepPill, step >= 2 && cls.stepPillActive].filter(Boolean).join(" ")}>2. Фото</span>
-              <span className={[cls.stepPill, step >= 3 && cls.stepPillActive].filter(Boolean).join(" ")}>3. Контакты</span>
+              <span className={[cls.stepPill, step >= 1 && cls.stepPillActive].filter(Boolean).join(" ")}>1. Device</span>
+              <span className={[cls.stepPill, step >= 2 && cls.stepPillActive].filter(Boolean).join(" ")}>2. Photo</span>
+              <span className={[cls.stepPill, step >= 3 && cls.stepPillActive].filter(Boolean).join(" ")}>3. Contacts</span>
             </div>
           </div>
-          <div className={cls.progressCard} aria-label="Прогресс оформления">
+          <div className={cls.progressCard} aria-label="Registration progress">
             <div className={cls.progressHead}>
-              <span>Шаг {step} из 3</span>
+              <span>Step {step} of 3</span>
               <span>{stepTitle}</span>
             </div>
             <div className={cls.progressTrack}>
@@ -388,38 +388,38 @@ export const CreateOrderPage: React.FC = () => {
           >
             {step === 1 ? (
               <section className={cls.section}>
-                <h3 className={cls.sectionTitle}>Устройство</h3>
+                <h3 className={cls.sectionTitle}>Device</h3>
                 <div className={cls.gridTwo}>
                   <label className={cls.label}>
-                    Тип устройства
+                    Device type
                     <select
                       className={cls.input}
                       value={deviceCategory}
                       onChange={(e) => setDeviceCategory(e.target.value as "phone" | "tablet" | "laptop")}
                     >
-                      <option value="phone">Смартфон</option>
-                      <option value="tablet">Планшет</option>
-                      <option value="laptop">Ноутбук</option>
+                      <option value="phone">Smartphone</option>
+                      <option value="tablet">Tablet</option>
+                      <option value="laptop">Laptop</option>
                     </select>
                   </label>
                   <label className={cls.label}>
-                    Модель
+                    Model
                     <input
                       className={cls.input}
                       value={device}
                       onChange={(e) => setDevice(e.target.value)}
-                      placeholder="Например: iPhone 14"
+                      placeholder="For example: iPhone 14"
                       required
                     />
                   </label>
                 </div>
                 <label className={cls.label}>
-                  Что случилось
+                  What's happened
                   <textarea
                     className={cls.textarea}
                     value={issue}
                     onChange={(e) => setIssue(e.target.value)}
-                    placeholder="Опишите симптомы, когда началось и что уже пробовали"
+                    placeholder="Describe the symptoms, when it started and what you have already tried"
                     required
                   />
                 </label>
@@ -428,26 +428,26 @@ export const CreateOrderPage: React.FC = () => {
 
             {step === 2 ? (
               <section className={cls.section}>
-                <h3 className={cls.sectionTitle}>Фото поломки</h3>
+                <h3 className={cls.sectionTitle}>Photo of the breakdown</h3>
                 <div className={cls.uploadBox}>
-                  <span className={cls.uploadTitle}>Добавьте минимум 1 фото</span>
-                  <span className={cls.fileHint}>С устройства или камеры (PNG/JPG, до {MAX_BREAKAGE_PHOTOS} файлов). Без фото заявку нельзя отправить.</span>
+                  <span className={cls.uploadTitle}>Add at least 1 photo</span>
+                  <span className={cls.fileHint}>From device or camera (PNG/JPG, up to {MAX_BREAKAGE_PHOTOS} files). You cannot submit an application without a photo.</span>
                   <Button type="button" variant="outline" onClick={() => void onAddPhotos()} disabled={picking || submitting || photos.length >= MAX_BREAKAGE_PHOTOS}>
-                    {picking ? "Выбор…" : photos.length >= MAX_BREAKAGE_PHOTOS ? "Максимум фото" : "Выбрать фото"}
+                    {picking ? "Choice…" : photos.length >= MAX_BREAKAGE_PHOTOS ? "Maximum photo" : "Select photo"}
                   </Button>
                   {photos.length > 0 ? (
                     <div className={cls.photoPreviewGrid}>
                       {photos.map((p) => (
                         <div key={p.id} className={cls.photoPreviewItem}>
                           <img className={cls.photoPreviewImg} src={p.dataUrl} alt="" />
-                          <button type="button" className={cls.photoRemove} onClick={() => removePhoto(p.id)} aria-label="Убрать фото">
+                          <button type="button" className={cls.photoRemove} onClick={() => removePhoto(p.id)} aria-label="Remove photo">
                             ×
                           </button>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className={cls.fileHint}>Сейчас фото: 0 из {MAX_BREAKAGE_PHOTOS}</p>
+                    <p className={cls.fileHint}>Currently photos: 0 from {MAX_BREAKAGE_PHOTOS}</p>
                   )}
                 </div>
               </section>
@@ -456,9 +456,9 @@ export const CreateOrderPage: React.FC = () => {
             {step === 3 ? (
               <>
               <section className={cls.section}>
-                <h3 className={cls.sectionTitle}>Контакты и визит</h3>
+                <h3 className={cls.sectionTitle}>Contacts and visit</h3>
                 <label className={cls.label}>
-                  Телефон для связи
+                  Contact phone number
                   <input
                     className={cls.input}
                     value={contactPhone}
@@ -470,7 +470,7 @@ export const CreateOrderPage: React.FC = () => {
                 </label>
 
                 <div className={cls.label}>
-                  Когда удобно приехать
+                  When is it convenient to come
                   <div className={cls.radioGrid}>
                     <label className={[cls.radioCard, visitMode === "asap" && cls.radioCardActive].filter(Boolean).join(" ")}>
                       <input
@@ -479,7 +479,7 @@ export const CreateOrderPage: React.FC = () => {
                         checked={visitMode === "asap"}
                         onChange={() => setVisitMode("asap")}
                       />
-                      <span>В ближайшее время</span>
+                      <span>Coming soon</span>
                     </label>
                     <label className={[cls.radioCard, visitMode === "slot" && cls.radioCardActive].filter(Boolean).join(" ")}>
                       <input
@@ -488,7 +488,7 @@ export const CreateOrderPage: React.FC = () => {
                         checked={visitMode === "slot"}
                         onChange={() => setVisitMode("slot")}
                       />
-                      <span>Выбрать дату и время</span>
+                      <span>Select date and time</span>
                     </label>
                   </div>
                   {visitMode === "slot" ? (
@@ -503,7 +503,7 @@ export const CreateOrderPage: React.FC = () => {
                 </div>
               </section>
                 <section className={cls.section}>
-                  <h3 className={cls.sectionTitle}>Дополнительно</h3>
+                  <h3 className={cls.sectionTitle}>Additionally</h3>
                   <div className={cls.checks}>
                     <label className={cls.checkCard}>
                       <input
@@ -511,7 +511,7 @@ export const CreateOrderPage: React.FC = () => {
                         checked={bringInPerson}
                         onChange={(e) => setBringInPerson(e.target.checked)}
                       />
-                      <span>Принесу устройство лично</span>
+                      <span>I will bring the device personally</span>
                     </label>
                     <label className={cls.checkCard}>
                       <input
@@ -519,18 +519,18 @@ export const CreateOrderPage: React.FC = () => {
                         checked={needsConsultation}
                         onChange={(e) => setNeedsConsultation(e.target.checked)}
                       />
-                      <span>Нужна консультация перед ремонтом</span>
+                      <span>Need advice before repair</span>
                     </label>
                   </div>
                 </section>
                 <section className={cls.section}>
-                  <h3 className={cls.sectionTitle}>Проверьте перед отправкой</h3>
+                  <h3 className={cls.sectionTitle}>Check before sending</h3>
                   <div className={cls.summaryList}>
-                    <div className={cls.summaryRow}><span>Устройство</span><strong>{deviceCategory === "phone" ? "Смартфон" : deviceCategory === "tablet" ? "Планшет" : "Ноутбук"}</strong></div>
-                    <div className={cls.summaryRow}><span>Модель</span><strong>{device || "—"}</strong></div>
-                    <div className={cls.summaryRow}><span>Телефон</span><strong>{contactPhone || "—"}</strong></div>
-                    <div className={cls.summaryRow}><span>Фото</span><strong>{photos.length}</strong></div>
-                    <div className={cls.summaryRow}><span>Когда удобно</span><strong>{visitMode === "asap" ? "В ближайшее время" : slot || "—"}</strong></div>
+                    <div className={cls.summaryRow}><span>Device</span><strong>{deviceCategory ==="phone" ? "Smartphone" : deviceCategory === "tablet" ? "Tablet" : "Laptop"}</strong></div>
+                    <div className={cls.summaryRow}><span>Model</span><strong>{device ||"—"}</strong></div>
+                    <div className={cls.summaryRow}><span>Phone</span><strong>{contactPhone ||"—"}</strong></div>
+                    <div className={cls.summaryRow}><span>Photo</span><strong>{photos.length}</strong></div>
+                    <div className={cls.summaryRow}><span>When convenient</span><strong>{visitMode ==="asap" ? "Coming soon" : slot || "—"}</strong></div>
                   </div>
                 </section>
               </>
@@ -539,21 +539,21 @@ export const CreateOrderPage: React.FC = () => {
             <div className={cls.actions}>
               {step > 1 ? (
                 <Button type="button" variant="outline" onClick={() => setStep((s) => (s - 1) as CreateOrderStep)}>
-                  Назад
+                  Back
                 </Button>
               ) : (
                 <div className={cls.actionsLeft}>
                   <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-                    Назад
+                    Back
                   </Button>
                   <Button type="button" variant="ghost" onClick={clearCurrentForm}>
-                    Очистить
+                    Clear
                   </Button>
                 </div>
               )}
               {step < 3 ? (
                 <Button type="button" onClick={goNext} disabled={step === 1 ? !device.trim() || !issue.trim() : photos.length === 0}>
-                  Далее
+                  Next
                 </Button>
               ) : (
                 <div className={cls.actionsRight}>
@@ -563,14 +563,14 @@ export const CreateOrderPage: React.FC = () => {
                     onClick={() => void saveCurrentDraft({ redirectToDrafts: true })}
                     disabled={submitting}
                   >
-                    Сохранить как черновик
+                    Save as draft
                   </Button>
                   <Button
                     type="button"
                     onClick={() => void submitOrder()}
                     disabled={submitting || !contactPhone.trim() || (visitMode === "slot" && !slot) || photos.length === 0}
                   >
-                    {submitting ? "Отправка..." : "Отправить заявку"}
+                    {submitting ? "Sending..." : "Send a request"}
                   </Button>
                 </div>
               )}

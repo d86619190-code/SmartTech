@@ -1,12 +1,12 @@
-/** Данные карточки для 3D-карусели отслеживания */
+/** Card data for 3D tracking carousel */
 export type TrackingCardData = {
   id: string;
   deviceName: string;
   issueLabel: string;
   imageUrl: string;
-  /** 0–100: заполнение прогресс-бара */
+  /** 0–100: filling the progress bar */
   progressPercent: number;
   estimateLabel: string;
-  /** Связь с заказом в приложении */
+  /** Connection with the order in the application */
   orderId?: string;
 };

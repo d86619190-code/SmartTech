@@ -9,9 +9,9 @@ type Ctx = {
 
 const LandingExitNavContext = React.createContext<Ctx | null>(null);
 
-/** Синхронно с `animation-duration` у `.coverPanel` в LandingExitNav.module.css */
+/** Synchronized with `animation-duration` of `.coverPanel` in LandingExitNav.module.css */
 const EXIT_ANIM_MS = 880;
-/** После fade-in (45% × 880 ≈ 396 ms при linear) — маршрут меняется под полным затемнением */
+/** After fade-in (45% × 880 ≈ 396 ms with linear) - the route changes under complete blackout */
 const NAVIGATE_AT_MS = 400;
 const FALLBACK_PAD_MS = 400;
 

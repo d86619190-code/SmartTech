@@ -201,7 +201,7 @@ export const IconMessage: React.FC<IconProps> = ({ className, size = 18, "aria-h
   </svg>
 );
 
-/** Справка / FAQ */
+/** Help / FAQ */
 export const IconHelp: React.FC<IconProps> = ({ className, size = 18, "aria-hidden": ariaHidden = true }) => (
   <svg
     width={size}
@@ -243,7 +243,7 @@ export const IconLogin: React.FC<IconProps> = ({ className, size = 18, "aria-hid
   </svg>
 );
 
-/** Отслеживание / дашборд */
+/** Tracking / dashboard */
 export const IconTrack: React.FC<IconProps> = ({ className, size = 18, "aria-hidden": ariaHidden = true }) => (
   <svg
     width={size}

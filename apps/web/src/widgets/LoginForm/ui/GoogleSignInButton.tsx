@@ -5,7 +5,7 @@ import cls from "./LoginForm.module.css";
 
 const GSI_SCRIPT = "https://accounts.google.com/gsi/client";
 
-/** GSI допускает один вызов `initialize()` на client_id; иначе спам в консоли и гонки в Strict Mode. */
+/** GSI allows one call to `initialize()` per client_id; otherwise spam in the console and races in Strict Mode. */
 const gsiSingleton = {
   initialized: false,
   dispatchCredential: (_credential: string) => {},
@@ -70,9 +70,9 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCreden
   const isInAppWebView = /(FBAN|FBAV|Instagram|Line|Telegram|wv;|WebView|MiuiBrowser|YaApp_Android)/i.test(ua);
   const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
 
-  // Не завязываем эффект на `disabled` / isSubmitting: иначе при «Отправить код» GSI
-  // переинициализируется, в консоли сыпятся COOP/postMessage от accounts.google.com, возможны гонки.
-  // Блокировка кликов — через `data-disabled` + CSS (pointer-events: none).
+  // We do not bind the effect to `disabled` / isSubmitting: otherwise when “Submit code” GSI
+  // is re-initialized, COOP/postMessage from accounts.google.com appears in the console, races are possible.
+  // Click blocking - via `data-disabled` + CSS (pointer-events: none).
   React.useEffect(() => {
     if (!googleClientId || !googleUiSupported) return;
 
@@ -153,7 +153,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCreden
         {t("login.googleNeedClientId")}
         {" "}
         <code className={cls.code}>VITE_GOOGLE_CLIENT_ID</code>
-        {locale === "ru" ? " для входа через Google." : " to enable Google sign in."}
+        {locale === "ru" ? " to login via Google." : " to enable Google sign in."}
       </p>
     );
   }

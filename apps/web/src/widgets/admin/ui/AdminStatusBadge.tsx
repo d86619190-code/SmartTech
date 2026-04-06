@@ -3,13 +3,13 @@ import type { AdminOrderStatus } from "@/entities/admin";
 import cls from "./AdminStatusBadge.module.css";
 
 const LABELS: Record<AdminOrderStatus, string> = {
-  new: "Новый",
-  diagnostics: "Диагностика",
-  approval: "Согласование",
-  in_progress: "В работе",
-  ready: "Готово",
-  completed: "Завершён",
-  cancelled: "Отменён",
+  new: "New",
+  diagnostics: "Diagnostics",
+  approval: "Coordination",
+  in_progress: "In progress",
+  ready: "Ready",
+  completed: "Completed",
+  cancelled: "Canceled",
 };
 
 const CLASS: Record<AdminOrderStatus, string> = {

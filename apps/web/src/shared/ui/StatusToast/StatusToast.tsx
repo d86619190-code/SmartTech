@@ -23,7 +23,7 @@ export const StatusToast: React.FC<StatusToastProps> = ({ tone, message, onClose
           {toneIcon[tone]}
         </span>
         <span className={cls.text}>{message}</span>
-        <button type="button" className={cls.close} onClick={onClose} aria-label="Закрыть уведомление">
+        <button type="button" className={cls.close} onClick={onClose} aria-label="Close notification">
           ×
         </button>
       </div>

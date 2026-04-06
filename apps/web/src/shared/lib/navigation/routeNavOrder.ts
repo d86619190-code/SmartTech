@@ -1,6 +1,6 @@
 /**
- * Порядок пунктов сайдбара сверху вниз — для направления анимации перехода.
- * Ниже в меню → новый экран «поднимается» снизу (forward).
+ * The order of the sidebar items from top to bottom is for the direction of the transition animation.
+ * Below in the menu → a new screen “rises” from the bottom (forward).
  */
 
 export function getRouteNavOrder(pathname: string): number {

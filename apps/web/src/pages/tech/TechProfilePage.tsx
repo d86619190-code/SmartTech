@@ -16,47 +16,47 @@ export const TechProfilePage: React.FC = () => {
   if (!techProfile) {
     return (
       <>
-        <TechPageHeader title="Профиль" subtitle="Загрузка…" />
+        <TechPageHeader title="Profile" subtitle="Loading…" />
         <SkeletonKpiGrid count={5} />
       </>
     );
   }
   return (
     <>
-      <TechPageHeader title="Профиль" subtitle="Показатели и репутация мастера." />
+      <TechPageHeader title="Profile" subtitle="Indicators and reputation of the master." />
       <div className={cls.grid2}>
         <TechCard style={{ padding: 24 }}>
-          <p className={cls.blockTitle}>Мастер</p>
+          <p className={cls.blockTitle}>Master</p>
           <p className={cls.p} style={{ fontSize: 20 }}>
             <strong>{techProfile.name}</strong>
           </p>
           <p className={cls.muted}>{techProfile.role}</p>
         </TechCard>
         <TechCard style={{ padding: 24 }}>
-          <p className={cls.blockTitle}>Рейтинг</p>
+          <p className={cls.blockTitle}>Rating</p>
           <p className={cls.p} style={{ fontSize: 28 }}>
             <strong>{techProfile.rating.toFixed(1)}</strong>
           </p>
-          <p className={cls.muted}>Средняя оценка клиентов</p>
+          <p className={cls.muted}>Average customer rating</p>
         </TechCard>
         <TechCard style={{ padding: 24 }}>
-          <p className={cls.blockTitle}>Завершено заказов</p>
+          <p className={cls.blockTitle}>Completed orders</p>
           <p className={cls.p} style={{ fontSize: 28 }}>
             <strong>{techProfile.completedJobs}</strong>
           </p>
         </TechCard>
         <TechCard style={{ padding: 24 }}>
-          <p className={cls.blockTitle}>Доход за месяц</p>
+          <p className={cls.blockTitle}>Monthly income</p>
           <p className={cls.p} style={{ fontSize: 22 }}>
             <strong>{formatRub(techProfile.monthEarningsRub)}</strong>
           </p>
         </TechCard>
         <TechCard style={{ padding: 24 }}>
-          <p className={cls.blockTitle}>Среднее время ответа</p>
+          <p className={cls.blockTitle}>Average response time</p>
           <p className={cls.p}>
-            <strong>{techProfile.responseMin} мин</strong>
+            <strong>{techProfile.responseMin} min</strong>
           </p>
-          <p className={cls.muted}>В чате с клиентами</p>
+          <p className={cls.muted}>Chat with clients</p>
         </TechCard>
       </div>
     </>

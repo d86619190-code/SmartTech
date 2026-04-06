@@ -1,17 +1,17 @@
 import type { OrderFlowStepId } from "./orderFlow";
 
-/** Вариант ремонта после диагностики */
+/** Repair option after diagnostics */
 export type RepairQuoteOption = {
   id: string;
   title: string;
   subtitle?: string;
   priceRub: number;
   isOriginal?: boolean;
-  /** Срок ремонта, напр. «1–2 дня» */
+  /** Repair period, e.g. “1–2 days” */
   repairDaysLabel?: string;
-  /** В наличии / под заказ */
+  /** In stock / on order */
   availability?: "in_stock" | "on_order";
-  /** Если под заказ — сколько дней ожидания детали */
+  /** If made to order - how many days to wait for the part */
   orderLeadDays?: number;
 };
 
@@ -33,8 +33,8 @@ export type ServiceOrder = {
   diagnosisProblem?: string;
   quoteOptions?: RepairQuoteOption[];
   diagnosticFeeRub?: number;
-  /** Развёрнутое описание для блока «Подробнее о ремонте» */
+  /** Detailed description for the block “More details about repairs” */
   diagnosisDetail?: string;
-  /** Фактическая длительность ремонта для экрана выдачи */
+  /** Actual repair duration for the issue screen */
   repairDurationLabel?: string;
 };

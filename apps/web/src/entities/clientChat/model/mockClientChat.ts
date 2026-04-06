@@ -6,25 +6,25 @@ export type ClientChatMessage = {
 };
 
 export const CLIENT_CHAT_TEMPLATES = [
-  "Когда можно забрать устройство?",
-  "Уточните по смете",
-  "Спасибо, жду готовности",
+  "When can I pick up the device?",
+  "Check the estimate",
+  "Thank you, I'm waiting for you to be ready",
 ];
 
-/** Локальный fallback по orderId (основной чат — API). Мастера: ff ddd, Алексей, Иван Петров. */
+/** Local fallback by orderId (main chat - API). Masters: ff ddd, Alexey, Ivan Petrov. */
 export const clientChatByOrderId: Record<string, ClientChatMessage[]> = {
   "r-ff": [
-    { id: "1", from: "service", text: "ff ddd: дисплей в пути, завтра установлю. ff6690473@gmail.com", at: "24.03, 09:25" },
-    { id: "2", from: "user", text: "Спасибо!", at: "24.03, 10:00" },
+    { id: "1", from: "service", text: "ff ddd: The display is on the way, I'll install it tomorrow. ff6690473@gmail.com", at: "24.03, 09:25" },
+    { id: "2", from: "user", text: "Thank you!", at: "24.03, 10:00" },
   ],
   "r-alex": [
-    { id: "1", from: "service", text: "Алексей: АКБ ниже 78%, готовлю замену. +79789195542", at: "24.03, 09:00" },
+    { id: "1", from: "service", text: "Alexey: The battery is below 78%, I’m preparing a replacement. +79789195542", at: "24.03, 09:00" },
   ],
   "r-user": [
     {
       id: "1",
       from: "service",
-      text: "Иван Петров: жду выбора варианта ремонта MacBook. 98y7tbnb97t@gmail.com",
+      text: "Ivan Petrov: I’m waiting to choose the MacBook repair option. 98y7tbnb97t@gmail.com",
       at: "23.03, 18:00",
     },
   ],

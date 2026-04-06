@@ -14,7 +14,7 @@ export const TechSettingsPage: React.FC = () => {
   const [workFrom, setWorkFrom] = React.useState("10:00");
   const [workTo, setWorkTo] = React.useState("20:00");
   const [phone, setPhone] = React.useState("+7 900 000-00-00");
-  const [specialty, setSpecialty] = React.useState("Дисплеи Apple");
+  const [specialty, setSpecialty] = React.useState("Apple Displays");
   const [saving, setSaving] = React.useState(false);
   const { toast, showToast, closeToast } = useStatusToast();
 
@@ -43,9 +43,9 @@ export const TechSettingsPage: React.FC = () => {
         phone,
         specialty,
       });
-      showToast("success", "Настройки сохранены");
+      showToast("success", "Settings saved");
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось сохранить";
+      const msg = e instanceof Error ? e.message : "Failed to save";
       showToast("error", msg);
     } finally {
       setSaving(false);
@@ -54,29 +54,29 @@ export const TechSettingsPage: React.FC = () => {
 
   return (
     <>
-      <TechPageHeader title="Настройки" subtitle="Доступность, уведомления и профиль." />
+      <TechPageHeader title="Settings" subtitle="Availability, notifications and profile." />
       <TechCard style={{ marginBottom: 16 }}>
         <div style={{ padding: "24px", borderBottom: "1px solid var(--color-order-row-border)" }}>
           <h2 className={cls.sectionTitle} style={{ marginBottom: 12 }}>
-            Доступность
+            Availability
           </h2>
           <label className={cls.rowFlex} style={{ alignItems: "center", gap: 12 }}>
             <input type="checkbox" checked={avail} onChange={(e) => setAvail(e.target.checked)} />
-            <span className={cls.p}>Принимать новые заявки</span>
+            <span className={cls.p}>Accept new applications</span>
           </label>
         </div>
         <div style={{ padding: "24px", borderBottom: "1px solid var(--color-order-row-border)" }}>
           <h2 className={cls.sectionTitle} style={{ marginBottom: 12 }}>
-            Рабочие часы (опционально)
+            Working hours (optional)
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, maxWidth: 400 }}>
             <AdminInput label="С" type="time" value={workFrom} onChange={(e) => setWorkFrom(e.target.value)} />
-            <AdminInput label="До" type="time" value={workTo} onChange={(e) => setWorkTo(e.target.value)} />
+            <AdminInput label="To" type="time" value={workTo} onChange={(e) => setWorkTo(e.target.value)} />
           </div>
         </div>
         <div style={{ padding: "24px", borderBottom: "1px solid var(--color-order-row-border)" }}>
           <h2 className={cls.sectionTitle} style={{ marginBottom: 12 }}>
-            Уведомления
+            Notifications
           </h2>
           <label style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
             <input type="checkbox" checked={email} onChange={(e) => setEmail(e.target.checked)} />
@@ -84,21 +84,21 @@ export const TechSettingsPage: React.FC = () => {
           </label>
           <label style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <input type="checkbox" checked={push} onChange={(e) => setPush(e.target.checked)} />
-            <span className={cls.p}>Push в приложении</span>
+            <span className={cls.p}>Push in the application</span>
           </label>
         </div>
         <div style={{ padding: "24px" }}>
           <h2 className={cls.sectionTitle} style={{ marginBottom: 12 }}>
-            Профиль
+            Profile
           </h2>
-          <AdminInput label="Телефон" value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <AdminInput label="Telephone" value={phone} onChange={(e) => setPhone(e.target.value)} />
           <div style={{ marginTop: 12 }}>
-            <AdminInput label="Специализация (видна администратору)" value={specialty} onChange={(e) => setSpecialty(e.target.value)} />
+            <AdminInput label="Specialization (visible to administrator)" value={specialty} onChange={(e) => setSpecialty(e.target.value)} />
           </div>
         </div>
         <div style={{ padding: "16px 24px 24px", display: "flex", justifyContent: "flex-end", gap: 10 }}>
           <Button type="button" onClick={() => void save()} disabled={saving}>
-            {saving ? "Сохранение…" : "Сохранить"}
+            {saving ? "Saving…" : "Save"}
           </Button>
         </div>
       </TechCard>

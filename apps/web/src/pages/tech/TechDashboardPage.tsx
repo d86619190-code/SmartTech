@@ -16,7 +16,7 @@ export const TechDashboardPage: React.FC = () => {
   if (!data) {
     return (
       <>
-        <TechPageHeader title="Рабочий стол" subtitle="Загрузка данных…" />
+        <TechPageHeader title="Desk" subtitle="Loading data..." />
         <SkeletonKpiGrid count={4} />
         <SkeletonCard rows={6} />
       </>
@@ -26,36 +26,36 @@ export const TechDashboardPage: React.FC = () => {
 
   return (
     <>
-      <TechPageHeader title="Рабочий стол" subtitle={`${data.profile.name} — активные заявки и быстрый доступ.`} />
+      <TechPageHeader title="Desk" subtitle={`${data.profile.name} — active applications and quick access.`} />
       <div className={cls.grid2}>
         <TechCard style={{ padding: 20 }}>
           <div className={cls.kpiMini}>
-            В работе
+            In progress
             <strong>{data.inProg}</strong>
           </div>
         </TechCard>
         <TechCard style={{ padding: 20 }}>
           <div className={cls.kpiMini}>
-            Ожидают согласования
+            Awaiting approval
             <strong>{data.waiting}</strong>
           </div>
         </TechCard>
         <TechCard style={{ padding: 20 }}>
           <div className={cls.kpiMini}>
-            Входящие
+            Inbox
             <strong>{data.pendingIncomingCount}</strong>
           </div>
         </TechCard>
         <TechCard style={{ padding: 20 }}>
           <div className={cls.kpiMini}>
-            Рейтинг
+            Rating
             <strong>{data.profile.rating.toFixed(1)}</strong>
           </div>
         </TechCard>
       </div>
       <div className={cls.twoCol}>
         <div>
-          <h2 className={cls.sectionTitle}>Уведомления</h2>
+          <h2 className={cls.sectionTitle}>Notifications</h2>
           <TechCard style={{ padding: 0 }}>
             <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
               {data.alerts.map((a: any) => (
@@ -76,7 +76,7 @@ export const TechDashboardPage: React.FC = () => {
           </TechCard>
         </div>
         <div>
-          <h2 className={cls.sectionTitle}>Текущий ремонт</h2>
+          <h2 className={cls.sectionTitle}>Current repair</h2>
           <TechCard style={{ padding: 20 }}>
             {active[0] ? (
               <>
@@ -92,25 +92,25 @@ export const TechDashboardPage: React.FC = () => {
                 </div>
                 <div style={{ marginTop: 16 }}>
                   <Link to={`/tech/repairs/${active[0].id}`}>
-                    <Button type="button">Открыть карточку</Button>
+                    <Button type="button">Open card</Button>
                   </Link>
                 </div>
               </>
             ) : (
-              <p className={cls.emptyState}>Нет активных ремонтов в очереди.</p>
+              <p className={cls.emptyState}>There are no active repairs in the queue.</p>
             )}
           </TechCard>
         </div>
       </div>
-      <h2 className={cls.sectionTitle}>Назначенные задачи</h2>
+      <h2 className={cls.sectionTitle}>Assigned tasks</h2>
       <TechCard style={{ padding: 0 }}>
         <AdminTable>
           <thead>
             <tr>
-              <AdminTh>Заказ</AdminTh>
-              <AdminTh>Устройство</AdminTh>
-              <AdminTh>Статус</AdminTh>
-              <AdminTh>Сумма</AdminTh>
+              <AdminTh>Order</AdminTh>
+              <AdminTh>Device</AdminTh>
+              <AdminTh>Status</AdminTh>
+              <AdminTh>Sum</AdminTh>
               <AdminTh />
             </tr>
           </thead>
@@ -127,7 +127,7 @@ export const TechDashboardPage: React.FC = () => {
                 <AdminTd>{formatRub(r.laborRub + r.partsRub)}</AdminTd>
                 <AdminTd>
                   <Link className={cls.link} to={`/tech/repairs/${r.id}`}>
-                    Открыть
+                    Open
                   </Link>
                 </AdminTd>
               </tr>

@@ -2,7 +2,7 @@ export type StreamStatus = "connecting" | "connected" | "reconnecting" | "auth_e
 
 function isAuthRelatedError(e: unknown): boolean {
   const msg = e instanceof Error ? e.message : String(e);
-  return /Сессия|авторизац|401|Unauthorized|Требуется/i.test(msg);
+  return /Session|authorization|401|Unauthorized|Required/i.test(msg);
 }
 
 type OpenSseStreamOptions = {
@@ -12,7 +12,7 @@ type OpenSseStreamOptions = {
   onStatus?: (status: StreamStatus) => void;
   initialRetryMs?: number;
   maxRetryMs?: number;
-  /** Минимальная пауза перед переподключением — меньше «дрожи» статуса при кратковременных обрывах. */
+  /** Minimum pause before reconnection - less “shuddering” status during short-term interruptions. */
   minReconnectDelayMs?: number;
 };
 

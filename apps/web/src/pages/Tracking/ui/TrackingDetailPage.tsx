@@ -80,23 +80,23 @@ export const TrackingDetailPage: React.FC = () => {
   }, [mockOrder, meta]);
 
   const handleCancel = () => {
-    if (!window.confirm("Отменить заявку? При необходимости уточним детали по телефону.")) return;
+    if (!window.confirm("Cancel application? If necessary, we will clarify the details by phone.")) return;
     navigate("/history");
   };
 
   const downloadAct = () => {
     if (!meta) return;
     const lines = [
-      "Акт выполненных работ",
-      `Заказ: ${meta.id}`,
-      `Устройство: ${meta.deviceLabel}`,
-      `Проблема: ${meta.issueSummary}`,
+      "Certificate of completed work",
+      `Order: ${meta.id}`,
+      `Device: ${meta.deviceLabel}`,
+      `Issue: ${meta.issueSummary}`,
       "",
-      "Стоимость:",
-      ...(meta.pricing?.items?.map((it) => `- ${it.type === "service" ? "Услуга" : "Деталь"}: ${it.name} — ${formatRub(it.priceRub)}${it.description ? ` (${it.description})` : ""}`) ?? []),
-      `Итого: ${formatRub(meta.pricing?.totalRub)}`,
+      "Price:",
+      ...(meta.pricing?.items?.map((it) => `- ${it.type === "service" ? "Service" : "Detail"}: ${it.name} — ${formatRub(it.priceRub)}${it.description ? ` (${it.description})` : ""}`) ?? []),
+      `Total: ${formatRub(meta.pricing?.totalRub)}`,
       "",
-      "Хронология:",
+      "Chronology:",
       ...(meta.timeline?.map((t) => `- ${t.atLabel}: ${t.title}${t.description ? ` — ${t.description}` : ""}`) ?? []),
     ].join("\n");
     const blob = new Blob([lines], { type: "text/plain;charset=utf-8" });
@@ -119,7 +119,7 @@ export const TrackingDetailPage: React.FC = () => {
   if (metaLoading) {
     return (
       <div className={cls.shell}>
-        <PageHeader maxWidth="narrow" title="Заказ" subtitle="Отслеживание" />
+        <PageHeader maxWidth="narrow" title="Order" subtitle="Tracking" />
         <div className={cls.body}>
           <SkeletonCard rows={3} />
           <SkeletonCard rows={4} />
@@ -131,11 +131,11 @@ export const TrackingDetailPage: React.FC = () => {
   if (metaError || !meta) {
     return (
       <div className={cls.shell}>
-        <PageHeader maxWidth="narrow" title="Заказ" />
+        <PageHeader maxWidth="narrow" title="Order" />
         <div className={cls.body}>
-          <p className={cls.emptyState}>Заказ не найден или нет доступа.</p>
+          <p className={cls.emptyState}>Order not found or access not available.</p>
           <Button type="button" variant="outline" onClick={() => navigate("/tracking")}>
-            К отслеживанию
+            Go to tracking
           </Button>
         </div>
       </div>
@@ -145,24 +145,24 @@ export const TrackingDetailPage: React.FC = () => {
   if (!order) {
     return (
       <div className={cls.shell}>
-        <PageHeader maxWidth="narrow" title={meta.deviceLabel} subtitle="Отслеживание заказа" />
+        <PageHeader maxWidth="narrow" title={meta.deviceLabel} subtitle="Order tracking" />
         <div className={cls.body}>
-          <section className={cls.card} aria-label="Устройство">
+          <section className={cls.card} aria-label="Device">
             <p className={cls.deviceIssue}>{meta.issueSummary}</p>
           </section>
-          <section className={cls.card} aria-label="Этапы заказа">
-            <h2 className={cls.cardHeading}>Статус</h2>
+          <section className={cls.card} aria-label="Order stages">
+            <h2 className={cls.cardHeading}>Status</h2>
             <OrderTimeline currentStep={meta.clientStep} variant={isNarrow ? "horizontal" : "vertical"} />
           </section>
           {meta.needsApproval ? (
             <div className={cls.banner}>
-              Требуется выбор варианта ремонта.{" "}
-              <Link to={`/orders/${meta.id}/approval`}>Перейти к согласованию →</Link>
+              Requires selection of repair option.{" "}
+              <Link to={`/orders/${meta.id}/approval`}>Go to approval →</Link>
             </div>
           ) : null}
           <p className={cls.backRow}>
             <Link className={cls.inlineLink} to="/tracking">
-              ← Все ремонты
+              ← All repairs
             </Link>
           </p>
         </div>
@@ -174,9 +174,9 @@ export const TrackingDetailPage: React.FC = () => {
 
   return (
     <div className={cls.shell}>
-      <PageHeader maxWidth="narrow" title={`${order.deviceLabel}`} subtitle="Отслеживание заказа" />
+      <PageHeader maxWidth="narrow" title={`${order.deviceLabel}`} subtitle="Order tracking" />
       <div className={cls.body}>
-        <section className={cls.card} aria-label="Устройство">
+        <section className={cls.card} aria-label="Device">
           <div className={cls.deviceRow}>
             <div className={cls.devicePhoto} aria-hidden />
             <div>
@@ -186,62 +186,62 @@ export const TrackingDetailPage: React.FC = () => {
           </div>
         </section>
 
-        <section className={cls.card} aria-label="Этапы заказа">
-          <h2 className={cls.cardHeading}>Статус</h2>
+        <section className={cls.card} aria-label="Order stages">
+          <h2 className={cls.cardHeading}>Status</h2>
           <OrderTimeline currentStep={meta.clientStep} variant="horizontal" />
         </section>
 
         {meta.needsApproval ? (
           <div className={cls.banner}>
-            Требуется выбор варианта ремонта после диагностики.{" "}
-            <Link to={`/orders/${order.id}/approval`}>Перейти к согласованию →</Link>
+            It is necessary to select a repair option after diagnostics.{" "}
+            <Link to={`/orders/${order.id}/approval`}>Go to approval →</Link>
           </div>
         ) : null}
 
         {order.step === "ready" ? (
           <div className={cls.banner}>
-            Устройство готово к выдаче.{" "}
-            <Link to={`/orders/${order.id}/pickup`}>Инструкция и итог →</Link>
+            The device is ready for pickup.{" "}
+            <Link to={`/orders/${order.id}/pickup`}>Instructions and summary →</Link>
           </div>
         ) : null}
 
         <section className={cls.card}>
-          <h2 className={cls.cardHeading}>Сейчас</h2>
+          <h2 className={cls.cardHeading}>Now</h2>
           <OrderStagePanel order={order} selectedTitle={selected?.title} />
         </section>
 
         <section className={cls.card}>
           <button type="button" className={cls.detailsToggle} onClick={() => setPricingOpen((v) => !v)}>
-            Стоимость {pricingOpen ? "▼" : "▶"}
+            Cost {pricingOpen ?"▼" : "▶"}
           </button>
           <p className={cls.meta} style={{ marginTop: 10 }}>
-            <strong>Итого:</strong> {formatRub(meta.pricing?.totalRub)}
+            <strong>Total:</strong>{formatRub(meta.pricing?.totalRub)}
           </p>
           {pricingOpen ? (
             <div className={cls.detailsBody}>
               {meta.pricing?.items?.length ? (
                 meta.pricing.items.map((it) => (
                   <p key={it.id}>
-                    <strong>{it.type === "service" ? "Услуга" : "Деталь"}:</strong> {it.name}
+                    <strong>{it.type === "service" ? "Service" : "Detail"}:</strong> {it.name}
                     {it.description ? ` · ${it.description}` : ""} ·{" "}
-                    <strong>{it.priceRub === 0 ? "Бесплатно" : formatRub(it.priceRub)}</strong>
+                    <strong>{it.priceRub === 0 ? "For free" : formatRub(it.priceRub)}</strong>
                   </p>
                 ))
               ) : (
-                <p className={cls.mutedSmall}>Стоимость пока не добавлена мастером.</p>
+                <p className={cls.mutedSmall}>The cost has not yet been added by the master.</p>
               )}
             </div>
           ) : null}
         </section>
 
         <section className={cls.card}>
-          <h2 className={cls.cardHeading}>История работ</h2>
+          <h2 className={cls.cardHeading}>History of work</h2>
           {meta.timeline?.length ? (
             <div style={{ display: "grid", gap: 16 }}>
               {(["diagnostics", "repair"] as const).map((stageKey) => {
                 const items = meta.timeline?.filter((t) => t.stage === stageKey) ?? [];
                 if (!items.length) return null;
-                const title = stageKey === "diagnostics" ? "Диагностика — подпункты" : "Работа / ремонт — подпункты";
+                const title = stageKey === "diagnostics" ? "Diagnostics - sub-items" : "Work/repair - sub-items";
                 return (
                   <details key={stageKey} className={cls.detailsGroup} open>
                     <summary className={cls.detailsSummary}>{title}</summary>
@@ -256,7 +256,7 @@ export const TrackingDetailPage: React.FC = () => {
                               <strong>{item.title}</strong> · {item.atLabel}
                             </p>
                             <p className={cls.mutedSmall}>
-                              {item.kind === "stage" ? "Этап" : "Подпункт"} · {item.stage}
+                              {item.kind === "stage" ? "Stage" : "Sub-clause"} · {item.stage}
                             </p>
                             {item.description ? <p className={cls.meta} style={{ marginTop: 6 }}>{item.description}</p> : null}
                             {item.photoDataUrls?.length ? (
@@ -292,7 +292,7 @@ export const TrackingDetailPage: React.FC = () => {
               })}
               {meta.timeline.some((t) => t.stage !== "diagnostics" && t.stage !== "repair") ? (
                 <details className={cls.detailsGroup}>
-                  <summary className={cls.detailsSummary}>Другие этапы</summary>
+                  <summary className={cls.detailsSummary}>Other stages</summary>
                   <div className={cls.detailsBody}>
                     <div style={{ display: "grid", gap: 10 }}>
                       {[...meta.timeline]
@@ -307,7 +307,7 @@ export const TrackingDetailPage: React.FC = () => {
                               <strong>{item.title}</strong> · {item.atLabel}
                             </p>
                             <p className={cls.mutedSmall}>
-                              {item.kind === "stage" ? "Этап" : "Подпункт"} · {item.stage}
+                              {item.kind === "stage" ? "Stage" : "Sub-clause"} · {item.stage}
                             </p>
                             {item.description ? <p className={cls.meta} style={{ marginTop: 6 }}>{item.description}</p> : null}
                             {item.photoDataUrls?.length ? (
@@ -342,73 +342,73 @@ export const TrackingDetailPage: React.FC = () => {
               ) : null}
             </div>
           ) : (
-            <p className={cls.emptyState}>Мастер ещё не добавил подробную хронологию.</p>
+            <p className={cls.emptyState}>The master has not yet added a detailed chronology.</p>
           )}
         </section>
 
         <section className={cls.card}>
-          <h2 className={cls.cardHeading}>Краткое резюме</h2>
+          <h2 className={cls.cardHeading}>Brief summary</h2>
           <p className={cls.meta}>
-            <strong>Создан:</strong> {order.createdAtLabel}
+            <strong>Created:</strong>{order.createdAtLabel}
             <br />
-            <strong>Обновлён:</strong> {order.updatedAtLabel}
+            <strong>Updated:</strong>{order.updatedAtLabel}
             <br />
-            <strong>Визит:</strong> {order.visitMode === "asap" ? "В ближайшее время" : order.visitSlotLabel ?? "—"}
+            <strong>Visit:</strong>{order.visitMode ==="asap" ? "Coming soon" : order.visitSlotLabel ?? "—"}
             <br />
-            <strong>Приём:</strong> {order.bringInPerson ? "Принесу лично" : "Доставка/другое"}
-            {order.needsConsultation ? " · нужна консультация" : ""}
+            <strong>Reception:</strong> {order.bringInPerson ?"I'll bring it personally" : "Delivery/other"}
+            {order.needsConsultation ? " · need advice" : ""}
           </p>
           <p className={cls.meta}>
-            <strong>Гарантия:</strong> {order.warrantyDays} дн.
+            <strong>Warranty:</strong>{order.warrantyDays} days.
           </p>
           {order.finalPriceRub != null ? (
             <p className={cls.meta}>
-              <strong>Итог:</strong> {formatRub(order.finalPriceRub)}
+              <strong>Result:</strong>{formatRub(order.finalPriceRub)}
               {selected ? ` · ${selected.title}` : ""}
             </p>
           ) : null}
           <div className={cls.actions}>
             <Button type="button" variant="outline" onClick={() => window.open(`tel:${SITE.phoneTel}`)}>
-              Связаться с сервисом
+              Contact the service
             </Button>
             <Button type="button" variant="outline" onClick={downloadAct} disabled={meta.clientStep !== "completed"}>
-              Скачать акт
+              Download the act
             </Button>
             <Button type="button" variant="ghost" onClick={handleCancel}>
-              Отменить заявку
+              Cancel application
             </Button>
           </div>
         </section>
 
         <section className={cls.card}>
           <button type="button" className={cls.detailsToggle} onClick={() => setDetailsOpen((v) => !v)}>
-            Подробнее о ремонте {detailsOpen ? "▼" : "▶"}
+            More details about the repair {detailsOpen ?"▼" : "▶"}
           </button>
           {detailsOpen ? (
             <div className={cls.detailsBody}>
               <p>
-                <strong>Поломка:</strong> {order.diagnosisDetail ?? order.diagnosisProblem ?? order.issueSummary}
+                <strong>Breakdown:</strong>{order.diagnosisDetail ?? order.diagnosisProblem ?? order.issueSummary}
               </p>
               {selected ? (
                 <p>
-                  <strong>Выбранный вариант:</strong> {selected.title}
+                  <strong>Selected option:</strong>{selected.title}
                   {selected.subtitle ? ` — ${selected.subtitle}` : ""}
                 </p>
               ) : null}
               {selected && !selected.isOriginal ? (
                 <p className={cls.disclaimer}>
-                  Деталь не является оригинальной. Возможны отличия в цветопередаче или яркости; на производительность
-                  это не влияет.
+                  The part is not original. There may be differences in color or brightness; for productivity
+                  it has no effect.
                 </p>
               ) : null}
-              <p className={cls.mutedSmall}>Гарантия на работы и детали — согласно договору и выбранному варианту.</p>
+              <p className={cls.mutedSmall}>Warranty for work and parts - according to the contract and the selected option.</p>
             </div>
           ) : null}
         </section>
 
         <p className={cls.backRow}>
           <Link className={cls.inlineLink} to="/tracking">
-            ← Все ремонты
+            ← All repairs
           </Link>
         </p>
       </div>

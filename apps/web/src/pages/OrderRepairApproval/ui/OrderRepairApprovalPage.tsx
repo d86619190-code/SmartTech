@@ -49,7 +49,7 @@ export const OrderRepairApprovalPage: React.FC = () => {
   if (metaLoading) {
     return (
       <div className={cls.shell}>
-        <PageHeader title="Согласование ремонта" />
+        <PageHeader title="Repair approval" />
         <div className={cls.body}>
           <SkeletonCard rows={3} />
           <SkeletonCard rows={4} />
@@ -79,7 +79,7 @@ export const OrderRepairApprovalPage: React.FC = () => {
     photoUrls: [],
     warrantyDays: 90,
     diagnosisProblem: meta.issueSummary,
-    diagnosisDetail: "Мастер отправил смету и ждёт ваше решение.",
+    diagnosisDetail: "The master has sent an estimate and is waiting for your decision.",
     diagnosticFeeRub: 990,
     quoteOptions:
       meta.quoteOptions && meta.quoteOptions.length > 0
@@ -87,21 +87,21 @@ export const OrderRepairApprovalPage: React.FC = () => {
         : [
             {
               id: "opt-fast",
-              title: "Ремонт с доступной деталью",
-              subtitle: "Быстрее, при наличии на складе",
+              title: "Repair with available part",
+              subtitle: "Faster if in stock",
               availability: "in_stock",
               isOriginal: false,
-              repairDaysLabel: "1-2 дня",
+              repairDaysLabel: "1-2 day",
               priceRub: 6900,
             },
             {
               id: "opt-oem",
-              title: "Ремонт с оригинальной деталью",
-              subtitle: "Надежнее, может потребоваться ожидание",
+              title: "Repair with original part",
+              subtitle: "More reliable, may require waiting",
               availability: "on_order",
               orderLeadDays: 2,
               isOriginal: true,
-              repairDaysLabel: "2-4 дня",
+              repairDaysLabel: "2-4 day",
               priceRub: 9900,
             },
           ],
@@ -109,7 +109,7 @@ export const OrderRepairApprovalPage: React.FC = () => {
 
   return (
     <div className={cls.shell}>
-      <PageHeader title="Согласование ремонта" />
+      <PageHeader title="Repair approval" />
       <div className={cls.body}>
         <div className={cls.contentCard}>
           <RepairApproval
@@ -124,10 +124,10 @@ export const OrderRepairApprovalPage: React.FC = () => {
                 setBusy(true);
                 try {
                   await resolveApprovalApi(approvalId, "approved", optionId);
-                  showToast("success", "Согласование подтверждено");
+                  showToast("success", "Agreement confirmed");
                   navigate(`/tracking/${order.id}`);
                 } catch (e) {
-                  const msg = e instanceof Error ? e.message : "Не удалось отправить согласование";
+                  const msg = e instanceof Error ? e.message : "Failed to send approval";
                   showToast("error", msg);
                 } finally {
                   setBusy(false);
@@ -143,10 +143,10 @@ export const OrderRepairApprovalPage: React.FC = () => {
                 setBusy(true);
                 try {
                   await resolveApprovalApi(approvalId, "declined");
-                  showToast("info", "Отказ отправлен");
+                  showToast("info", "Refusal sent");
                   navigate(`/tracking/${order.id}`);
                 } catch (e) {
-                  const msg = e instanceof Error ? e.message : "Не удалось отправить отказ";
+                  const msg = e instanceof Error ? e.message : "Failed to send refusal";
                   showToast("error", msg);
                 } finally {
                   setBusy(false);
@@ -154,7 +154,7 @@ export const OrderRepairApprovalPage: React.FC = () => {
               })();
             }}
           />
-          {busy ? <p className={cls.lead}>Отправляем решение...</p> : null}
+          {busy ? <p className={cls.lead}>Submitting the solution...</p> : null}
         </div>
       </div>
       {toast ? <StatusToast tone={toast.tone} message={toast.message} onClose={closeToast} /> : null}

@@ -70,7 +70,7 @@ export const TechIncomingDetailPage: React.FC = () => {
   if (!req) {
     return (
       <>
-        <TechPageHeader title="Входящая заявка" subtitle="Загрузка…" />
+        <TechPageHeader title="Incoming request" subtitle="Loading…" />
         <SkeletonCard rows={6} />
       </>
     );
@@ -92,26 +92,26 @@ export const TechIncomingDetailPage: React.FC = () => {
     <>
       <TechPageHeader
         title={req.publicId}
-        subtitle="Детали заявки до принятия в работу."
+        subtitle="Application details before hiring."
         actions={
           <>
             <Link to={chatThreadId ? `/tech/messages/${chatThreadId}` : "/tech/messages"}>
               <Button type="button" variant="outline">
-                Чат с клиентом
+                Chat with a client
               </Button>
             </Link>
             <Button type="button" variant="outline" onClick={() => setModal("decline")}>
-              Отклонить
+              Reject
             </Button>
             <Button type="button" onClick={() => setModal("accept")}>
-              Принять
+              Accept
             </Button>
           </>
         }
       />
       <div className={cls.twoCol}>
         <TechCard style={{ padding: 24 }}>
-          <p className={cls.blockTitle}>Устройство</p>
+          <p className={cls.blockTitle}>Device</p>
           <div className={cls.rowFlex}>
             <div className={cls.thumb}>{req.thumb}</div>
             <div>
@@ -119,14 +119,14 @@ export const TechIncomingDetailPage: React.FC = () => {
                 <strong>{req.device}</strong>
               </p>
               <p className={cls.muted}>
-                Тип:{" "}
-                {req.deviceType === "phone" ? "Телефон" : req.deviceType === "tablet" ? "Планшет" : "Ноутбук"}
+                Type:{" "}
+                {req.deviceType === "phone" ? "Telephone" : req.deviceType === "tablet" ? "Tablet" : "Laptop"}
               </p>
             </div>
           </div>
         </TechCard>
         <TechCard style={{ padding: 24 }}>
-          <p className={cls.blockTitle}>Клиент</p>
+          <p className={cls.blockTitle}>Client</p>
           <div className={cls.rowFlex}>
             {req.clientAvatarUrl ? (
               <img
@@ -144,15 +144,15 @@ export const TechIncomingDetailPage: React.FC = () => {
         </TechCard>
       </div>
       <TechCard style={{ padding: 24, marginBottom: 20 }}>
-        <p className={cls.blockTitle}>Описание</p>
+        <p className={cls.blockTitle}>Description</p>
         <p className={cls.p}>{req.issueShort}</p>
         <p className={cls.blockTitle} style={{ marginTop: 20 }}>
-          Фото от клиента
+          Photo from the client
         </p>
-        <p className={cls.muted} style={{ marginTop: 0, marginBottom: 10 }}>Фото из заявки клиента + можно добавить локально для сверки.</p>
+        <p className={cls.muted} style={{ marginTop: 0, marginBottom: 10 }}>Photos from the client's request + can be added locally for verification.</p>
         <div className={cls.photoGrid}>
           <button type="button" className={cls.photoStub} onClick={() => void onAddClientPhotos()} disabled={picking}>
-            {picking ? "…" : "+ С устройства"}
+            {picking ? "…" : "+ From device"}
           </button>
           {clientPhotos.map((p, i) => (
             <div key={p.id} className={cls.photoCell}>
@@ -165,66 +165,66 @@ export const TechIncomingDetailPage: React.FC = () => {
                   downloadDataUrl(p.dataUrl, p.name.endsWith(".png") || p.name.endsWith(".jpg") ? p.name : `client-${i + 1}.${ext}`);
                 }}
               >
-                Сохранить
+                Save
               </button>
               <button type="button" className={cls.photoRemoveSmall} onClick={() => removePhoto(p.id)}>
-                Убрать
+                Put away
               </button>
             </div>
           ))}
         </div>
         <p className={cls.muted} style={{ marginTop: 12 }}>
-          Оценка сложности: средняя (после осмотра уточним).
+          Difficulty rating: medium (we will clarify after inspection).
         </p>
       </TechCard>
       <Link className={cls.link} to="/tech/incoming">
-        ← К входящим
+        ← To inbox
       </Link>
 
       <TechModal
         open={modal === "accept"}
         onClose={() => setModal(null)}
-        title="Принять заявку"
+        title="Accept application"
         footer={
           <>
             <Button type="button" variant="outline" onClick={() => setModal(null)}>
-              Отмена
+              Cancel
             </Button>
             <Button type="button" onClick={confirmAccept}>
-              Подтвердить
+              Confirm
             </Button>
           </>
         }
       >
         <p className={cls.p} style={{ marginBottom: 16 }}>
-          Укажите доступность — клиент получит уведомление.
+          Specify availability and the client will receive a notification.
         </p>
-        <AdminSelect label="Доступность" value={availability} onChange={(e) => setAvailability(e.target.value)}>
-          <option value="today">Сегодня</option>
-          <option value="tomorrow">Завтра</option>
-          <option value="later">Позже (уточню)</option>
+        <AdminSelect label="Availability" value={availability} onChange={(e) => setAvailability(e.target.value)}>
+          <option value="today">Today</option>
+          <option value="tomorrow">Tomorrow</option>
+          <option value="later">Later (I’ll clarify)</option>
         </AdminSelect>
         <div style={{ marginTop: 14 }}>
-          <AdminInput label="Комментарий по времени (необязательно)" value={slotNote} onChange={(e) => setSlotNote(e.target.value)} placeholder="Например: после 16:00" />
+          <AdminInput label="Time comment (optional)" value={slotNote} onChange={(e) => setSlotNote(e.target.value)} placeholder="For example: after 16:00" />
         </div>
       </TechModal>
 
       <TechModal
         open={modal === "decline"}
         onClose={() => setModal(null)}
-        title="Отклонить заявку"
+        title="Reject application"
         footer={
           <>
             <Button type="button" variant="outline" onClick={() => setModal(null)}>
-              Отмена
+              Cancel
             </Button>
             <Button type="button" onClick={confirmDecline}>
-              Отклонить
+              Reject
             </Button>
           </>
         }
       >
-        <p className={cls.p}>Заявка вернётся в очередь диспетчера. Продолжить?</p>
+        <p className={cls.p}>The request will return to the dispatcher's queue. Continue?</p>
       </TechModal>
     </>
   );

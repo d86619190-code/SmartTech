@@ -7,20 +7,20 @@ import { AdminCard, AdminPageHeader, AdminTable, AdminTd, AdminTh } from "@/widg
 import cls from "./adminPages.module.css";
 
 const ACTIVITY: Record<string, string[]> = {
-  u1: ["24.03 — открыл карточку заказа EV-10421", "18.03 — оплатил ремонт онлайн", "10.02 — новая заявка"],
-  u2: ["24.03 — согласовал смету по EV-10420"],
-  u3: ["23.03 — корпоративный договор, счёт на оплату"],
+  u1: ["24.03 — opened the order card EV-10421", "18.03 — paid for repairs online", "10.02 — new application"],
+  u2: ["24.03 — agreed on the estimate for EV-10420"],
+  u3: ["23.03 — corporate agreement, invoice"],
 };
 
 const ORDERS_SUMMARY: Record<string, { id: string; label: string; status: string }[]> = {
   u1: [
-    { id: "a1", label: "EV-10421 — iPhone 14 Pro", status: "В работе" },
-    { id: "a5", label: "EV-10398 — Pixel 8", status: "Завершён" },
+    { id: "a1", label: "EV-10421 — iPhone 14 Pro", status: "In progress" },
+    { id: "a5", label: "EV-10398 — Pixel 8", status: "Completed" },
   ],
-  u2: [{ id: "a2", label: "EV-10420 — Samsung Galaxy S23", status: "Согласование" }],
+  u2: [{ id: "a2", label: "EV-10420 — Samsung Galaxy S23", status: "Coordination" }],
   u3: [
-    { id: "a3", label: "EV-10418 — MacBook Air M2", status: "Диагностика" },
-    { id: "a4", label: "EV-10410 — iPad Pro 11", status: "Готово" },
+    { id: "a3", label: "EV-10418 — MacBook Air M2", status: "Diagnostics" },
+    { id: "a4", label: "EV-10410 — iPad Pro 11", status: "Ready" },
   ],
 };
 
@@ -43,54 +43,54 @@ export const AdminUserDetailPage: React.FC = () => {
   if (!user) {
     return (
       <>
-        <AdminPageHeader title="Карточка клиента" subtitle="Загрузка…" />
+        <AdminPageHeader title="Customer card" subtitle="Loading…" />
         <SkeletonCard rows={6} />
       </>
     );
   }
 
-  const activity = ACTIVITY[user.id] ?? ["Нет записей активности."];
+  const activity = ACTIVITY[user.id] ?? ["No activity records."];
   const orders = ORDERS_SUMMARY[user.id] ?? [];
 
   return (
     <>
       <AdminPageHeader
         title={user.name}
-        subtitle="Карточка клиента: контакты, заказы и активность."
+        subtitle="Customer card: contacts, orders and activity."
         actions={
           <Button type="button" variant="outline">
-            Редактировать
+            Edit
           </Button>
         }
       />
       <div className={cls.detailGrid}>
         <AdminCard>
-          <p className={cls.blockTitle}>Контакты</p>
+          <p className={cls.blockTitle}>Contacts</p>
           <p className={cls.p}>
-            Телефон: <strong>{user.phone}</strong>
+            Phone: <strong>{user.phone}</strong>
             <br />
             Email: <strong>{user.email}</strong>
             <br />
-            Город: {user.city}
+            City: {user.city}
           </p>
         </AdminCard>
         <AdminCard>
-          <p className={cls.blockTitle}>Сводка</p>
+          <p className={cls.blockTitle}>Summary</p>
           <p className={cls.p}>
-            Всего заказов: <strong>{user.ordersCount}</strong>
+            Total orders: <strong>{user.ordersCount}</strong>
             <br />
-            Последний визит: <strong>{user.lastVisit}</strong>
+            Last visit: <strong>{user.lastVisit}</strong>
           </p>
         </AdminCard>
       </div>
       <div className={cls.section}>
-        <h2 className={cls.h2}>Заказы</h2>
+        <h2 className={cls.h2}>Orders</h2>
         <AdminCard>
           <AdminTable>
             <thead>
               <tr>
-                <AdminTh>Заказ</AdminTh>
-                <AdminTh>Статус</AdminTh>
+                <AdminTh>Order</AdminTh>
+                <AdminTh>Status</AdminTh>
                 <AdminTh />
               </tr>
             </thead>
@@ -101,7 +101,7 @@ export const AdminUserDetailPage: React.FC = () => {
                   <AdminTd>{o.status}</AdminTd>
                   <AdminTd>
                     <Link className={cls.link} to={`/admin/orders/${o.id}`}>
-                      Открыть
+                      Open
                     </Link>
                   </AdminTd>
                 </tr>
@@ -111,7 +111,7 @@ export const AdminUserDetailPage: React.FC = () => {
         </AdminCard>
       </div>
       <AdminCard>
-        <p className={cls.blockTitle}>История активности</p>
+        <p className={cls.blockTitle}>Activity history</p>
         <ul className={cls.noteList}>
           {activity.map((line) => (
             <li key={line}>{line}</li>
@@ -119,7 +119,7 @@ export const AdminUserDetailPage: React.FC = () => {
         </ul>
       </AdminCard>
       <Link to="/admin/users" className={cls.link} style={{ display: "inline-block", marginTop: 16 }}>
-        ← К списку клиентов
+        ← To the list of clients
       </Link>
     </>
   );

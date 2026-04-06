@@ -14,9 +14,9 @@ const statusToVariant: Record<RepairOrderStatus, BadgeVariant> = {
 };
 
 const statusLabel: Record<RepairOrderStatus, string> = {
-  completed: "Завершён",
-  canceled: "Отменён",
-  in_progress: "В работе",
+  completed: "Completed",
+  canceled: "Canceled",
+  in_progress: "In progress",
 };
 
 function formatRub(value: number): string {

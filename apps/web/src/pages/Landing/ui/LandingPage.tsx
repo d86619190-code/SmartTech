@@ -130,28 +130,28 @@ export const LandingPage: React.FC = () => {
         <span className={cls.brand} aria-hidden>
           TECH
         </span>
-        <nav className={cls.topLinks} aria-label="Навигация лендинга">
+        <nav className={cls.topLinks} aria-label="Landing page navigation">
           <LandingLink className={cls.navLink} to="/">
-            В приложение
+            To the application
           </LandingLink>
           <LandingLink className={cls.navLink} to="/create-order">
-            Новая заявка
+            New application
           </LandingLink>
           <LandingLink className={cls.navLink} to="/tracking">
-            Отслеживание
+            Tracking
           </LandingLink>
         </nav>
       </header>
 
       <main className={cls.scroll}>
-        <section className={cls.portalHero} aria-label="До и после ремонта">
+        <section className={cls.portalHero} aria-label="Before and after renovation">
           <div className={cls.portalHeroInner}>
             <PortalBeforeAfter
               layout="hero"
               beforeSrc={phoneBrokenHq}
               afterSrc={phoneAfter1}
-              beforeLabel="До ремонта"
-              afterLabel="После"
+              beforeLabel="Before renovation"
+              afterLabel="After"
             />
           </div>
         </section>
@@ -190,7 +190,7 @@ export const LandingPage: React.FC = () => {
           <div className={cls.heroInner}>
             <div className={cls.heroCard}>
               <div className={cls.heroCardInner}>
-                <p className={cls.heroKicker}>Первое впечатление · без сайдбара · только шоу</p>
+                <p className={cls.heroKicker}>First impression · no sidebar · show only</p>
                 <h1 id="landing-hero-title" className={cls.heroTitle}>
                   {HERO.title}
                 </h1>
@@ -198,11 +198,11 @@ export const LandingPage: React.FC = () => {
                 <div className={cls.heroCta}>
                   <span className={cls.ctaSparks}>
                     <LandingLink to="/create-order" className={[btnCls.root, btnCls.primary].join(" ")}>
-                      Оставить заявку
+                      Leave a request
                     </LandingLink>
                   </span>
                   <LandingLink className={cls.ctaGhost} to="/">
-                    Перейти в приложение
+                    Go to application
                   </LandingLink>
                 </div>
               </div>
@@ -217,7 +217,7 @@ export const LandingPage: React.FC = () => {
         type="button"
         className={[cls.backToTop, showBackTop ? cls.backToTopVisible : ""].filter(Boolean).join(" ")}
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        aria-label="Наверх"
+        aria-label="Top"
       >
         ↑
       </button>

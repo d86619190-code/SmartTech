@@ -60,9 +60,9 @@ export type ClientOrderMeta = {
     | "completed";
   canRateOrder?: boolean;
   myRating?: number;
-  /** Мастер набирает сообщение (когда бэкенд отдаёт) — показываем «Печатает» вместо «вы в сети» */
+  /** The wizard types a message (when the backend sends it) - we show “Printing” instead of “you are online” */
   serviceTyping?: boolean;
-  /** Мастер недавно на связи — зелёный индикатор */
+  /** The master is recently online - green indicator */
   counterpartOnline?: boolean;
   diagnosticFeeRub?: number;
   quoteOptions?: Array<{
@@ -148,7 +148,7 @@ type RefreshResponse = {
 
 async function parseError(res: Response): Promise<string> {
   const body = (await res.json().catch(() => ({}))) as { error?: string };
-  const base = body.error ?? `Ошибка ${res.status}`;
+  const base = body.error ?? `Error ${res.status}`;
   if (isAuthRequiredMessage(base)) {
     redirectToLoginForAuthMissing();
     return normalizeAuthRequiredMessage(base);
@@ -160,7 +160,7 @@ async function refreshSessionOrThrow(): Promise<AuthSession> {
   const current = readAuthSession();
   if (!current) {
     redirectToLoginForAuthMissing();
-    throw new Error("Нужна авторизация");
+    throw new Error("Authorization required");
   }
   const res = await fetch(`${apiOrigin}/api/v1/auth/refresh`, {
     method: "POST",
@@ -169,7 +169,7 @@ async function refreshSessionOrThrow(): Promise<AuthSession> {
   });
   if (!res.ok) {
     clearAuthSession();
-    throw new Error("Сессия истекла");
+    throw new Error("Session expired");
   }
   const body = (await res.json()) as RefreshResponse;
   const next: AuthSession = {
@@ -185,7 +185,7 @@ async function authorizedFetch(path: string, init?: RequestInit): Promise<Respon
   let session = readAuthSession();
   if (!session) {
     redirectToLoginForAuthMissing();
-    throw new Error("Нужна авторизация");
+    throw new Error("Authorization required");
   }
   let res = await fetch(`${apiOrigin}${path}`, {
     ...init,

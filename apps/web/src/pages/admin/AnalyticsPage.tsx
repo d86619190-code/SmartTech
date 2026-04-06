@@ -55,7 +55,7 @@ export const AdminAnalyticsPage: React.FC = () => {
       const next = await getAdminAnalyticsApi();
       setData(next);
     } catch (e) {
-      showToast("error", e instanceof Error ? e.message : "Не удалось загрузить аналитику");
+      showToast("error", e instanceof Error ? e.message : "Failed to load analytics");
     }
   }, [showToast]);
 
@@ -73,7 +73,7 @@ export const AdminAnalyticsPage: React.FC = () => {
   const filteredOrders = orders.filter((o) => {
     if (deviceFilter !== "all" && o.deviceType !== deviceFilter) return false;
     if (statusFilter !== "all" && o.status !== statusFilter) return false;
-    if (technicianFilter !== "all" && (o.technician ?? "Без мастера") !== technicianFilter) return false;
+    if (technicianFilter !== "all" && (o.technician ?? "Without a master") !== technicianFilter) return false;
     if (clientTypeFilter !== "all") {
       const freq = customerFrequency.get(o.customer) ?? 0;
       if (clientTypeFilter === "new" && freq > 1) return false;
@@ -87,9 +87,9 @@ export const AdminAnalyticsPage: React.FC = () => {
   >;
   const latestDate = datedScopeOrders.reduce<Date | null>((acc, o) => (!acc || o.parsedDate > acc ? o.parsedDate : acc), null);
   const labelsByPeriod: Record<Period, string[]> = {
-    "7d": ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
-    "30d": ["Нед 1", "Нед 2", "Нед 3", "Нед 4"],
-    "90d": ["Месяц 1", "Месяц 2", "Месяц 3"],
+    "7d": ["Mon", "W", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "30d": ["Week 1", "Week 2", "Week 3", "Week 4"],
+    "90d": ["Month 1", "Month 2", "Month 3"],
   };
 
   const barData = React.useMemo<Point[]>(() => {
@@ -131,7 +131,7 @@ export const AdminAnalyticsPage: React.FC = () => {
     if (donutMode === "technicians") {
       const map = new Map<string, number>();
       for (const o of scopeOrders) {
-        const key = o.technician ?? "Без мастера";
+        const key = o.technician ?? "Without a master";
         map.set(key, (map.get(key) ?? 0) + 1);
       }
       return Array.from(map.entries()).map(([label, value]) => ({ label, value }));
@@ -140,12 +140,12 @@ export const AdminAnalyticsPage: React.FC = () => {
       const map = new Map<string, number>();
       for (const o of scopeOrders) {
         const category =
-          o.repairOption?.includes("АКБ") ? "АКБ"
-          : o.repairOption?.includes("дисп") || o.repairOption?.includes("сенсор") ? "Экран/сенсор"
-          : o.repairOption?.includes("кулер") || o.repairOption?.includes("охлаж") ? "Охлаждение"
-          : o.repairOption?.includes("плата") ? "Плата"
-          : o.repairOption?.includes("разъём") || o.repairOption?.includes("шлейф") ? "Разъём/шлейф"
-          : "Прочее";
+          o.repairOption?.includes("battery") ? "battery"
+          : o.repairOption?.includes("disp") || o.repairOption?.includes("sensor") ? "Screen/sensor"
+          : o.repairOption?.includes("cooler") || o.repairOption?.includes("cooling") ? "Cooling"
+          : o.repairOption?.includes("pay") ? "Pay"
+          : o.repairOption?.includes("connector") || o.repairOption?.includes("train") ? "Connector/train"
+          : "Other";
         map.set(category, (map.get(category) ?? 0) + 1);
       }
       return Array.from(map.entries()).map(([label, value]) => ({ label, value }));
@@ -162,9 +162,9 @@ export const AdminAnalyticsPage: React.FC = () => {
     const tablet = scope.filter((o) => o.deviceType === "tablet").length;
     const laptop = scope.filter((o) => o.deviceType === "laptop").length;
     return [
-      { label: "Смартфоны", value: phone },
-      { label: "Планшеты", value: tablet },
-      { label: "Ноутбуки", value: laptop },
+      { label: "Smartphones", value: phone },
+      { label: "Tablets", value: tablet },
+      { label: "Laptops", value: laptop },
     ];
   }, [donutMode, scopeOrders]);
 
@@ -185,10 +185,10 @@ export const AdminAnalyticsPage: React.FC = () => {
 
   const barTitle =
     metric === "revenue"
-      ? "Динамика выручки (тыс. ₽)"
+      ? "Revenue dynamics (RUB thousand)"
       : metric === "orders"
-        ? "Динамика заявок"
-        : "Динамика клиентов";
+        ? "Dynamics of applications"
+        : "Customer dynamics";
   const selectedRevenue = scopeOrders.reduce((sum, o) => sum + (o.totalRub ?? 0), 0);
   const selectedClients = new Set(scopeOrders.map((o) => o.customer)).size;
   const repeatClients = Array.from(customerFrequency.entries()).filter(([, count]) => count > 1).length;
@@ -197,7 +197,7 @@ export const AdminAnalyticsPage: React.FC = () => {
   if (!data) {
     return (
       <>
-        <AdminPageHeader title="Аналитика" subtitle="Загрузка данных…" />
+        <AdminPageHeader title="Analytics" subtitle="Loading data..." />
         <SkeletonKpiGrid count={4} />
         <SkeletonCard rows={8} />
       </>
@@ -206,52 +206,52 @@ export const AdminAnalyticsPage: React.FC = () => {
 
   return (
     <>
-      <AdminPageHeader title="Аналитика" subtitle="Два графика: столбчатый и круговой, с фильтрами по периоду и сегментам." />
+      <AdminPageHeader title="Analytics" subtitle="Two charts: columnar and pie, with filters by period and segments." />
 
       <AdminCard>
         <div className={cls.analyticsFilters}>
           <label className={cls.filterField}>
-            <span className={cls.blockTitle}>Период</span>
+            <span className={cls.blockTitle}>Period</span>
             <AdminSelect value={period} onChange={(e) => setPeriod(e.target.value as Period)}>
-              <option value="7d">7 дней</option>
-              <option value="30d">30 дней</option>
-              <option value="90d">90 дней</option>
+              <option value="7d">7 days</option>
+              <option value="30d">30 days</option>
+              <option value="90d">90 days</option>
             </AdminSelect>
           </label>
           <label className={cls.filterField}>
-            <span className={cls.blockTitle}>Метрика</span>
+            <span className={cls.blockTitle}>Metrics</span>
             <AdminSelect value={metric} onChange={(e) => setMetric(e.target.value as Metric)}>
-              <option value="revenue">Выручка</option>
-              <option value="orders">Заявки</option>
-              <option value="clients">Клиенты</option>
+              <option value="revenue">Revenue</option>
+              <option value="orders">Applications</option>
+              <option value="clients">Clients</option>
             </AdminSelect>
           </label>
           <label className={cls.filterField}>
-            <span className={cls.blockTitle}>Тип устройства</span>
+            <span className={cls.blockTitle}>Device type</span>
             <AdminSelect value={deviceFilter} onChange={(e) => setDeviceFilter(e.target.value as DeviceFilter)}>
-              <option value="all">Все устройства</option>
-              <option value="phone">Смартфоны</option>
-              <option value="tablet">Планшеты</option>
-              <option value="laptop">Ноутбуки</option>
+              <option value="all">All devices</option>
+              <option value="phone">Smartphones</option>
+              <option value="tablet">Tablets</option>
+              <option value="laptop">Laptops</option>
             </AdminSelect>
           </label>
           <label className={cls.filterField}>
-            <span className={cls.blockTitle}>Статус</span>
+            <span className={cls.blockTitle}>Status</span>
             <AdminSelect value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}>
-              <option value="all">Все статусы</option>
-              <option value="new">Новая</option>
-              <option value="diagnostics">Диагностика</option>
-              <option value="approval">Согласование</option>
-              <option value="in_progress">В работе</option>
-              <option value="ready">Готово</option>
-              <option value="completed">Завершено</option>
-              <option value="cancelled">Отменено</option>
+              <option value="all">All statuses</option>
+              <option value="new">New</option>
+              <option value="diagnostics">Diagnostics</option>
+              <option value="approval">Coordination</option>
+              <option value="in_progress">In progress</option>
+              <option value="ready">Ready</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Canceled</option>
             </AdminSelect>
           </label>
           <label className={cls.filterField}>
-            <span className={cls.blockTitle}>Мастер</span>
+            <span className={cls.blockTitle}>Master</span>
             <AdminSelect value={technicianFilter} onChange={(e) => setTechnicianFilter(e.target.value)}>
-              <option value="all">Все мастера</option>
+              <option value="all">All masters</option>
               {technicians.map((name) => (
                 <option key={name} value={name}>
                   {name}
@@ -260,39 +260,39 @@ export const AdminAnalyticsPage: React.FC = () => {
             </AdminSelect>
           </label>
           <label className={cls.filterField}>
-            <span className={cls.blockTitle}>Тип клиента</span>
+            <span className={cls.blockTitle}>Client type</span>
             <AdminSelect value={clientTypeFilter} onChange={(e) => setClientTypeFilter(e.target.value as ClientTypeFilter)}>
-              <option value="all">Все</option>
-              <option value="new">Новые</option>
-              <option value="repeat">Повторные</option>
+              <option value="all">Sunе</option>
+              <option value="new">New</option>
+              <option value="repeat">Repeated</option>
             </AdminSelect>
           </label>
           <label className={cls.filterField}>
-            <span className={cls.blockTitle}>Круговой срез</span>
+            <span className={cls.blockTitle}>Circular cut</span>
             <AdminSelect value={donutMode} onChange={(e) => setDonutMode(e.target.value as DonutMode)}>
-              <option value="devices">По устройствам</option>
-              <option value="statuses">По статусам</option>
-              <option value="technicians">По мастерам</option>
-              <option value="repairTypes">По типам ремонта</option>
+              <option value="devices">By device</option>
+              <option value="statuses">By status</option>
+              <option value="technicians">By master</option>
+              <option value="repairTypes">By type of repair</option>
             </AdminSelect>
           </label>
         </div>
       </AdminCard>
       <div className={cls.quickStats}>
         <div className={cls.quickCard}>
-          <span className={cls.quickLabel}>Заявок в выборке</span>
+          <span className={cls.quickLabel}>Applications in the sample</span>
           <strong className={cls.quickValue}>{scopeOrders.length}</strong>
         </div>
         <div className={cls.quickCard}>
-          <span className={cls.quickLabel}>Клиентов в выборке</span>
+          <span className={cls.quickLabel}>Clients in the sample</span>
           <strong className={cls.quickValue}>{selectedClients}</strong>
         </div>
         <div className={cls.quickCard}>
-          <span className={cls.quickLabel}>Повторных клиентов</span>
+          <span className={cls.quickLabel}>Repeat clients</span>
           <strong className={cls.quickValue}>{repeatClients}</strong>
         </div>
         <div className={cls.quickCard}>
-          <span className={cls.quickLabel}>Средний чек (выборка)</span>
+          <span className={cls.quickLabel}>Average check (sample)</span>
           <strong className={cls.quickValue}>{selectedAverageCheck.toLocaleString("ru-RU")} ₽</strong>
         </div>
       </div>
@@ -305,15 +305,15 @@ export const AdminAnalyticsPage: React.FC = () => {
           <div className={cls.donutWrap}>
             <h3 className={cls.donutTitle}>
               {donutMode === "devices"
-                ? "Распределение по типам устройств"
+                ? "Distribution by device type"
                 : donutMode === "statuses"
-                  ? "Распределение по статусам"
+                  ? "Distribution by status"
                   : donutMode === "technicians"
-                    ? "Распределение по мастерам"
-                    : "Распределение по типам ремонта"}
+                    ? "Distribution by masters"
+                    : "Distribution by type of repair"}
             </h3>
             <div className={cls.donutBody}>
-              <div className={cls.donut} style={{ background: `conic-gradient(${donutGradient})` }} aria-label="Круговой график" />
+              <div className={cls.donut} style={{ background: `conic-gradient(${donutGradient})` }} aria-label="Pie chart" />
               <div className={cls.donutLegend}>
                 {donutSegments.map((s) => (
                   <div key={s.label} className={cls.legendRow}>

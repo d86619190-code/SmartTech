@@ -46,13 +46,13 @@ function encodeSessionParam(session: AuthSession): string {
   return window.btoa(encodeURIComponent(json));
 }
 
-/** evrenyan://auth или URL с уже заданным query */
+/** evrenyan://auth or URL with already specified query */
 function appendSessionToCallbackUrl(callbackBase: string, encodedSession: string): string {
   const sep = callbackBase.includes("?") ? "&" : "?";
   return `${callbackBase}${sep}session=${encodeURIComponent(encodedSession)}`;
 }
 
-/** Локальный мост: сессия в теле POST — иначе GET превышает лимит URL («страница недоступна»). */
+/** Local bridge: session in POST body - otherwise GET exceeds URL limit (“page unreachable”). */
 function isLocalAuthBridgeUrl(callbackUrl: string): boolean {
   try {
     const u = new URL(callbackUrl);
@@ -121,13 +121,13 @@ export const LoginPage: React.FC = () => {
     })();
   }, [isBrowser, isElectron]);
 
-  /** Системный браузер после входа: сначала localhost в приложении, иначе evrenyan:// */
+  /** System browser after logging in: first localhost in the application, otherwise evrenyan:// */
   const resolvedElectronCallback = React.useMemo(() => {
     if (electronCallbackRaw) return electronCallbackRaw;
     if (authBridgeOrigin) return `${authBridgeOrigin.replace(/\/$/, "")}/auth-callback`;
     return "evrenyan://auth";
   }, [electronCallbackRaw, authBridgeOrigin]);
-  /** Во вкладке браузера isElectron=false — редирект в приложение только по флагу из URL */
+  /** In the browser tab isElectron=false - redirect to the application only by the flag from the URL */
   const electronBridgeOn = search?.get("electronBridge") === "1";
   const nextPathRaw = search?.get("next") ?? "";
   const nextPath = nextPathRaw.startsWith("/") ? nextPathRaw : "/profile";

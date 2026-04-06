@@ -22,20 +22,20 @@ export const TechCompletedPage: React.FC = () => {
 
   return (
     <>
-      <TechPageHeader title="Завершённые работы" subtitle="История, выплаты и оценки клиентов." />
+      <TechPageHeader title="Completed works" subtitle="History, payments and customer ratings." />
       <FilterBar>
-        <AdminInput placeholder="Поиск по заказу или устройству…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <AdminInput placeholder="Search by order or device..." value={q} onChange={(e) => setQ(e.target.value)} />
       </FilterBar>
       <TechCard style={{ padding: 0 }}>
         <AdminTable>
           <thead>
             <tr>
-              <AdminTh>Заказ</AdminTh>
-              <AdminTh>Устройство</AdminTh>
-              <AdminTh>Клиент</AdminTh>
-              <AdminTh>Завершён</AdminTh>
-              <AdminTh>Оценка</AdminTh>
-              <AdminTh>Доход</AdminTh>
+              <AdminTh>Order</AdminTh>
+              <AdminTh>Device</AdminTh>
+              <AdminTh>Client</AdminTh>
+              <AdminTh>Completed</AdminTh>
+              <AdminTh>Grade</AdminTh>
+              <AdminTh>Income</AdminTh>
               <AdminTh />
             </tr>
           </thead>
@@ -52,7 +52,7 @@ export const TechCompletedPage: React.FC = () => {
                 <AdminTd>{j.earningsRub != null ? formatRub(j.earningsRub) : "—"}</AdminTd>
                 <AdminTd>
                   <Link className={cls.link} to={`/tech/repairs/${j.id}`}>
-                    Карточка
+                    Card
                   </Link>
                 </AdminTd>
               </tr>

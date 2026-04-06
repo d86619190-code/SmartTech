@@ -10,35 +10,35 @@ export const AccountSettingsPage: React.FC = () => {
 
   return (
     <div className={cls.shell}>
-      <PageHeader title="Настройки" subtitle="Уведомления и предпочтения аккаунта (демо)." />
+      <PageHeader title="Settings" subtitle="Account notifications and preferences (demo)." />
       <div className={cls.body}>
         <section className={cls.card}>
-          <h2 className={cls.h2}>Уведомления</h2>
+          <h2 className={cls.h2}>Notifications</h2>
           <label className={cls.settingsRow}>
-            <span>Push о статусе заказа</span>
+            <span>Push about order status</span>
             <input type="checkbox" checked={pushOrder} onChange={(e) => setPushOrder(e.target.checked)} />
           </label>
           <label className={cls.settingsRow}>
-            <span>Email-рассылка акций</span>
+            <span>Email-promotions mailing</span>
             <input type="checkbox" checked={emailNews} onChange={(e) => setEmailNews(e.target.checked)} />
           </label>
           <label className={cls.settingsRow}>
-            <span>SMS напоминания о визите</span>
+            <span>SMS visit reminders</span>
             <input type="checkbox" checked={sms} onChange={(e) => setSms(e.target.checked)} />
           </label>
         </section>
         <section className={cls.card}>
-          <h2 className={cls.h2}>Конфиденциальность</h2>
+          <h2 className={cls.h2}>Confidentiality</h2>
           <p className={cls.lead}>
-            Политика обработки данных описана в документах:{" "}
+            The data processing policy is described in the documents: {" "}
             <a href="#/privacy" style={{ color: "var(--color-link)" }}>
-              конфиденциальность
+              confidentiality
             </a>
             .
           </p>
         </section>
         <Button type="button" variant="outline">
-          Сохранить
+          Save
         </Button>
       </div>
     </div>

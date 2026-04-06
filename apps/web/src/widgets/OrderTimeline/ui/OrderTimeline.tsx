@@ -4,7 +4,7 @@ import cls from "./OrderTimeline.module.css";
 
 type OrderTimelineProps = {
   currentStep: OrderFlowStepId;
-  /** Горизонтальный таймлайн (ТЗ: линия с точками, скролл если не влезает) */
+  /** Horizontal timeline (TZ: line with dots, scroll if it doesn’t fit) */
   variant?: "vertical" | "horizontal";
 };
 
@@ -14,7 +14,7 @@ export const OrderTimeline: React.FC<OrderTimelineProps> = ({ currentStep, varia
   return (
     <ol
       className={[cls.root, variant === "horizontal" && cls.rootHorizontal].filter(Boolean).join(" ")}
-      aria-label="Этапы заказа"
+      aria-label="Order stages"
     >
       {ORDER_FLOW_STEPS.map((step, i) => {
         const state = i < activeIdx ? "done" : i === activeIdx ? "current" : "upcoming";

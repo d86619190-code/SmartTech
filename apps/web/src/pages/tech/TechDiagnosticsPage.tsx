@@ -35,7 +35,7 @@ export const TechDiagnosticsPage: React.FC = () => {
   if (!job) {
     return (
       <>
-        <TechPageHeader title="Диагностика" subtitle="Загрузка…" />
+        <TechPageHeader title="Diagnostics" subtitle="Loading…" />
         <SkeletonCard rows={5} />
       </>
     );
@@ -63,7 +63,7 @@ export const TechDiagnosticsPage: React.FC = () => {
       const slice = picked.slice(0, room).map((p) => p.dataUrl);
       setPendingPhotoUrls((prev) => [...prev, ...slice]);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось добавить фото";
+      const msg = e instanceof Error ? e.message : "Failed to add photo";
       showToast("error", msg);
     } finally {
       setPicking(false);
@@ -81,9 +81,9 @@ export const TechDiagnosticsPage: React.FC = () => {
       setJob(res.repair);
       setServerPhotoUrls(Array.isArray(res.repair.photoUrls) ? res.repair.photoUrls : []);
       setPendingPhotoUrls([]);
-      showToast("success", "Диагностика сохранена");
+      showToast("success", "Diagnostics saved");
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось сохранить";
+      const msg = e instanceof Error ? e.message : "Failed to save";
       showToast("error", msg);
     } finally {
       setSaving(false);
@@ -92,9 +92,9 @@ export const TechDiagnosticsPage: React.FC = () => {
 
   return (
     <>
-      <TechPageHeader title="Диагностика" subtitle={`${job.publicId} · фиксация неисправностей и фото.`} />
+      <TechPageHeader title="Diagnostics" subtitle={`${job.publicId} · Fault recording and photos.`} />
       <TechCard style={{ padding: 24, marginBottom: 16 }}>
-        <p className={cls.blockTitle}>Выявленные проблемы</p>
+        <p className={cls.blockTitle}>Identified problems</p>
         <ul style={{ margin: "0 0 16px", paddingLeft: 20 }}>
           {issues.map((x) => (
             <li key={x} className={cls.p}>
@@ -104,17 +104,17 @@ export const TechDiagnosticsPage: React.FC = () => {
         </ul>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: "1 1 220px" }}>
-            <AdminInput placeholder="Добавить пункт" value={note} onChange={(e) => setNote(e.target.value)} />
+            <AdminInput placeholder="Add item" value={note} onChange={(e) => setNote(e.target.value)} />
           </div>
           <Button type="button" variant="outline" onClick={addIssue}>
-            Добавить
+            Add
           </Button>
         </div>
       </TechCard>
       <TechCard style={{ padding: 24, marginBottom: 16 }}>
-        <p className={cls.blockTitle}>Фото с диагностики</p>
+        <p className={cls.blockTitle}>Photos from diagnostics</p>
         <p className={cls.muted} style={{ marginTop: 0, marginBottom: 12 }}>
-          Файлы с устройства; после сохранения попадают в карточку ремонта локально (без облака).
+          Files from the device; after saving they end up in the repair card locally (without the cloud).
         </p>
         <div className={cls.photoGrid}>
           <button
@@ -123,7 +123,7 @@ export const TechDiagnosticsPage: React.FC = () => {
             onClick={() => void onAddPhotos()}
             disabled={picking || displayCount >= 16}
           >
-            {picking ? "…" : "+ С устройства"}
+            {picking ? "…" : "+ From device"}
           </button>
           {serverPhotoUrls.map((url, i) => (
             <div key={`s-${i}`} className={cls.photoCell}>
@@ -136,7 +136,7 @@ export const TechDiagnosticsPage: React.FC = () => {
                   downloadDataUrl(url, `diagnostic-${i + 1}.${ext}`);
                 }}
               >
-                Сохранить
+                Save
               </button>
             </div>
           ))}
@@ -144,17 +144,17 @@ export const TechDiagnosticsPage: React.FC = () => {
             <div key={`p-${i}`} className={cls.photoCell}>
               <img className={cls.photoThumb} src={url} alt="" />
               <button type="button" className={cls.photoRemoveSmall} onClick={() => removePendingAt(i)}>
-                Убрать
+                Put away
               </button>
             </div>
           ))}
         </div>
       </TechCard>
       <Button type="button" onClick={() => void save()} disabled={saving}>
-        {saving ? "Сохранение…" : "Сохранить"}
+        {saving ? "Saving…" : "Save"}
       </Button>
       <Link className={cls.link} to={`/tech/repairs/${job.id}`} style={{ marginLeft: 16 }}>
-        К карточке ремонта
+        To the repair card
       </Link>
       {toast ? <StatusToast tone={toast.tone} message={toast.message} onClose={closeToast} /> : null}
     </>

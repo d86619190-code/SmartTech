@@ -9,18 +9,18 @@ export const CreateOrderSuccessPage: React.FC = () => {
   return (
     <div className={cls.shell}>
       <div className={cls.body}>
-        <h1 className={cls.title}>Заявка принята</h1>
+        <h1 className={cls.title}>Application accepted</h1>
         <div className={cls.card}>
           <p className={cls.text}>
-            Мы получили заявку и скоро свяжемся с вами для уточнения. Статус можно отслеживать на главной и в
-            разделе «Сообщения».
+            We have received your application and will contact you soon for clarification. The status can be tracked on the main page and in
+            "Messages" section.
           </p>
           <div className={cls.actions}>
             <Button type="button" onClick={() => navigate("/")}>
-              На главную
+              Home
             </Button>
             <Button type="button" variant="outline" onClick={() => navigate("/messages")}>
-              Сообщения
+              Messages
             </Button>
           </div>
         </div>

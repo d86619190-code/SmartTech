@@ -6,25 +6,25 @@ type Props = {
   afterSrc: string;
   beforeLabel?: string;
   afterLabel?: string;
-  /** Полноэкранное погружение после заставки */
+  /** Full screen immersion after splash screen */
   immersive?: boolean;
   onCloseImmersive?: () => void;
-  /** Первая секция на весь экран (без модального окна) */
+  /** The first section is full screen (without a modal window) */
   layout?: "default" | "hero";
 };
 
 export const PortalBeforeAfter: React.FC<Props> = ({
   beforeSrc,
   afterSrc,
-  beforeLabel = "До ремонта",
-  afterLabel = "После",
+  beforeLabel = "Before renovation",
+  afterLabel = "After",
   immersive = false,
   onCloseImmersive,
   layout = "default",
 }) => {
   const wrapRef = React.useRef<HTMLDivElement>(null);
   const gradId = React.useId().replace(/:/g, "");
-  /** Hero: сначала весь кадр «сломанный» (клип починенного ≈0); иначе — середина */
+  /** Hero: first, the entire frame is “broken” (fixed clip ≈0); otherwise - the middle */
   const [split, setSplit] = React.useState(() => (layout === "hero" ? 0.02 : 0.5));
   const dragging = React.useRef(false);
   const pendingX = React.useRef<number | null>(null);
@@ -92,7 +92,7 @@ export const PortalBeforeAfter: React.FC<Props> = ({
   }, [immersive, onCloseImmersive]);
 
   const wrapStyle = { "--split": String(split) } as React.CSSProperties;
-  /** Верхний слой — «После» (слева от разделителя); низ — «До» (сломанный) на всю ширину */
+  /** The top layer is “After” (to the left of the separator); bottom - “Before” (broken) across the entire width */
   const repairedClip: React.CSSProperties = {
     clipPath: `inset(0 ${(1 - split) * 100}% 0 0)`,
     WebkitClipPath: `inset(0 ${(1 - split) * 100}% 0 0)`,
@@ -114,7 +114,7 @@ export const PortalBeforeAfter: React.FC<Props> = ({
           setFromClientX(e.clientX);
         }}
         role="img"
-        aria-label={`${afterLabel} слева и ${beforeLabel} справа. Проведите по экрану, чтобы сдвинуть границу.`}
+        aria-label={`${afterLabel} on the left and ${beforeLabel} on the right. Swipe the screen to move the border.`}
       >
         <div className={cls.viewport}>
           <img
@@ -205,18 +205,18 @@ export const PortalBeforeAfter: React.FC<Props> = ({
         </div>
       </div>
       {!immersive && layout !== "hero" ? (
-        <p className={cls.hint}>Тяните разделитель — «портал» между до и после</p>
+        <p className={cls.hint}>Pull the separator - the “portal” between before and after</p>
       ) : null}
     </>
   );
 
   if (immersive) {
     return (
-      <div className={cls.immersiveOverlay} role="dialog" aria-modal="true" aria-label="Сравнение до и после">
-        <button type="button" className={cls.immersiveClose} onClick={onCloseImmersive} aria-label="Закрыть полноэкранный режим">
+      <div className={cls.immersiveOverlay} role="dialog" aria-modal="true" aria-label="Comparison before and after">
+        <button type="button" className={cls.immersiveClose} onClick={onCloseImmersive} aria-label="Close full screen mode">
           ✕
         </button>
-        <p className={cls.immersiveHint}>Потяните разделитель · Esc — выход</p>
+        <p className={cls.immersiveHint}>Pull the separator Esc - exit</p>
         <div className={cls.immersiveStage}>{inner}</div>
       </div>
     );

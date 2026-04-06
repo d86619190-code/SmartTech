@@ -5,7 +5,7 @@ import { normalizeAuthRequiredMessage, redirectToLoginForAuthMissing, isAuthRequ
 
 async function parseError(res: Response): Promise<string> {
   const body = (await res.json().catch(() => ({}))) as { error?: string };
-  const base = body.error ?? `Ошибка ${res.status}`;
+  const base = body.error ?? `Error ${res.status}`;
   if (isAuthRequiredMessage(base)) {
     redirectToLoginForAuthMissing();
     return normalizeAuthRequiredMessage(base);
@@ -17,7 +17,7 @@ async function authFetch(path: string, init?: RequestInit): Promise<Response> {
   let session = readAuthSession();
   if (!session) {
     redirectToLoginForAuthMissing();
-    throw new Error("Нужна авторизация");
+    throw new Error("Authorization required");
   }
   let res = await fetch(`${apiOrigin}${path}`, {
     ...init,
@@ -25,7 +25,7 @@ async function authFetch(path: string, init?: RequestInit): Promise<Response> {
   });
   if (res.status !== 401) return res;
   session = await refreshSessionOrNull();
-  if (!session) throw new Error("Сессия истекла");
+  if (!session) throw new Error("Session expired");
   res = await fetch(`${apiOrigin}${path}`, {
     ...init,
     headers: { ...(init?.headers ?? {}), Authorization: `Bearer ${session.accessToken}` },

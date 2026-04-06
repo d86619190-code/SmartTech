@@ -49,11 +49,11 @@ export const TechPricePage: React.FC = () => {
       ...partsCatalog,
       ...customParts.map((p) => ({
         id: p.id,
-        name: p.name.trim() || "Своя позиция",
+        name: p.name.trim() || "Your position",
         oem: false,
         inStock: true,
         priceRub: p.priceRub,
-        deviceHint: "Своё",
+        deviceHint: "Yours",
       })),
     ],
     [partsCatalog, customParts],
@@ -68,7 +68,7 @@ export const TechPricePage: React.FC = () => {
         const [repairRes, partsRes] = await Promise.all([techApi.getRepairById(repairId), techApi.getParts()]);
         const repair = repairRes?.repair;
         if (!repair) {
-          throw new Error("Ремонт не найден");
+          throw new Error("Repair not found");
         }
         setJob(repair);
         setPartsCatalog(Array.isArray(partsRes?.rows) ? partsRes.rows : []);
@@ -85,30 +85,30 @@ export const TechPricePage: React.FC = () => {
           setOptions(
             existing.map((o: any, i: number) => ({
               id: o.id || `opt-${i + 1}`,
-              title: o.title || `Вариант ${i + 1}`,
+              title: o.title || `Option ${i + 1}`,
               laborRub: Number(o.laborRub) || 0,
               selectedPartIds: Array.isArray(o.selectedPartIds) ? o.selectedPartIds : [],
               availability: o.availability === "on_order" ? "on_order" : "in_stock",
               orderLeadDays: o.orderLeadDays != null ? Number(o.orderLeadDays) : undefined,
               isOriginal: Boolean(o.isOriginal),
-              repairDaysLabel: o.repairDaysLabel ?? (o.availability === "on_order" ? "2-4 дня" : "1-2 дня"),
+              repairDaysLabel: o.repairDaysLabel ?? (o.availability === "on_order" ? "2-4 day" : "1-2 day"),
             })),
           );
         } else {
           setOptions([
             {
               id: "base",
-              title: "Вариант 1",
+              title: "Option 1",
               laborRub: Number(repair.laborRub) || 0,
               selectedPartIds: Array.isArray(repair.selectedPartIds) ? repair.selectedPartIds : [],
               availability: "in_stock",
               isOriginal: false,
-              repairDaysLabel: "1-2 дня",
+              repairDaysLabel: "1-2 day",
             },
           ]);
         }
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Не удалось загрузить стоимость";
+        const msg = e instanceof Error ? e.message : "Failed to load cost";
         setLoadError(msg);
         setJob(null);
       }
@@ -118,13 +118,13 @@ export const TechPricePage: React.FC = () => {
   if (loadError) {
     return (
       <>
-        <TechPageHeader title="Стоимость" subtitle="Ошибка загрузки" />
+        <TechPageHeader title="Price" subtitle="Loading error" />
         <TechCard style={{ padding: 20 }}>
           <p className={cls.p} style={{ marginBottom: 16 }}>
             {loadError}
           </p>
           <Link className={cls.link} to="/tech/tasks">
-            ← К задачам
+            ← To the tasks
           </Link>
         </TechCard>
       </>
@@ -133,7 +133,7 @@ export const TechPricePage: React.FC = () => {
   if (!job) {
     return (
       <>
-        <TechPageHeader title="Стоимость" subtitle="Загрузка…" />
+        <TechPageHeader title="Price" subtitle="Loading…" />
         <SkeletonCard rows={6} />
       </>
     );
@@ -159,12 +159,12 @@ export const TechPricePage: React.FC = () => {
     setOptions((prev) => {
       const next: QuoteOptionDraft = {
         id: newLocalId("opt"),
-        title: `Вариант ${prev.length + 1}`,
+        title: `Option ${prev.length + 1}`,
         laborRub: 0,
         selectedPartIds: [],
         availability: "in_stock",
         isOriginal: false,
-        repairDaysLabel: "1-2 дня",
+        repairDaysLabel: "1-2 day",
       };
       return [...prev, next].slice(0, 6);
     });
@@ -203,7 +203,7 @@ export const TechPricePage: React.FC = () => {
           availability: opt.availability,
           orderLeadDays: opt.availability === "on_order" ? (opt.orderLeadDays ?? 2) : undefined,
           isOriginal: hasOem || opt.isOriginal,
-          repairDaysLabel: opt.repairDaysLabel || (hasInStock ? "1-2 дня" : "2-4 дня"),
+          repairDaysLabel: opt.repairDaysLabel || (hasInStock ? "1-2 day" : "2-4 day"),
         };
       });
       const cpPayload = customParts
@@ -215,9 +215,9 @@ export const TechPricePage: React.FC = () => {
       setCustomParts(
         savedCp.map((p: any) => ({ id: p.id, name: String(p.name ?? ""), priceRub: Number(p.priceRub) || 0 })),
       );
-      showToast("success", "Стоимость сохранена");
+      showToast("success", "Cost saved");
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось сохранить стоимость";
+      const msg = e instanceof Error ? e.message : "Failed to save value";
       showToast("error", msg);
     } finally {
       setSaving(false);
@@ -226,7 +226,7 @@ export const TechPricePage: React.FC = () => {
 
   return (
     <>
-      <TechPageHeader title="Стоимость" subtitle="Работа и запчасти — итог для согласования с клиентом." />
+      <TechPageHeader title="Price" subtitle="Work and spare parts are the result for agreement with the client." />
       <div style={{ display: "grid", gap: 14, marginBottom: 14 }}>
         {options.map((opt, idx) => {
           const selectedParts = mergedCatalog.filter((p: any) => opt.selectedPartIds.includes(p.id));
@@ -237,13 +237,13 @@ export const TechPricePage: React.FC = () => {
               <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--color-order-row-border)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                 <AdminInput value={opt.title} onChange={(e) => updateOption(idx, { title: e.target.value })} />
                 <Button type="button" variant="outline" onClick={() => removeOption(idx)} disabled={options.length <= 1}>
-                  Удалить
+                  Delete
                 </Button>
               </div>
               <div style={{ padding: 16, display: "grid", gap: 10 }}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
                   <label>
-                    <span className={cls.muted}>Работа, ₽</span>
+                    <span className={cls.muted}>Work, ₽</span>
                     <AdminInput
                       inputMode="numeric"
                       value={String(opt.laborRub)}
@@ -251,11 +251,11 @@ export const TechPricePage: React.FC = () => {
                     />
                   </label>
                   <label>
-                    <span className={cls.muted}>Срок</span>
+                    <span className={cls.muted}>Term</span>
                     <AdminInput value={opt.repairDaysLabel ?? ""} onChange={(e) => updateOption(idx, { repairDaysLabel: e.target.value })} />
                   </label>
                   <label>
-                    <span className={cls.muted}>Под заказ (дней)</span>
+                    <span className={cls.muted}>To order (days)</span>
                     <AdminInput
                       inputMode="numeric"
                       value={String(opt.orderLeadDays ?? "")}
@@ -270,7 +270,7 @@ export const TechPricePage: React.FC = () => {
                       checked={opt.availability === "in_stock"}
                       onChange={(e) => updateOption(idx, { availability: e.target.checked ? "in_stock" : "on_order" })}
                     />{" "}
-                    В наличии
+                    In stock
                   </label>
                 </div>
               </div>
@@ -291,7 +291,7 @@ export const TechPricePage: React.FC = () => {
                     <div style={{ flex: 1 }}>
                       <span className={cls.p}>{p.name}</span>
                       <span className={cls.muted} style={{ display: "block" }}>
-                        {p.oem ? "OEM" : "Аналог"} · {p.inStock ? "В наличии" : "Под заказ"} · {p.deviceHint}
+                        {p.oem ? "OEM" : "Analogue"} · {p.inStock ? "In stock" : "To order"} · {p.deviceHint}
                       </span>
                     </div>
                     <strong>{formatRub(p.priceRub)}</strong>
@@ -300,7 +300,7 @@ export const TechPricePage: React.FC = () => {
               </div>
               <div style={{ padding: "10px 16px 16px", borderTop: "1px solid var(--color-order-row-border)" }}>
                 <p className={cls.p}>
-                  Итого варианта: <strong>{formatRub(total)}</strong>
+                  Total option: <strong>{formatRub(total)}</strong>
                 </p>
               </div>
             </TechCard>
@@ -309,7 +309,7 @@ export const TechPricePage: React.FC = () => {
       </div>
       <TechCard style={{ padding: 16, marginBottom: 16 }}>
         <p className={cls.p} style={{ marginBottom: 12 }}>
-          <strong>Свои запчасти и позиции</strong> — добавьте название и цену, затем отметьте их в вариантах стоимости.
+          <strong>Your parts and items</strong>—Add a name and price, then mark them in the cost options.
         </p>
         {customParts.map((cp) => (
           <div
@@ -323,11 +323,11 @@ export const TechPricePage: React.FC = () => {
             }}
           >
             <label>
-              <span className={cls.muted}>Название</span>
+              <span className={cls.muted}>Name</span>
               <AdminInput value={cp.name} onChange={(e) => updateCustomPart(cp.id, { name: e.target.value })} />
             </label>
             <label>
-              <span className={cls.muted}>Цена, ₽</span>
+              <span className={cls.muted}>Price, ₽</span>
               <AdminInput
                 inputMode="numeric"
                 value={String(cp.priceRub)}
@@ -335,27 +335,27 @@ export const TechPricePage: React.FC = () => {
               />
             </label>
             <Button type="button" variant="outline" onClick={() => removeCustomPart(cp.id)}>
-              Удалить
+              Delete
             </Button>
           </div>
         ))}
         <Button type="button" variant="outline" onClick={addCustomPart} style={{ marginBottom: 16 }}>
-          + Своя позиция
+          + Your position
         </Button>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
           <p className={cls.p}>
-            Вариантов: <strong>{options.length}</strong>
+            Options: <strong>{options.length}</strong>
           </p>
           <Button type="button" variant="outline" onClick={addOption} disabled={options.length >= 6}>
-            + Добавить вариант
+            + Add an option
           </Button>
         </div>
       </TechCard>
       <Button type="button" onClick={() => void save()} disabled={saving}>
-        {saving ? "Сохранение…" : "Сохранить стоимость"}
+        {saving ? "Saving…" : "Save cost"}
       </Button>
       <Link className={cls.link} to={`/tech/repairs/${job.id}/approval`} style={{ marginLeft: 16 }}>
-        Далее: согласование →
+        Next: approval →
       </Link>
       {toast ? <StatusToast tone={toast.tone} message={toast.message} onClose={closeToast} /> : null}
     </>

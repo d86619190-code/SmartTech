@@ -4,16 +4,16 @@ import type { TrackingCardData } from "@/entities/tracking";
 import cls from "./TrackingRepairCard.module.css";
 
 const STAGES = [
-  "Принят",
-  "В работе",
-  "Готов",
+  "Accepted",
+  "In progress",
+  "Ready",
 ] as const;
 
 function stageClass(active: boolean): string {
   return active ? cls.stageActive : cls.stageInactive;
 }
 
-/** Принят: 0–49%, в работе: 50–99%, готов: 100% */
+/** Accepted: 0–49%, in progress: 50–99%, ready: 100% */
 function stageActiveFlags(progressPercent: number): [boolean, boolean, boolean] {
   const p = Math.min(100, Math.max(0, progressPercent));
   return [p < 50, p >= 50 && p < 100, p >= 100];
@@ -27,7 +27,7 @@ type TrackingRepairCardProps = {
 
 export const TrackingRepairCard: React.FC<TrackingRepairCardProps> = ({
   data,
-  cardTitle = "Активный ремонт",
+  cardTitle = "Active repair",
   fullWidth = false,
 }) => {
   const navigate = useNavigate();
@@ -61,11 +61,11 @@ export const TrackingRepairCard: React.FC<TrackingRepairCardProps> = ({
         <div className={cls.textCol}>
           <h3 className={cls.device}>{deviceName}</h3>
           <p className={cls.issue}>
-            Неисправность: {issueLabel}
+            Issue: {issueLabel}
           </p>
 
           <div className={cls.progressBlock}>
-            <p className={cls.progressLabel}>Прогресс</p>
+            <p className={cls.progressLabel}>Progress</p>
             <div
               className={cls.barTrack}
               role="progressbar"
@@ -83,17 +83,17 @@ export const TrackingRepairCard: React.FC<TrackingRepairCardProps> = ({
           </div>
 
           <p className={cls.estimate}>
-            Ориентир завершения: {estimateLabel}
+            Completion Landmark: {estimateLabel}
           </p>
         </div>
       </div>
 
       <div className={cls.actions}>
         <button type="button" className={cls.btnPrimary} onClick={goStatus}>
-          Статус ремонта
+          Repair status
         </button>
         <button type="button" className={cls.btnSecondary} onClick={goContact}>
-          Сообщения по заказу
+          Order messages
         </button>
       </div>
     </article>

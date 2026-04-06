@@ -140,16 +140,16 @@ export const TechChatPage: React.FC = () => {
   if (!thread) {
     return (
       <>
-        <TechPageHeader title="Чат" subtitle="Загрузка…" />
+        <TechPageHeader title="Chat" subtitle="Loading…" />
         <div className={chatCls.body}>
-          <p className={chatCls.streamStatus}>Загрузка…</p>
+          <p className={chatCls.streamStatus}>Loading…</p>
         </div>
       </>
     );
   }
 
   const messages = baseMessages;
-  const masterName = thread.masterName ?? profile?.name ?? "Мастер";
+  const masterName = thread.masterName ?? profile?.name ?? "Master";
   const masterAvatar = thread.masterAvatarUrl ?? profile?.avatar_url ?? dicebear(masterName);
   const clientAvatar = thread.clientAvatarUrl ?? dicebear(thread.clientName);
 
@@ -167,7 +167,7 @@ export const TechChatPage: React.FC = () => {
       setPendingAttachment(null);
       await loadThread();
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось отправить";
+      const msg = e instanceof Error ? e.message : "Failed to send";
       showToast("error", msg);
     } finally {
       setIsSending(false);
@@ -185,7 +185,7 @@ export const TechChatPage: React.FC = () => {
       const first = picked[0];
       if (first) setPendingAttachment({ name: first.file.name, dataUrl: first.dataUrl });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось выбрать файл";
+      const msg = e instanceof Error ? e.message : "Failed to select file";
       showToast("error", msg);
     } finally {
       setPicking(false);
@@ -197,24 +197,24 @@ export const TechChatPage: React.FC = () => {
 
   return (
     <>
-      <TechPageHeader title={thread.clientName} subtitle={`Заказ ${thread.orderPublicId} · ведёт ${masterName}`} />
+      <TechPageHeader title={thread.clientName} subtitle={`Order ${thread.orderPublicId} · leads ${masterName}`} />
       <div className={chatCls.body}>
         <Link
           to="/tech/messages"
           className={chatCls.backCircle}
-          aria-label="К списку диалогов"
-          title="К списку диалогов"
+          aria-label="To the list of dialogues"
+          title="To the list of dialogues"
         >
           ←
         </Link>
-        <div className={chatCls.chatParticipants} aria-label="Участники чата">
+        <div className={chatCls.chatParticipants} aria-label="Chat participants">
           <div className={chatCls.participant}>
             <div className={chatCls.avatarWrap}>
               <img className={chatCls.participantAvatar} src={clientAvatar} alt="" />
-              {clientOn ? <span className={chatCls.onlineDot} title="Клиент на связи" /> : null}
+              {clientOn ? <span className={chatCls.onlineDot} title="Client in touch" /> : null}
             </div>
             <div>
-              <div className={chatCls.participantRole}>Клиент</div>
+              <div className={chatCls.participantRole}>Client</div>
               <div className={chatCls.participantName}>{thread.clientName}</div>
             </div>
           </div>
@@ -222,7 +222,7 @@ export const TechChatPage: React.FC = () => {
           <div className={chatCls.participant}>
             <img className={chatCls.participantAvatar} src={masterAvatar} alt="" />
             <div>
-              <div className={chatCls.participantRole}>Вы</div>
+              <div className={chatCls.participantRole}>You</div>
               <div className={chatCls.participantName}>{masterName}</div>
             </div>
           </div>
@@ -233,11 +233,11 @@ export const TechChatPage: React.FC = () => {
             <p className={[chatCls.streamStatus, chatCls.streamStatusLine].join(" ")}>
               <span>{streamStatusLabel(streamStatus)} ·</span>
               {messagesLoading ? (
-                <span>Загрузка…</span>
+                <span>Loading…</span>
               ) : showClientTyping ? (
-                <TypingIndicator variant="inline" label="Клиент печатает" />
+                <TypingIndicator variant="inline" label="Client prints" />
               ) : (
-                <span>{presence === "online" ? "вы в сети" : "оффлайн"}</span>
+                <span>{presence === "online" ? "you are online" : "offline"}</span>
               )}
             </p>
           </div>
@@ -262,11 +262,11 @@ export const TechChatPage: React.FC = () => {
                         {isTech ? (
                           <span className={chatCls.tickStatus}>
                             {m.read_by_client_at ? (
-                              <span className={chatCls.tickRead} title="Прочитано клиентом">
+                              <span className={chatCls.tickRead} title="Read by client">
                                 ✓✓
                               </span>
                             ) : (
-                              <span title="Доставлено">✓✓</span>
+                              <span title="Delivered">✓✓</span>
                             )}
                           </span>
                         ) : null}
@@ -286,9 +286,9 @@ export const TechChatPage: React.FC = () => {
           </div>
           {pendingAttachment ? (
             <div className={chatCls.pendingAttach}>
-              <span>Готово к отправке: {pendingAttachment.name || "вложение"}</span>
+              <span>Ready to send: {pendingAttachment.name ||"attachment"}</span>
               <button type="button" className={chatCls.pendingAttachClear} onClick={() => setPendingAttachment(null)}>
-                Убрать
+                Put away
               </button>
             </div>
           ) : null}
@@ -306,7 +306,7 @@ export const TechChatPage: React.FC = () => {
                   void techApi.postThreadTyping(threadId).catch(() => {});
                 }, 400);
               }}
-              placeholder="Напишите сообщение…"
+              placeholder="Write a message..."
               rows={2}
             />
             <div className={chatCls.chatInputTools}>
@@ -315,8 +315,8 @@ export const TechChatPage: React.FC = () => {
                 className={chatCls.chatCircleBtn}
                 onClick={() => void onPickMedia()}
                 disabled={picking || isSending}
-                aria-label="Добавить фото или видео"
-                title="Добавить фото или видео"
+                aria-label="Add a photo or video"
+                title="Add a photo or video"
               >
                 📎
               </button>
@@ -325,8 +325,8 @@ export const TechChatPage: React.FC = () => {
                 className={[chatCls.chatCircleBtn, chatCls.chatCircleBtnPrimary].join(" ")}
                 onClick={send}
                 disabled={isSending || (!text.trim() && !pendingAttachment)}
-                aria-label="Отправить сообщение"
-                title="Отправить сообщение"
+                aria-label="Send message"
+                title="Send message"
               >
                 ➤
               </button>

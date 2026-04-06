@@ -18,9 +18,9 @@ function formatThreadLastTime(ts: number): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   const hm = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
   if (diffDays === 0) return hm;
-  if (diffDays === 1) return `вчера ${hm}`;
+  if (diffDays === 1) return `yesterday ${hm}`;
   if (diffDays < 7) {
-    const w = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"];
+    const w = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     return `${w[d.getDay()]} ${hm}`;
   }
   return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}`;
@@ -48,7 +48,7 @@ export const MessagesListPage: React.FC = () => {
       setApprovals(data.approvals);
       setThreads(data.threads);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось загрузить сообщения";
+      const msg = e instanceof Error ? e.message : "Failed to load messages";
       showToast("error", msg);
     } finally {
       setLoading(false);
@@ -65,9 +65,9 @@ export const MessagesListPage: React.FC = () => {
       try {
         await resolveApprovalApi(approvalId, decision);
         await loadInbox();
-        showToast("success", decision === "approved" ? "Согласование подтверждено" : "Согласование отклонено");
+        showToast("success", decision === "approved" ? "Agreement confirmed" : "Agreement rejected");
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Не удалось обновить согласование";
+        const msg = e instanceof Error ? e.message : "Failed to update reconciliation";
         showToast("error", msg);
       } finally {
         setBusyApprovalId(null);
@@ -78,11 +78,11 @@ export const MessagesListPage: React.FC = () => {
 
   return (
     <div className={cls.shell}>
-      <PageHeader title="Сообщения" subtitle="Переписка с сервисом по вашим заказам." />
+      <PageHeader title="Messages" subtitle="Correspondence with the service regarding your orders." />
       <div className={cls.body}>
         {approvals.length > 0 ? (
           <section className={cls.card}>
-            <h2 className={cls.h2}>Нужно ваше решение</h2>
+            <h2 className={cls.h2}>We need your solution</h2>
             <p className={cls.streamStatus}>{streamUpdatesLabel(streamStatus)}</p>
             <div className={cls.approvalsList}>
               {approvals.map((item) => (
@@ -90,7 +90,7 @@ export const MessagesListPage: React.FC = () => {
                   <p className={cls.approvalLabel}>{item.label}</p>
                   <div className={cls.approvalActions}>
                     <Link className={cls.approvalLink} to={`/orders/${item.orderId}/approval`}>
-                      Открыть
+                      Open
                     </Link>
                     <button
                       type="button"
@@ -98,7 +98,7 @@ export const MessagesListPage: React.FC = () => {
                       disabled={busyApprovalId === item.id}
                       onClick={() => void onResolve(item.id, "approved")}
                     >
-                      Согласовать
+                      Approve
                     </button>
                   </div>
                 </article>
@@ -110,16 +110,16 @@ export const MessagesListPage: React.FC = () => {
         <section className={cls.card} style={{ padding: 0 }}>
           {loading ? (
             <p className={cls.lead} style={{ padding: 24 }}>
-              Загрузка диалогов…
+              Loading dialogues...
             </p>
           ) : threads.length === 0 ? (
             <p className={cls.emptyState} style={{ padding: 24 }}>
-              Нет активных диалогов.
+              There are no active dialogs.
             </p>
           ) : (
             <div className={cls.threadList}>
               {threads.map((thread) => {
-                const name = thread.counterpartName?.trim() || "Мастер";
+                const name = thread.counterpartName?.trim() || "Master";
                 const avatar = thread.counterpartAvatarUrl?.trim();
                 const timeLabel = formatThreadLastTime(thread.lastAt);
                 return (
@@ -165,7 +165,7 @@ export const MessagesListPage: React.FC = () => {
                           {thread.unreadCount > 0 ? <span className={cls.threadUnread}>{thread.unreadCount}</span> : null}
                         </div>
                       </div>
-                      <div className={cls.threadPreviewLine}>{thread.preview || "Нет сообщений"}</div>
+                      <div className={cls.threadPreviewLine}>{thread.preview || "No messages"}</div>
                     </div>
                   </Link>
                 );

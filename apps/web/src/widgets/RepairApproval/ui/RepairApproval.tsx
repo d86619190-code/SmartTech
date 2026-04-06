@@ -28,7 +28,7 @@ export const RepairApproval: React.FC<RepairApprovalProps> = ({
     <div className={cls.root}>
       <section className={cls.section} aria-labelledby="diag-problem">
         <h2 id="diag-problem" className={cls.sectionTitle}>
-          Описание поломки
+          Description of the breakdown
         </h2>
         <p className={cls.problem}>{order.diagnosisProblem}</p>
         {order.diagnosisDetail ? (
@@ -38,9 +38,9 @@ export const RepairApproval: React.FC<RepairApprovalProps> = ({
 
       <section className={cls.section} aria-labelledby="repair-options">
         <h2 id="repair-options" className={cls.sectionTitle}>
-          Выбор варианта ремонта
+          Selecting a repair option
         </h2>
-        <p className={cls.hintTop}>Срок зависит от наличия детали</p>
+        <p className={cls.hintTop}>The period depends on the availability of the part</p>
         <ul className={cls.options}>
           {options.map((opt: RepairQuoteOption) => {
             const selected = opt.id === selectedId;
@@ -57,22 +57,22 @@ export const RepairApproval: React.FC<RepairApprovalProps> = ({
                       <span className={cls.optionTitle}>{opt.title}</span>
                       {opt.subtitle ? <span className={cls.optionSub}>{opt.subtitle}</span> : null}
                       <div className={cls.metaRow}>
-                        {opt.isOriginal ? <span className={cls.badge}>Оригинал</span> : null}
+                        {opt.isOriginal ? <span className={cls.badge}>Original</span> : null}
                         <span className={cls.stock}>
                           {opt.availability === "in_stock"
-                            ? "В наличии"
+                            ? "In stock"
                             : opt.orderLeadDays != null
-                              ? `Под заказ (${opt.orderLeadDays} дн.)`
-                              : "Под заказ"}
+                              ? `To order (${opt.orderLeadDays} days)`
+                              : "To order"}
                         </span>
                       </div>
                       {opt.repairDaysLabel ? (
-                        <span className={cls.leadTime}>Срок ремонта: {opt.repairDaysLabel}</span>
+                        <span className={cls.leadTime}>Repair time: {opt.repairDaysLabel}</span>
                       ) : null}
                       {!opt.isOriginal ? (
                         <p className={cls.disclaimer}>
-                          Деталь не является оригинальной. Возможны отличия в цветопередаче или яркости; на
-                          производительность это не влияет.
+                          The part is not original. There may be differences in color or brightness; on
+                          This does not affect performance.
                         </p>
                       ) : null}
                     </div>
@@ -89,15 +89,15 @@ export const RepairApproval: React.FC<RepairApprovalProps> = ({
           disabled={!selectedId}
           onClick={() => selectedId && onConfirmOption(selectedId)}
         >
-          Подтвердить выбор
+          Confirm selection
         </Button>
       </section>
 
       <div className={cls.decline}>
         <Button type="button" variant="outline" fullWidth onClick={onDeclinePayDiagnostic}>
-          Отказаться от ремонта (оплатить диагностику {formatRub(fee)})
+          Refuse repair (pay for diagnostics {formatRub(fee)})
         </Button>
-        <p className={cls.hint}>После оплаты диагностики заберёте устройство без ремонта.</p>
+        <p className={cls.hint}>After paying for the diagnostics, you will pick up the device without repair.</p>
       </div>
     </div>
   );

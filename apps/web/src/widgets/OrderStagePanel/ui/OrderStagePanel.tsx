@@ -24,12 +24,12 @@ export const OrderStagePanel: React.FC<OrderStagePanelProps> = ({ order, selecte
     return (
       <div className={cls.panel}>
         <p className={cls.lead}>
-          Заявка создана. Пожалуйста, передайте устройство в сервисный центр по адресу:{" "}
+          The application has been created. Please send the device to the service center at:{" "}
           <strong>{SITE.address}</strong>
         </p>
         <div className={cls.row}>
           <Button type="button" variant="outline" onClick={() => window.open(`tel:${SITE.phoneTel}`)}>
-            Связаться
+            Contact
           </Button>
         </div>
       </div>
@@ -39,7 +39,7 @@ export const OrderStagePanel: React.FC<OrderStagePanelProps> = ({ order, selecte
   if (step === "diagnostics") {
     return (
       <div className={cls.panel}>
-        <p className={cls.lead}>Устройство находится на диагностике.</p>
+        <p className={cls.lead}>The device is undergoing diagnostics.</p>
       </div>
     );
   }
@@ -47,9 +47,9 @@ export const OrderStagePanel: React.FC<OrderStagePanelProps> = ({ order, selecte
   if (step === "awaiting_approval") {
     return (
       <div className={cls.panel}>
-        <p className={cls.lead}>Требуется согласовать вариант ремонта и стоимость.</p>
+        <p className={cls.lead}>It is necessary to agree on the repair option and cost.</p>
         <Link to={`/orders/${order.id}/approval`} className={cls.linkBtn}>
-          Перейти к согласованию →
+          Go to approval →
         </Link>
       </div>
     );
@@ -58,16 +58,16 @@ export const OrderStagePanel: React.FC<OrderStagePanelProps> = ({ order, selecte
   if (step === "in_repair") {
     return (
       <div className={cls.panel}>
-        <p className={cls.lead}>Устройство ремонтируется.</p>
+        <p className={cls.lead}>The device is being repaired.</p>
         <ul className={cls.list}>
           <li>
-            <strong>Тип детали:</strong> {selectedTitle ?? "—"}
+            <strong>Part Type:</strong>{selectedTitle ??"—"}
           </li>
           <li>
-            <strong>Итоговая стоимость:</strong> {formatRub(order.finalPriceRub)}
+            <strong>Final cost:</strong>{formatRub(order.finalPriceRub)}
           </li>
           <li>
-            <strong>Проблема:</strong> {order.issueSummary}
+            <strong>Issue:</strong>{order.issueSummary}
           </li>
         </ul>
       </div>
@@ -77,7 +77,7 @@ export const OrderStagePanel: React.FC<OrderStagePanelProps> = ({ order, selecte
   if (step === "ready") {
     return (
       <div className={cls.panel}>
-        <p className={cls.lead}>Устройство отремонтировано и готово к выдаче.</p>
+        <p className={cls.lead}>The device has been repaired and is ready for pickup.</p>
       </div>
     );
   }
@@ -85,7 +85,7 @@ export const OrderStagePanel: React.FC<OrderStagePanelProps> = ({ order, selecte
   if (step === "completed") {
     return (
       <div className={cls.panel}>
-        <p className={cls.lead}>Заказ завершён. Возвращайтесь к нам снова!</p>
+        <p className={cls.lead}>The order is completed. Come back to us again!</p>
       </div>
     );
   }

@@ -5,7 +5,7 @@ const DOT_COUNT = 8;
 
 type BrandSpinnerProps = {
   size?: "sm" | "md" | "lg";
-  /** На тёмном фоне админки/канваса */
+  /** On a dark background of the admin panel/canvas */
   onDarkCanvas?: boolean;
   className?: string;
   "aria-label"?: string;
@@ -15,7 +15,7 @@ export const BrandSpinner: React.FC<BrandSpinnerProps> = ({
   size = "md",
   onDarkCanvas,
   className,
-  "aria-label": ariaLabel = "Загрузка",
+  "aria-label": ariaLabel = "Loading",
 }) => {
   const trackClass = size === "sm" ? cls.trackSm : size === "lg" ? cls.trackLg : cls.trackMd;
   return (
@@ -36,7 +36,7 @@ type BrandSpinnerBlockProps = BrandSpinnerProps & {
   label?: string;
 };
 
-export const BrandSpinnerBlock: React.FC<BrandSpinnerBlockProps> = ({ label = "Загрузка…", ...rest }) => {
+export const BrandSpinnerBlock: React.FC<BrandSpinnerBlockProps> = ({ label = "Loading…", ...rest }) => {
   return (
     <div className={cls.centered}>
       <BrandSpinner size="lg" {...rest} />

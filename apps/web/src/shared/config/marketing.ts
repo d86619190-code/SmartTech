@@ -1,18 +1,18 @@
-/** Маркетинговый контент по ТЗ (лендинг, процесс, отзывы) */
+/** Marketing content according to technical requirements (landing page, process, reviews) */
 
 export const HERO = {
-  title: "Ремонт телефонов, планшетов и ноутбуков за 1 день с гарантией до 1 года.",
-  subtitle: "Сам выбери стоимость и следи за ремонтом в реальном времени.",
+  title: "Repair of phones, tablets and laptops in 1 day with a guarantee of up to 1 year.",
+  subtitle: "Choose the cost yourself and monitor the repair in real time.",
 } as const;
 
 export const BENEFITS: string[] = [
-  "Бесплатная диагностика",
-  "Мастера с опытом более 5 лет",
-  "Оплата только по факту успешного ремонта",
-  "Отслеживание ремонта 24/7 в личном кабинете",
-  "Оригинальные и проверенные запчасти",
-  "Ремонт без потери данных с официальной гарантией",
-  "Прозрачная стоимость без скрытых условий",
+  "Free diagnostics",
+  "Masters with more than 5 years of experience",
+  "Payment only upon successful repair",
+  "Repair tracking 24/7 in your personal account",
+  "Original and tested spare parts",
+  "Repair without data loss with official guarantee",
+  "Transparent cost without hidden conditions",
 ];
 
 export type ProcessStep = {
@@ -22,60 +22,60 @@ export type ProcessStep = {
   body: string;
 };
 
-/** Экран 2 — 5 шагов прозрачности */
+/** Screen 2 - 5 steps of transparency */
 export const PROCESS_STEPS: ProcessStep[] = [
   {
     n: 1,
     imageUrl:
       "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=640&h=420&fit=crop&auto=format&q=80",
-    title: "Оставляете заявку",
+    title: "Leave a request",
     body:
-      "Выберите удобный формат: оставьте заявку онлайн, дождитесь звонка или прийдите лично в сервис в удобное время с 10:00 до 20:00.",
+      "Choose a convenient format: leave a request online, wait for a call, or come to the service in person at a convenient time from 10:00 to 20:00.",
   },
   {
     n: 2,
     imageUrl:
       "https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=640&h=420&fit=crop&auto=format&q=80",
-    title: "Проводим диагностику",
+    title: "We carry out diagnostics",
     body:
-      "Полностью бесплатно проверяем устройство и точно определяем поломку и сроки ремонта. Диагностика остаётся бесплатной в любом случае — даже если вы решите отказаться от ремонта.",
+      "We check the device completely free of charge and accurately determine the breakdown and repair time. Diagnostics remain free in any case - even if you decide to refuse repairs.",
   },
   {
     n: 3,
     imageUrl:
       "https://images.unsplash.com/photo-1579621970795-87facc2f976d?w=640&h=420&fit=crop&auto=format&q=80",
-    title: "Согласовываем стоимость",
+    title: "We agree on the cost",
     body:
-      'После диагностики предлагаем несколько вариантов ремонта с разной стоимостью — в зависимости от типа запчастей. Все подробности — в разделе «Отслеживание заказа». Вы заранее видите цену и сроки, что в наличии, а что придётся подождать. Выбираете вариант и подтверждаете онлайн — без скрытых платежей.',
+      'After diagnostics, we offer several repair options with different costs, depending on the type of spare parts. All details are in the “Order Tracking” section. You see in advance the price and terms, what is in stock and what will have to wait. Choose an option and confirm online - no hidden fees.',
   },
   {
     n: 4,
     imageUrl:
       "https://images.unsplash.com/photo-1486006920555-c77dcf18193c?w=640&h=420&fit=crop&auto=format&q=80",
-    title: "Выполняем ремонт",
+    title: "We carry out repairs",
     body:
-      'Приступаем к работе только после вашего согласия. Этапы отображаются в разделе «Отслеживание заказа» — в любой момент можно проверить статус или связаться с менеджером.',
+      'We begin work only after your consent. The stages are displayed in the “Order Tracking” section - you can check the status or contact the manager at any time.',
   },
   {
     n: 5,
     imageUrl:
       "https://images.unsplash.com/photo-1586769852044-692d6e3703f0?w=640&h=420&fit=crop&auto=format&q=80",
-    title: "Возвращаем устройство",
+    title: "Returning the device",
     body:
-      "Вы получаете исправное устройство без потери данных с официальной гарантией. Оплата — только после завершения ремонта, наличными или по карте.",
+      "You receive a working device without data loss with an official guarantee. Payment is only after completion of the repair, in cash or by card.",
   },
 ];
 
 export const GUARANTEE = {
-  title: "Гарантия на каждый ремонт",
-  subtitle: "Каждую работу фиксируем документально. Вы знаете срок гарантии заранее и получаете подтверждение на руки.",
+  title: "Guarantee for every repair",
+  subtitle: "We document every job. You know the warranty period in advance and receive confirmation in your hands.",
   imageUrl:
     "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&h=640&fit=crop&auto=format&q=80",
   items: [
-    "Дисплей — до 24 месяцев",
-    "Разъём питания — до 6 месяцев",
-    "Аккумулятор — до 12 месяцев",
-    "Стекло и тачскрин — до 12 месяцев",
+    "Display - up to 24 months",
+    "Power socket - up to 6 months",
+    "Battery - up to 12 months",
+    "Glass and touchscreen - up to 12 months",
   ],
 } as const;
 
@@ -90,26 +90,26 @@ export const REVIEWS: ReviewCard[] = [
   {
     id: "r1",
     rating: 5,
-    name: "Анна",
-    text: "Заменили экран за день, по цене всё прозрачно объяснили. Рекомендую.",
+    name: "Anna",
+    text: "They replaced the screen in a day, and everything was explained transparently about the price. I recommend it.",
   },
   {
     id: "r2",
     rating: 5,
-    name: "Михаил",
-    text: "Диагностика бесплатно, согласовали ремонт онлайн — без навязчивых звонков.",
+    name: "Michael",
+    text: "Diagnostics is free, repairs are agreed upon online - without intrusive calls.",
   },
   {
     id: "r3",
     rating: 5,
-    name: "Елена",
-    text: "Данные сохранили, гарантийный талон выдали на месте. Очень довольна.",
+    name: "Elena",
+    text: "The data was saved and the warranty card was issued on the spot. I'm very pleased.",
   },
   {
     id: "r4",
     rating: 5,
-    name: "Дмитрий",
-    text: "Статус в приложении обновлялся, приехал забрать — всё работает.",
+    name: "Dmitry",
+    text: "The status in the application was updated, I came to pick it up - everything works.",
   },
 ];
 
@@ -117,23 +117,23 @@ export type FaqItem = { q: string; a: string };
 
 export const FAQ_ITEMS: FaqItem[] = [
   {
-    q: "Сколько длится ремонт?",
-    a: "В большинстве случаев — от нескольких часов до 1 дня. Точные сроки сообщаем после диагностики.",
+    q: "How long does the repair take?",
+    a: "In most cases - from several hours to 1 day. We will inform you about the exact timing after diagnosis.",
   },
   {
-    q: "Нужно ли платить за диагностику?",
-    a: "Нет, диагностика всегда бесплатная — даже если вы откажетесь от ремонта.",
+    q: "Do I need to pay for diagnostics?",
+    a: "No, diagnostics are always free - even if you refuse repairs.",
   },
   {
-    q: "Можно ли сохранить данные?",
-    a: "Да, мы выполняем ремонт без потери данных в большинстве случаев.",
+    q: "Is it possible to save the data?",
+    a: "Yes, we perform repairs without data loss in most cases.",
   },
   {
-    q: "Как узнать статус ремонта?",
-    a: "Вы можете отслеживать все этапы онлайн в разделе «Отслеживание заказа» или связаться с менеджером.",
+    q: "How can I find out the repair status?",
+    a: "You can track all stages online in the “Order Tracking” section or contact the manager.",
   },
   {
-    q: "Какие запчасти используются?",
-    a: "Мы предлагаем несколько вариантов: оригинальные, восстановленные или качественные аналоги — вы сами выбираете.",
+    q: "What spare parts are used?",
+    a: "We offer several options: original, refurbished or high-quality analogues - you choose.",
   },
 ];

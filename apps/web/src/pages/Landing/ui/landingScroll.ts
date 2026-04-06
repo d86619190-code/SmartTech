@@ -7,7 +7,7 @@ function motionOk(): boolean {
 }
 
 /**
- * Scroll-driven анимации в духе GSAP ScrollTrigger для нижней части лендинга.
+ * Scroll-driven animations in the spirit of GSAP ScrollTrigger for the bottom of the landing page.
  */
 export function bindLandingScroll(root: HTMLElement): () => void {
   if (!motionOk()) {
@@ -19,7 +19,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
   const ctx = gsap.context(() => {
     const q = (sel: string) => gsap.utils.toArray<HTMLElement>(root.querySelectorAll(sel));
 
-    /* Универсальные появления */
+    /* Universal appearances */
     q(`[data-gsap="reveal"]`).forEach((el) => {
       gsap.from(el, {
         scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none" },
@@ -30,9 +30,9 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       });
     });
 
-    /* Бенто: только CSS + IntersectionObserver (.inView), без GSAP — иначе инлайн opacity ломала отображение */
+    /* Bento: only CSS + IntersectionObserver (.inView), without GSAP - otherwise inline opacity would break the display */
 
-    /* Процесс: лёгкий параллакс заголовка */
+    /* Process: light header parallax */
     const processScene = root.querySelector<HTMLElement>(`.${cls.processScene}`);
     const processMassive = root.querySelector<HTMLElement>(`.${cls.processMassive}`);
     if (processScene && processMassive) {
@@ -48,7 +48,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       });
     }
 
-    /* Таймлайн процесса: линия */
+    /* Process timeline: line */
     const lineInner = root.querySelector<HTMLElement>(`.${cls.processLineInner}`);
     const timeline = root.querySelector<HTMLElement>(`.${cls.processTimeline}`);
     if (lineInner && timeline) {
@@ -68,7 +68,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       );
     }
 
-    /* Узлы процесса */
+    /* Process nodes */
     q(`[data-gsap="process-node"]`).forEach((el, i) => {
       gsap.from(el, {
         scrollTrigger: { trigger: el, start: "top 86%" },
@@ -79,7 +79,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       });
     });
 
-    /* Гарантия: параллакс фона */
+    /* Guarantee: background parallax */
     const gBg = root.querySelector<HTMLElement>(`.${cls.guaranteeBg}`);
     const gSec = root.querySelector<HTMLElement>(`.${cls.guarantee}`);
     if (gBg && gSec) {
@@ -95,7 +95,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       });
     }
 
-    /* Панель гарантии */
+    /* Warranty panel */
     const gPanel = root.querySelector<HTMLElement>(`.${cls.guaranteePanel}`);
     if (gPanel) {
       gsap.from(gPanel, {
@@ -107,7 +107,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       });
     }
 
-    /* Отзывы */
+    /* Reviews */
     const revCards = q(`[data-gsap="review"]`);
     const reviewsSec = root.querySelector<HTMLElement>(`.${cls.reviews}`);
     if (revCards.length && reviewsSec) {
@@ -121,7 +121,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       });
     }
 
-    /* FAQ карточки */
+    /* FAQ cards */
     const faqCards = q(`[data-gsap="faq-card"]`);
     if (faqCards.length) {
       gsap.from(faqCards, {
@@ -134,7 +134,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       });
     }
 
-    /* Заголовок FAQ */
+    /* FAQ title */
     const faqHead = root.querySelector<HTMLElement>(`.${cls.faqTitleBlock}`);
     if (faqHead) {
       const faqHeadEls = [
@@ -153,7 +153,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       });
     }
 
-    /* Контакт: рамка и декор */
+    /* Contact: frame and decor */
     const leadFrame = root.querySelector<HTMLElement>(`.${cls.leadFrame}`);
     if (leadFrame) {
       gsap.from(leadFrame, {
@@ -176,7 +176,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       });
     }
 
-    /* Карта */
+    /* Map */
     const mapFrame = root.querySelector<HTMLElement>(`.${cls.locationFrame}`);
     if (mapFrame) {
       gsap.from(mapFrame, {
@@ -188,7 +188,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       });
     }
 
-    /* Футер */
+    /* Footer */
     const foot = root.querySelector<HTMLElement>(`.${cls.footer}`);
     if (foot) {
       gsap.from(foot.querySelectorAll(`.${cls.footerReveal}`), {
@@ -201,7 +201,7 @@ export function bindLandingScroll(root: HTMLElement): () => void {
       });
     }
 
-    /* Лента */
+    /* Ribbon */
     const tape = root.querySelector<HTMLElement>(`.${cls.tape}`);
     if (tape) {
       gsap.from(tape, {

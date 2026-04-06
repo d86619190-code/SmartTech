@@ -24,18 +24,18 @@ export const TechMessagesPage: React.FC = () => {
   }, [load]);
   return (
     <>
-      <TechPageHeader title="Сообщения" subtitle="Переписка с клиентами по заказам." />
+      <TechPageHeader title="Messages" subtitle="Correspondence with customers regarding orders." />
       <TechCard style={{ padding: 0 }}>
         <div className={cls.threadList}>
           {loading ? (
             <div className={cls.threadItem} style={{ pointerEvents: "none" }}>
               <p className={cls.p} style={{ padding: "4px 0" }}>
-                Загрузка…
+                Loading…
               </p>
             </div>
           ) : threads.length === 0 ? (
             <p className={cls.p} style={{ padding: 20 }}>
-              Нет диалогов.
+              No dialogue.
             </p>
           ) : (
             threads.map((t) => (

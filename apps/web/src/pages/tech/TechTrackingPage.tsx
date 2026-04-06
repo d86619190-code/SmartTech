@@ -34,7 +34,7 @@ export const TechTrackingPage: React.FC = () => {
   if (!baseJob) {
     return (
       <>
-        <TechPageHeader title="Этапы ремонта" subtitle="Загрузка…" />
+        <TechPageHeader title="Repair stages" subtitle="Loading…" />
         <SkeletonCard rows={5} />
       </>
     );
@@ -50,7 +50,7 @@ export const TechTrackingPage: React.FC = () => {
           new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = () => resolve(String(reader.result ?? ""));
-            reader.onerror = () => reject(new Error("Не удалось прочитать файл"));
+            reader.onerror = () => reject(new Error("Failed to read file"));
             reader.readAsDataURL(f);
           }),
       ),
@@ -64,9 +64,9 @@ export const TechTrackingPage: React.FC = () => {
       const res = await techApi.saveStage(baseJob.id, current);
       setBaseJob(res.repair);
       setStage(null);
-      showToast("success", "Этап сохранён — клиент увидит обновление");
+      showToast("success", "The stage is saved - the client will see the update");
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось сохранить этап";
+      const msg = e instanceof Error ? e.message : "Failed to save stage";
       showToast("error", msg);
     } finally {
       setSaving(false);
@@ -76,7 +76,7 @@ export const TechTrackingPage: React.FC = () => {
   const addProgress = async () => {
     const title = entryTitle.trim();
     if (!title) {
-      showToast("error", "Укажите название подпункта");
+      showToast("error", "Specify the name of the sub-item");
       return;
     }
     setSaving(true);
@@ -92,9 +92,9 @@ export const TechTrackingPage: React.FC = () => {
       setEntryTitle("");
       setEntryDescription("");
       setEntryPhotos([]);
-      showToast("success", "Подпункт добавлен в историю");
+      showToast("success", "Sub-item added to history");
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось добавить подпункт";
+      const msg = e instanceof Error ? e.message : "Failed to add subitem";
       showToast("error", msg);
     } finally {
       setSaving(false);
@@ -105,51 +105,51 @@ export const TechTrackingPage: React.FC = () => {
 
   return (
     <>
-      <TechPageHeader title="Этапы ремонта" subtitle="Обновление статуса для клиента и администрации." />
+      <TechPageHeader title="Repair stages" subtitle="Status update for client and administration." />
       <TechCard style={{ padding: 24, marginBottom: 20 }}>
         <TechTimeline stage={current} />
         <div style={{ marginTop: 24, maxWidth: 360 }}>
-          <AdminSelect label="Текущий этап" value={current} onChange={(e) => setStage(e.target.value as TechRepairStage)}>
-            <option value="accepted">Принято</option>
-            <option value="diagnostics">Диагностика</option>
-            <option value="waiting_approval">Согласование</option>
-            <option value="repair">Ремонт</option>
-            <option value="ready">Готово</option>
-            <option value="completed">Выдано</option>
+          <AdminSelect label="Current stage" value={current} onChange={(e) => setStage(e.target.value as TechRepairStage)}>
+            <option value="accepted">Accepted</option>
+            <option value="diagnostics">Diagnostics</option>
+            <option value="waiting_approval">Coordination</option>
+            <option value="repair">Repair</option>
+            <option value="ready">Ready</option>
+            <option value="completed">Issued</option>
           </AdminSelect>
         </div>
       </TechCard>
       <TechCard style={{ padding: 20, marginBottom: 20 }}>
-        <h3 className={cls.sectionTitle}>Подпункты этапа и фото</h3>
+        <h3 className={cls.sectionTitle}>Stage sub-items and photos</h3>
         <div style={{ display: "grid", gap: 10 }}>
           <label>
-            <span className={cls.muted}>Тип записи</span>
+            <span className={cls.muted}>Record type</span>
             <AdminSelect value={entryKind} onChange={(e) => setEntryKind(e.target.value as "stage" | "substep")}>
-              <option value="substep">Подпункт</option>
-              <option value="stage">Ключевое обновление этапа</option>
+              <option value="substep">Sub-clause</option>
+              <option value="stage">Key Stage Update</option>
             </AdminSelect>
           </label>
           <label>
-            <span className={cls.muted}>Название</span>
+            <span className={cls.muted}>Name</span>
             <input
               value={entryTitle}
               onChange={(e) => setEntryTitle(e.target.value)}
-              placeholder="Например: Проверка цепи питания"
+              placeholder="For example: Checking the power circuit"
               style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid var(--color-order-row-border)" }}
             />
           </label>
           <label>
-            <span className={cls.muted}>Описание</span>
+            <span className={cls.muted}>Description</span>
             <textarea
               value={entryDescription}
               onChange={(e) => setEntryDescription(e.target.value)}
               rows={3}
-              placeholder="Что сделали, что нашли, что дальше"
+              placeholder="What did you do, what did you find, what’s next?"
               style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid var(--color-order-row-border)", resize: "vertical" }}
             />
           </label>
           <label>
-            <span className={cls.muted}>Фото</span>
+            <span className={cls.muted}>Photo</span>
             <input type="file" accept="image/*" multiple onChange={(e) => void onPickPhotos(e.target.files)} />
           </label>
           {entryPhotos.length > 0 ? (
@@ -160,25 +160,25 @@ export const TechTrackingPage: React.FC = () => {
             </div>
           ) : null}
           <Button type="button" variant="outline" onClick={() => void addProgress()} disabled={saving}>
-            Добавить в историю
+            Add to story
           </Button>
         </div>
       </TechCard>
       <TechCard style={{ padding: 20, marginBottom: 20 }}>
-        <h3 className={cls.sectionTitle}>Хронология работ по этапам</h3>
+        <h3 className={cls.sectionTitle}>Chronology of work by stages</h3>
         {progressLog.length === 0 ? (
-          <p className={cls.p}>Записей пока нет.</p>
+          <p className={cls.p}>There are no entries yet.</p>
         ) : (
           <div style={{ display: "grid", gap: 14 }}>
             {(["accepted", "diagnostics", "repair", "ready", "completed"] as const).map((stageKey) => {
               const items = progressLog.filter((x: any) => x.stage === stageKey);
               if (!items.length) return null;
               const titleMap: Record<string, string> = {
-                accepted: "Принято",
-                diagnostics: "Диагностика — подпункты",
-                repair: "Работа / ремонт — подпункты",
-                ready: "Готово",
-                completed: "Выдано",
+                accepted: "Accepted",
+                diagnostics: "Diagnostics - sub-items",
+                repair: "Work/repair - sub-items",
+                ready: "Ready",
+                completed: "Issued",
               };
               return (
                 <details key={stageKey} open>
@@ -195,7 +195,7 @@ export const TechTrackingPage: React.FC = () => {
                           <strong>{item.title}</strong> · {item.atLabel}
                         </p>
                         <p className={cls.muted}>
-                          {item.kind === "stage" ? "Этап" : "Подпункт"} · {item.stage}
+                          {item.kind === "stage" ? "Stage" : "Sub-clause"} · {item.stage}
                         </p>
                         {item.description ? <p className={cls.p} style={{ marginTop: 6 }}>{item.description}</p> : null}
                         {Array.isArray(item.photoDataUrls) && item.photoDataUrls.length ? (
@@ -232,10 +232,10 @@ export const TechTrackingPage: React.FC = () => {
         )}
       </TechCard>
       <Button type="button" onClick={() => void save()} disabled={saving}>
-        {saving ? "Сохранение…" : "Сохранить этап"}
+        {saving ? "Saving…" : "Save stage"}
       </Button>
       <Link className={cls.link} to={`/tech/repairs/${baseJob.id}`} style={{ marginLeft: 16 }}>
-        К карточке
+        To the card
       </Link>
       {toast ? <StatusToast tone={toast.tone} message={toast.message} onClose={closeToast} /> : null}
     </>

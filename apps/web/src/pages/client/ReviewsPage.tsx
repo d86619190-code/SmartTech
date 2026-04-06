@@ -6,7 +6,7 @@ import cls from "./clientPages.module.css";
 export const ReviewsPage: React.FC = () => {
   return (
     <div className={cls.shell}>
-      <PageHeader title="Отзывы" subtitle="Что говорят клиенты о сервисе." />
+      <PageHeader title="Reviews" subtitle="What clients say about the service." />
       <div className={[cls.body, cls.bodyWide].join(" ")}>
         <div className={cls.reviewGrid}>
           {REVIEWS.map((r) => (

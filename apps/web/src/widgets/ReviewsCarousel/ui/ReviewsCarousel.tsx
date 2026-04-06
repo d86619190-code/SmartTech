@@ -17,10 +17,10 @@ export const ReviewsCarousel: React.FC<ReviewsCarouselProps> = ({ reviews, varia
     >
       <div className={cls.head}>
         <h2 id="reviews-heading" className={cls.title}>
-          Отзывы
+          Reviews
         </h2>
         <Button type="button" variant="outline" onClick={() => window.open(SITE.yandexReviewsUrl, "_blank")}>
-          Смотреть все отзывы
+          View all reviews
         </Button>
       </div>
       <div className={cls.strip} role="list">

@@ -21,7 +21,7 @@ export const AdminPricingPage: React.FC = () => {
         setRows(res.rows as AdminPriceRow[]);
         setInitial(res.rows as AdminPriceRow[]);
       } catch (e) {
-        showToast("error", e instanceof Error ? e.message : "Не удалось загрузить прайс");
+        showToast("error", e instanceof Error ? e.message : "Failed to load price list");
       }
     })();
   }, [showToast]);
@@ -38,7 +38,7 @@ export const AdminPricingPage: React.FC = () => {
 
   const save = async () => {
     if (!dirty) {
-      showToast("info", "Нет изменений для сохранения");
+      showToast("info", "No changes to save");
       return;
     }
     try {
@@ -47,9 +47,9 @@ export const AdminPricingPage: React.FC = () => {
       setRows(res.rows as AdminPriceRow[]);
       setInitial(res.rows as AdminPriceRow[]);
       setDirty(false);
-      showToast("success", "Прайс сохранён");
+      showToast("success", "Price saved");
     } catch (e) {
-      showToast("error", e instanceof Error ? e.message : "Не удалось сохранить прайс");
+      showToast("error", e instanceof Error ? e.message : "Failed to save price");
     } finally {
       setSaving(false);
     }
@@ -58,8 +58,8 @@ export const AdminPricingPage: React.FC = () => {
   return (
     <>
       <AdminPageHeader
-        title="Прайс и наценки"
-        subtitle="Структура работ и запчастей по категориям устройств."
+        title="Price and markups"
+        subtitle="Structure of work and spare parts by device category."
         actions={
           <>
             <Button
@@ -80,28 +80,28 @@ export const AdminPricingPage: React.FC = () => {
                 setDirty(true);
               }}
             >
-              Добавить строку
+              Add line
             </Button>
             <Button type="button" variant="outline" onClick={reset} disabled={saving || !dirty}>
-              Отменить
+              Cancel
             </Button>
             <Button type="button" onClick={() => void save()} disabled={saving}>
-              {saving ? "Сохранение..." : "Сохранить"}
+              {saving ? "Saving..." : "Save"}
             </Button>
           </>
         }
       />
       <AdminCard>
         <div style={{ padding: "8px 8px 0", fontSize: 13, color: "var(--color-text-muted)" }}>
-          {dirty ? "Есть несохранённые изменения." : "Измените любое поле и нажмите «Сохранить»."}
+          {dirty ? "There are unsaved changes." : 'Change any field and click "Save".'}
         </div>
         <div className={cls.priceHead}>
-          <span>Категория</span>
-          <span>Устройства</span>
-          <span>Услуга</span>
-          <span>Работа, ₽</span>
-          <span>Запчасть от, ₽</span>
-          <span>Ориентир</span>
+          <span>Category</span>
+          <span>Devices</span>
+          <span>Service</span>
+          <span>Work, ₽</span>
+          <span>Spare part from, ₽</span>
+          <span>Guideline</span>
         </div>
         {rows.map((row) => (
           <div key={row.id} className={cls.priceRow}>
@@ -120,7 +120,7 @@ export const AdminPricingPage: React.FC = () => {
               value={String(row.partsFromRub)}
               onChange={(e) => update(row.id, { partsFromRub: Number(e.target.value.replace(/\D/g, "")) || 0 })}
             />
-            <span className={cls.hint}>{formatRub(row.laborRub + row.partsFromRub)} суммарно от</span>
+            <span className={cls.hint}>{formatRub(row.laborRub + row.partsFromRub)} total from</span>
           </div>
         ))}
       </AdminCard>

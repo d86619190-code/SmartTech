@@ -55,7 +55,7 @@ async function parseError(res: Response): Promise<string> {
     return normalizeAuthRequiredMessage(base);
   }
   if (res.status === 400 && /google|oauth|origin|credential/i.test(base)) {
-    return `${base}. Попробуйте открыть сайт в обычном Chrome/Safari (не во встроенном браузере), затем повторите вход.`;
+    return `${base}. Try opening the site in regular Chrome/Safari (not the built-in browser), then sign in again.`;
   }
   return base;
 }

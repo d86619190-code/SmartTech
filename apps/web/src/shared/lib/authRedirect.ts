@@ -53,11 +53,11 @@ export function redirectToLoginForAuthMissing(nextPath?: string): void {
 }
 
 export function isAuthRequiredMessage(message: string): boolean {
-  return /Требуется\s+авторизация/i.test(message);
+  return /Required\s+authorization/i.test(message);
 }
 
 export function normalizeAuthRequiredMessage(message: string): string {
-  if (isAuthRequiredMessage(message)) return "Нужна авторизация";
+  if (isAuthRequiredMessage(message)) return "Authorization required";
   return message;
 }
 

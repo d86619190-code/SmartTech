@@ -79,7 +79,7 @@ export const TechIntroOverlay: React.FC<Props> = ({ onDone }) => {
       className={[cls.root, exiting ? cls.exit : "", booting ? cls.booting : cls.loaded].filter(Boolean).join(" ")}
       role="dialog"
       aria-modal="true"
-      aria-label="Заставка"
+      aria-label="Screensaver"
       aria-busy={booting}
     >
       <div className={cls.bgGrid} aria-hidden />
@@ -135,11 +135,11 @@ export const TechIntroOverlay: React.FC<Props> = ({ onDone }) => {
 
       {booting ? (
         <div className={cls.bootPanel}>
-          <div className={cls.bootLabel}>СИНХРОНИЗАЦИЯ</div>
+          <div className={cls.bootLabel}>SYNCHRONIZATION</div>
           <div className={cls.bootBarWrap} aria-hidden>
             <div className={cls.bootBar} />
           </div>
-          <p className={cls.bootHint}>Подготовка визуала и канала до / после</p>
+          <p className={cls.bootHint}>Preparation of visual and channel before / after</p>
         </div>
       ) : (
         <>
@@ -163,12 +163,12 @@ export const TechIntroOverlay: React.FC<Props> = ({ onDone }) => {
             const { delay, ...place } = pos;
             return <span key={i} className={cls.spark} style={{ ...place, animationDelay: delay }} aria-hidden />;
           })}
-          <p className={cls.sub}>ремонт · прозрачность · скорость</p>
+          <p className={cls.sub}>repair · transparency · speed</p>
         </>
       )}
 
       <button type="button" className={cls.skip} onClick={finish}>
-        Пропустить
+        Skip
       </button>
     </div>
   );

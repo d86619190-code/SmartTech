@@ -14,11 +14,11 @@ import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
 import cls from "./adminPages.module.css";
 
 const ROLE_OPTS: { value: "all" | Role; label: string }[] = [
-  { value: "all", label: "Все роли" },
-  { value: "client", label: "Клиент" },
-  { value: "master", label: "Мастер" },
-  { value: "admin", label: "Админ" },
-  { value: "boss", label: "Босс" },
+  { value: "all", label: "All roles" },
+  { value: "client", label: "Client" },
+  { value: "master", label: "Master" },
+  { value: "admin", label: "Admin" },
+  { value: "boss", label: "Boss" },
 ];
 
 export const AdminUsersPage: React.FC = () => {
@@ -35,7 +35,7 @@ export const AdminUsersPage: React.FC = () => {
         const rows = await listAdminUsersApi();
         if (mounted) setUsers(rows);
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Не удалось загрузить пользователей";
+        const msg = e instanceof Error ? e.message : "Failed to load users";
         showToast("error", msg);
       }
     };
@@ -59,9 +59,9 @@ export const AdminUsersPage: React.FC = () => {
     try {
       const updated = await setAdminUserRoleApi(userId, nextRole);
       setUsers((prev) => prev.map((u) => (u.id === userId ? updated : u)));
-      showToast("success", "Роль обновлена");
+      showToast("success", "Role updated");
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось обновить роль";
+      const msg = e instanceof Error ? e.message : "Failed to update role";
       showToast("error", msg);
     } finally {
       setBusyId(null);
@@ -70,9 +70,9 @@ export const AdminUsersPage: React.FC = () => {
 
   return (
     <>
-      <AdminPageHeader title="Пользователи и роли" subtitle="Управление уровнями доступа зарегистрированных пользователей." />
+      <AdminPageHeader title="Users and roles" subtitle="Manage access levels of registered users." />
       <FilterBar>
-        <AdminInput placeholder="Поиск по имени, телефону, email…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <AdminInput placeholder="Search by name, phone, email..." value={q} onChange={(e) => setQ(e.target.value)} />
         <AdminSelect value={role} onChange={(e) => setRole(e.target.value as "all" | Role)}>
           {ROLE_OPTS.map((o) => (
             <option key={o.value} value={o.value}>
@@ -84,17 +84,17 @@ export const AdminUsersPage: React.FC = () => {
       <AdminTable>
         <thead>
           <tr>
-            <AdminTh>Клиент</AdminTh>
-            <AdminTh>Контакты</AdminTh>
-            <AdminTh>Текущая роль</AdminTh>
-            <AdminTh>Выдать роль</AdminTh>
+            <AdminTh>Client</AdminTh>
+            <AdminTh>Contacts</AdminTh>
+            <AdminTh>Current Role</AdminTh>
+            <AdminTh>Issue role</AdminTh>
           </tr>
         </thead>
         <tbody>
           {rows.map((u) => (
             <tr key={u.id}>
               <AdminTd>
-                <strong>{u.name ?? "Пользователь"}</strong>
+                <strong>{u.name ?? "User"}</strong>
               </AdminTd>
               <AdminTd>
                 <div>{u.phone ?? "—"}</div>

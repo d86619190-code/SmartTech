@@ -42,7 +42,7 @@ export const TechRepairDetailPage: React.FC = () => {
   if (!job) {
     return (
       <>
-        <TechPageHeader title="Карточка ремонта" subtitle="Загрузка…" />
+        <TechPageHeader title="Repair card" subtitle="Loading…" />
         <SkeletonCard rows={6} />
       </>
     );
@@ -58,29 +58,29 @@ export const TechRepairDetailPage: React.FC = () => {
         actions={
           <Link to={messagesHref} style={{ textDecoration: "none" }}>
             <Button type="button" variant="outline">
-              Написать клиенту
+              Write to the client
             </Button>
           </Link>
         }
       />
       <div className={cls.subNav}>
         <NavLink className={({ isActive }) => [cls.subLink, isActive && cls.subLinkActive].filter(Boolean).join(" ")} end to={base}>
-          Обзор
+          Review
         </NavLink>
         <NavLink className={({ isActive }) => [cls.subLink, isActive && cls.subLinkActive].filter(Boolean).join(" ")} to={`${base}/diagnostics`}>
-          Диагностика
+          Diagnostics
         </NavLink>
         <NavLink className={({ isActive }) => [cls.subLink, isActive && cls.subLinkActive].filter(Boolean).join(" ")} to={`${base}/price`}>
-          Стоимость
+          Price
         </NavLink>
         <NavLink className={({ isActive }) => [cls.subLink, isActive && cls.subLinkActive].filter(Boolean).join(" ")} to={`${base}/approval`}>
-          Согласование
+          Coordination
         </NavLink>
         <NavLink className={({ isActive }) => [cls.subLink, isActive && cls.subLinkActive].filter(Boolean).join(" ")} to={`${base}/tracking`}>
-          Этапы
+          Stages
         </NavLink>
         <NavLink className={({ isActive }) => [cls.subLink, isActive && cls.subLinkActive].filter(Boolean).join(" ")} to={`${base}/parts`}>
-          Запчасти
+          Spare parts
         </NavLink>
       </div>
       <TechCard style={{ padding: 24, marginBottom: 20 }}>
@@ -99,7 +99,7 @@ export const TechRepairDetailPage: React.FC = () => {
         <TechTimeline stage={job.stage} />
         {Array.isArray(job.photoUrls) && job.photoUrls.length > 0 ? (
           <div style={{ marginTop: 20 }}>
-            <p className={cls.blockTitle}>Фото с диагностики</p>
+            <p className={cls.blockTitle}>Photos from diagnostics</p>
             <div className={cls.photoGrid}>
               {job.photoUrls.map((url: string, i: number) => (
                 <div key={`${i}-${url.slice(0, 24)}`} className={cls.photoCell}>
@@ -112,7 +112,7 @@ export const TechRepairDetailPage: React.FC = () => {
                       downloadDataUrl(url, `repair-photo-${i + 1}.${ext}`);
                     }}
                   >
-                    Сохранить на устройство
+                    Save to device
                   </button>
                 </div>
               ))}
@@ -121,19 +121,19 @@ export const TechRepairDetailPage: React.FC = () => {
         ) : null}
         <div style={{ marginTop: 20, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 12 }}>
           <div>
-            <span className={cls.muted}>Работа</span>
+            <span className={cls.muted}>Job</span>
             <p className={cls.p}>
               <strong>{formatRub(job.laborRub)}</strong>
             </p>
           </div>
           <div>
-            <span className={cls.muted}>Запчасти</span>
+            <span className={cls.muted}>Spare parts</span>
             <p className={cls.p}>
               <strong>{formatRub(job.partsRub)}</strong>
             </p>
           </div>
           <div>
-            <span className={cls.muted}>Ориентир по времени</span>
+            <span className={cls.muted}>Time reference</span>
             <p className={cls.p}>
               <strong>{job.etaHours} ч</strong>
             </p>
@@ -141,12 +141,12 @@ export const TechRepairDetailPage: React.FC = () => {
         </div>
         {job.deadline ? (
           <p className={cls.muted} style={{ marginTop: 12 }}>
-            Дедлайн: {job.deadline}
+            Deadline: {job.deadline}
           </p>
         ) : null}
       </TechCard>
       <Link className={cls.link} to="/tech/tasks">
-        ← Все задачи
+        ← All tasks
       </Link>
     </>
   );

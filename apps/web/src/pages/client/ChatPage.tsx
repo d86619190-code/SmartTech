@@ -85,7 +85,7 @@ export const ChatPage: React.FC = () => {
         setMessages(data);
         await markOrderMessagesReadApi(orderId);
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Не удалось загрузить чат";
+        const msg = e instanceof Error ? e.message : "Failed to load chat";
         showToast("error", msg);
       } finally {
         if (mounted) setLoading(false);
@@ -123,12 +123,12 @@ export const ChatPage: React.FC = () => {
       setRatingBusy(true);
       try {
         await rateClientOrderApi(orderId, stars);
-        showToast("success", "Спасибо за оценку");
+        showToast("success", "Thanks for your rating");
         await reloadMeta();
         const data = await getOrderMessagesApi(orderId);
         setMessages(data);
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Не удалось сохранить оценку";
+        const msg = e instanceof Error ? e.message : "Failed to save rating";
         showToast("error", msg);
       } finally {
         setRatingBusy(false);
@@ -148,7 +148,7 @@ export const ChatPage: React.FC = () => {
       setText("");
       setPendingAttachment(null);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось отправить сообщение";
+      const msg = e instanceof Error ? e.message : "Failed to send message";
       showToast("error", msg);
     } finally {
       setSending(false);
@@ -162,7 +162,7 @@ export const ChatPage: React.FC = () => {
       const first = picked[0];
       if (first) setPendingAttachment({ name: first.file.name, dataUrl: first.dataUrl });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось выбрать файл";
+      const msg = e instanceof Error ? e.message : "Failed to select file";
       showToast("error", msg);
     } finally {
       setPicking(false);
@@ -170,14 +170,14 @@ export const ChatPage: React.FC = () => {
   };
 
   const masterName = React.useMemo(
-    () => messages.find((m) => m.from === "service")?.senderName ?? "Сервис",
+    () => messages.find((m) => m.from === "service")?.senderName ?? "Service",
     [messages],
   );
   const masterAvatar = React.useMemo(
     () => messages.find((m) => m.from === "service")?.senderAvatarUrl,
     [messages],
   );
-  const userName = auth?.user.name?.trim() || "Вы";
+  const userName = auth?.user.name?.trim() || "You";
   const userAvatar = auth?.user.avatarUrl?.trim() || "";
   const userAvatarSrc = userAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(userName)}`;
 
@@ -195,19 +195,19 @@ export const ChatPage: React.FC = () => {
   return (
     <div className={cls.shell}>
       <PageHeader
-        title={orderMetaLoading ? "…" : orderMeta?.deviceLabel ?? "Чат"}
+        title={orderMetaLoading ? "…" : orderMeta?.deviceLabel ?? "Chat"}
         subtitle={orderMetaLoading ? "" : `${masterName} · ${orderMeta?.issueSummary ?? ""}`}
       />
       <div className={cls.body}>
-        <Link to="/messages" className={cls.backCircle} aria-label="К списку диалогов" title="К списку диалогов">
+        <Link to="/messages" className={cls.backCircle} aria-label="To the list of dialogues" title="To the list of dialogues">
           ←
         </Link>
         {!orderMetaLoading && orderMeta ? (
-          <div className={cls.chatParticipants} aria-label="Участники чата">
+          <div className={cls.chatParticipants} aria-label="Chat participants">
             <div className={cls.participant}>
               <img className={cls.participantAvatar} src={userAvatarSrc} alt="" />
               <div>
-                <div className={cls.participantRole}>Вы</div>
+                <div className={cls.participantRole}>You</div>
                 <div className={cls.participantName}>{userName}</div>
               </div>
             </div>
@@ -219,10 +219,10 @@ export const ChatPage: React.FC = () => {
                   src={masterAvatar ?? `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(masterName)}`}
                   alt=""
                 />
-                {masterOnlineDot ? <span className={cls.onlineDot} title="Мастер на связи" /> : null}
+                {masterOnlineDot ? <span className={cls.onlineDot} title="Master in touch" /> : null}
               </div>
               <div>
-                <div className={cls.participantRole}>Мастер</div>
+                <div className={cls.participantRole}>Master</div>
                 <div className={cls.participantName}>{masterName}</div>
               </div>
             </div>
@@ -234,26 +234,26 @@ export const ChatPage: React.FC = () => {
             <p className={[cls.streamStatus, cls.streamStatusLine].join(" ")}>
               <span>{streamStatusLabel(streamStatus)} ·</span>
               {loading ? (
-                <span>Загрузка…</span>
+                <span>Loading…</span>
               ) : serviceTyping ? (
-                <TypingIndicator variant="inline" label="Мастер печатает" />
+                <TypingIndicator variant="inline" label="Master prints" />
               ) : (
-                <span>{presence === "online" ? "вы в сети" : "оффлайн"}</span>
+                <span>{presence === "online" ? "you are online" : "offline"}</span>
               )}
             </p>
           </div>
           <div className={cls.chatScroll}>
             {!orderMetaLoading && orderMeta?.canRateOrder ? (
               <div className={cls.ratingPrompt}>
-                <p className={cls.ratingTitle}>Заказ выдан. Оцените работу сервиса:</p>
-                <div className={cls.starRow} role="group" aria-label="Оценка от 1 до 5">
+                <p className={cls.ratingTitle}>The order has been issued. Rate the service:</p>
+                <div className={cls.starRow} role="group" aria-label="Rating from 1 to 5">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button
                       key={n}
                       type="button"
                       className={cls.starBtn}
                       disabled={ratingBusy}
-                      aria-label={`${n} из 5`}
+                      aria-label={`${n} out of 5`}
                       onClick={() => void submitRating(n)}
                     >
                       ★
@@ -264,7 +264,7 @@ export const ChatPage: React.FC = () => {
             ) : null}
             {!orderMetaLoading && orderMeta?.myRating ? (
               <p className={cls.ratedNote} role="status">
-                Ваша оценка: {orderMeta.myRating} из 5
+                Your rating: {orderMeta.myRating} out of 5
               </p>
             ) : null}
             {messages.map((m, i) => (
@@ -292,11 +292,11 @@ export const ChatPage: React.FC = () => {
                       {m.from === "user" ? (
                         <span className={cls.tickStatus}>
                           {m.readByService ? (
-                            <span className={cls.tickRead} title="Прочитано мастером">
+                            <span className={cls.tickRead} title="Read by master">
                               ✓✓
                             </span>
                           ) : (
-                            <span title="Доставлено">✓✓</span>
+                            <span title="Delivered">✓✓</span>
                           )}
                         </span>
                       ) : null}
@@ -315,9 +315,9 @@ export const ChatPage: React.FC = () => {
           </div>
           {pendingAttachment ? (
             <div className={cls.pendingAttach}>
-              <span>Готово к отправке: {pendingAttachment.name || "вложение"}</span>
+              <span>Ready to send: {pendingAttachment.name ||"attachment"}</span>
               <button type="button" className={cls.pendingAttachClear} onClick={() => setPendingAttachment(null)}>
-                Убрать
+                Put away
               </button>
             </div>
           ) : null}
@@ -335,7 +335,7 @@ export const ChatPage: React.FC = () => {
                   void postOrderTyping(orderId).catch(() => {});
                 }, 400);
               }}
-              placeholder="Напишите сообщение…"
+              placeholder="Write a message..."
               rows={2}
             />
             <div className={cls.chatInputTools}>
@@ -344,8 +344,8 @@ export const ChatPage: React.FC = () => {
                 className={cls.chatCircleBtn}
                 onClick={() => void onPickMedia()}
                 disabled={picking || sending}
-                aria-label="Добавить фото или видео"
-                title="Добавить фото или видео"
+                aria-label="Add a photo or video"
+                title="Add a photo or video"
               >
                 📎
               </button>
@@ -354,8 +354,8 @@ export const ChatPage: React.FC = () => {
                 className={[cls.chatCircleBtn, cls.chatCircleBtnPrimary].join(" ")}
                 onClick={send}
                 disabled={sending || (!text.trim() && !pendingAttachment)}
-                aria-label="Отправить сообщение"
-                title="Отправить сообщение"
+                aria-label="Send message"
+                title="Send message"
               >
                 ➤
               </button>

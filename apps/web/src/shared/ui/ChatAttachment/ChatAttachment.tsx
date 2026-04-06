@@ -28,10 +28,10 @@ export const ChatAttachment: React.FC<ChatAttachmentProps> = ({ attachment, clas
       ) : isVideoMime(mime) ? (
         <video className={cls.media} src={attachment.dataUrl} controls playsInline />
       ) : (
-        <p className={cls.fallback}>Вложение</p>
+        <p className={cls.fallback}>Attachment</p>
       )}
       <button type="button" className={cls.downloadBtn} onClick={onDownload}>
-        Сохранить на устройство
+        Save to device
       </button>
     </div>
   );

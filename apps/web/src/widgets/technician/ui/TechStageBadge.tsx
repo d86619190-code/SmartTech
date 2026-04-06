@@ -3,12 +3,12 @@ import type { TechRepairStage } from "@/entities/technician";
 import cls from "./TechStageBadge.module.css";
 
 const LABELS: Record<TechRepairStage, string> = {
-  accepted: "Принято",
-  diagnostics: "Диагностика",
-  waiting_approval: "Ожидает согласования",
-  repair: "В ремонте",
-  ready: "Готово к выдаче",
-  completed: "Завершено",
+  accepted: "Accepted",
+  diagnostics: "Diagnostics",
+  waiting_approval: "Awaiting approval",
+  repair: "Under renovation",
+  ready: "Ready for pickup",
+  completed: "Completed",
 };
 
 export const TechStageBadge: React.FC<{ stage: TechRepairStage }> = ({ stage }) => (

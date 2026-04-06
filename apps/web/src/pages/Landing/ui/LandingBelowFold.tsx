@@ -36,7 +36,7 @@ function useInView<T extends HTMLElement>(): React.RefObject<T | null> {
 
 const BENEFIT_ACCENTS = ["cyan", "violet", "emerald", "amber", "rose", "sky", "fuchsia"] as const;
 
-/** Тема фоновой анимации при hover (см. CSS bentoTheme_*) */
+/** Hover background animation theme (see CSS bentoTheme_*) */
 const BENEFIT_THEMES = [
   "diagnostic",
   "craft",
@@ -63,19 +63,19 @@ export const LandingBelowFold: React.FC = () => {
     <div ref={belowRootRef} className={cls.belowRoot}>
       <div className={cls.tape} aria-hidden>
         <div className={cls.tapeTrack}>
-          <span>TECH · ПРОЗРАЧНОСТЬ · СКОРОСТЬ · ГАРАНТИЯ · ОНЛАЙН · TECH · ПРОЗРАЧНОСТЬ · СКОРОСТЬ · ГАРАНТИЯ · ОНЛАЙН ·</span>
-          <span aria-hidden>TECH · ПРОЗРАЧНОСТЬ · СКОРОСТЬ · ГАРАНТИЯ · ОНЛАЙН · TECH · ПРОЗРАЧНОСТЬ · СКОРОСТЬ · ГАРАНТИЯ · ОНЛАЙН ·</span>
+          <span>TECH · TRANSPARENCY · SPEED · GUARANTEE · ONLINE · TECH · TRANSPARENCY · SPEED · GUARANTEE · ONLINE ·</span>
+          <span aria-hidden>TECH · TRANSPARENCY · SPEED · GUARANTEE · ONLINE · TECH · TRANSPARENCY · SPEED · GUARANTEE · ONLINE ·</span>
         </div>
       </div>
 
       <section ref={benefitsRef} className={[cls.block, cls.benefits].join(" ")} aria-labelledby="below-benefits">
         <div className={cls.blockInner}>
           <header className={cls.blockHead} data-gsap="reveal">
-            <span className={cls.kicker}>01 / преимущества</span>
+            <span className={cls.kicker}>01 / advantages</span>
             <h2 id="below-benefits" className={cls.blockTitle}>
-              Семь вещей, которые реально отличают нас
+              Seven things that really set us apart
             </h2>
-            <p className={cls.blockLead}>Та же информация — но без скуки: каждый пункт со своим характером.</p>
+            <p className={cls.blockLead}>The same information - but without boredom: each item has its own character.</p>
           </header>
           <div className={cls.bento}>
             {BENEFITS.map((text, i) => (
@@ -121,16 +121,16 @@ export const LandingBelowFold: React.FC = () => {
         </div>
       </section>
 
-      {/* Процесс — вертикальный кинотаймлайн */}
+      {/* Process - vertical cinematic timeline */}
       <section className={[cls.block, cls.processScene].join(" ")} aria-labelledby="below-process">
         <div className={cls.processIntro}>
-          <span className={cls.kicker}>02 / маршрут</span>
+          <span className={cls.kicker}>02 / route</span>
           <div className={cls.processTitleCluster}>
             <h2 id="below-process" className={cls.processMassive}>
-              Пять шагов
+              Five steps
             </h2>
-            <p className={cls.processMassiveSub}>и вы всегда в курсе</p>
-            <p className={cls.processTagline}>Один путь от заявки до выдачи — без дыр в информации.</p>
+            <p className={cls.processMassiveSub}>and you are always in the know</p>
+            <p className={cls.processTagline}>One path from application to issue - without holes in information.</p>
           </div>
         </div>
 
@@ -168,12 +168,12 @@ export const LandingBelowFold: React.FC = () => {
         <div className={cls.blockInner}>
           <div className={cls.guaranteeGrid}>
             <div className={cls.guaranteePanel}>
-              <span className={cls.kicker}>03 / гарантия</span>
+              <span className={cls.kicker}>03 / guarantee</span>
               <h2 id="below-guarantee" className={cls.guaranteeTitle}>
                 {GUARANTEE.title}
               </h2>
               <p className={cls.guaranteeSub}>{GUARANTEE.subtitle}</p>
-              <p className={cls.guaranteeListLabel}>Что покрывает гарантия</p>
+              <p className={cls.guaranteeListLabel}>What does the warranty cover</p>
               <ul className={cls.guaranteeList}>
                 {GUARANTEE.items.map((line) => (
                   <li key={line} className={cls.guaranteeLine}>
@@ -185,7 +185,7 @@ export const LandingBelowFold: React.FC = () => {
                 ))}
               </ul>
               <Button type="button" variant="outline" onClick={() => navigateWithTransition("/create-order")}>
-                Оставить заявку
+                Leave a request
               </Button>
             </div>
           </div>
@@ -195,9 +195,9 @@ export const LandingBelowFold: React.FC = () => {
       <section className={[cls.block, cls.reviews].join(" ")} aria-labelledby="below-reviews">
         <div className={cls.blockInner}>
           <header className={cls.blockHead} data-gsap="reveal">
-            <span className={cls.kicker}>04 / голоса</span>
+            <span className={cls.kicker}>04 / vote</span>
             <h2 id="below-reviews" className={cls.blockTitle}>
-              Люди уже проверили
+              People have already checked
             </h2>
           </header>
           <div className={cls.reviewWall}>
@@ -207,7 +207,7 @@ export const LandingBelowFold: React.FC = () => {
                 data-gsap="review"
                 className={[cls.reviewCard, i % 2 === 0 ? cls.reviewTiltL : cls.reviewTiltR].join(" ")}
               >
-                <div className={cls.reviewStars} aria-label={`Оценка ${r.rating} из 5`}>
+                <div className={cls.reviewStars} aria-label={`Rating ${r.rating} out of 5`}>
                   {Array.from({ length: r.rating }, (_, si) => (
                     <span key={si} aria-hidden>
                       ★
@@ -222,14 +222,14 @@ export const LandingBelowFold: React.FC = () => {
         </div>
       </section>
 
-      {/* FAQ — кинозаголовок + сетка */}
+      {/* FAQ — movie title + grid */}
       <section className={[cls.block, cls.faqScene].join(" ")} aria-labelledby="below-faq">
         <div className={cls.blockInner}>
           <header className={cls.faqTitleBlock} id="below-faq">
-            <span className={cls.kicker}>05 / вопросы</span>
-            <h2 className={cls.faqTitleLine}>Коротко</h2>
-            <p className={cls.faqTitleSub}>и по делу</p>
-            <p className={cls.faqTitleHint}>Разверните карточку — ответ сразу под вопросом.</p>
+            <span className={cls.kicker}>05 / questions</span>
+            <h2 className={cls.faqTitleLine}>Short</h2>
+            <p className={cls.faqTitleSub}>and to the point</p>
+            <p className={cls.faqTitleHint}>Expand the card - the answer is right under the question.</p>
           </header>
           <div className={cls.faqMatrix}>
             {FAQ_ITEMS.map((item, i) => (
@@ -246,19 +246,19 @@ export const LandingBelowFold: React.FC = () => {
         </div>
       </section>
 
-      {/* Контакт */}
+      {/* Contact */}
       <section className={[cls.block, cls.contactScene].join(" ")} aria-labelledby="below-map">
         <div className={cls.leadGlowOrb} aria-hidden />
         <div className={cls.contactSplit}>
           <div className={cls.mapCol} data-gsap="reveal">
-            <span className={cls.kicker}>06 / адрес</span>
+            <span className={cls.kicker}>06 / address</span>
             <h2 id="below-map" className={cls.contactH2}>
-              Как добраться
+              How to get there
             </h2>
             <p className={cls.locationAddr}>{SITE.address}</p>
             <div className={cls.locationFrame}>
               <iframe
-                title="Карта"
+                title="Map"
                 src={SITE.yandexMapEmbedUrl}
                 className={cls.locationIframe}
                 loading="lazy"
@@ -268,15 +268,15 @@ export const LandingBelowFold: React.FC = () => {
             <div className={cls.locationStats}>
               <div className={cls.locationStat}>
                 <span className={cls.locationStatVal}>{SITE.statsRepairs}</span>
-                <span className={cls.locationStatLab}>ремонтов</span>
+                <span className={cls.locationStatLab}>repairs</span>
               </div>
               <div className={cls.locationStat}>
-                <span className={cls.locationStatVal}>с {SITE.sinceYear}</span>
-                <span className={cls.locationStatLab}>на рынке</span>
+                <span className={cls.locationStatVal}>from {SITE.sinceYear}</span>
+                <span className={cls.locationStatLab}>on the market</span>
               </div>
             </div>
             <Button type="button" variant="primary" onClick={() => window.open(SITE.mapsUrl, "_blank")}>
-              Маршрут
+              Route
             </Button>
           </div>
 
@@ -285,12 +285,12 @@ export const LandingBelowFold: React.FC = () => {
               <div className={cls.leadFrameCorners} aria-hidden />
               <div className={cls.leadFrameScan} aria-hidden />
               <div className={cls.leadFrameInner}>
-                <p className={cls.kicker}>07 / связь</p>
+                <p className={cls.kicker}>07 / connection</p>
                 <h2 className={cls.leadH2}>
-                  <span className={cls.leadH2A}>Напишите</span>
-                  <span className={cls.leadH2B}>ответим</span>
+                  <span className={cls.leadH2A}>Write</span>
+                  <span className={cls.leadH2B}>we will answer</span>
                 </h2>
-                <p className={cls.leadHint}>Заявка уходит в ту же систему — только обёртка другая.</p>
+                <p className={cls.leadHint}>The application goes into the same system - only the wrapper is different.</p>
                 <LeadForm variant="dark" navigateTo={navigateWithTransition} />
               </div>
             </div>
@@ -304,17 +304,17 @@ export const LandingBelowFold: React.FC = () => {
         <div className={cls.footerGrid}>
           <div className={[cls.footerCol, cls.footerReveal].join(" ")}>
             <p className={cls.footerBrand}>TECH</p>
-            <p className={cls.footerTagline}>Ремонт с прозрачностью и онлайн-статусом.</p>
+            <p className={cls.footerTagline}>Repair with transparency and online status.</p>
           </div>
           <div className={[cls.footerCol, cls.footerReveal].join(" ")}>
-            <p className={cls.footerNote}>Готово к работе? Сайдбар и все разделы — в приложении.</p>
+            <p className={cls.footerNote}>Ready to go? The sidebar and all sections are in the application.</p>
           </div>
           <div className={[cls.footerCol, cls.footerActions, cls.footerReveal].join(" ")}>
             <LandingLink className={cls.footerLink} to="/">
-              Открыть приложение
+              Open application
             </LandingLink>
             <LandingLink className={cls.footerLink} to="/login">
-              Войти
+              Login
             </LandingLink>
           </div>
         </div>

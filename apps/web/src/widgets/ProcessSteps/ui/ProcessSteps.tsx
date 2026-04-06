@@ -15,9 +15,9 @@ export const ProcessSteps: React.FC<ProcessStepsProps> = ({ steps, variant = "de
       aria-labelledby="process-heading"
     >
       <h2 id="process-heading" className={cls.title}>
-        Наши процессы абсолютно прозрачны
+        Our processes are completely transparent
       </h2>
-      <p className={cls.intro}>без скрытых платежей и сорванных сроков.</p>
+      <p className={cls.intro}>no hidden fees or missed deadlines.</p>
       <ol className={cls.track}>
         {steps.map((s) => (
           <li key={s.n} className={cls.step}>
@@ -30,21 +30,21 @@ export const ProcessSteps: React.FC<ProcessStepsProps> = ({ steps, variant = "de
               <p className={cls.body}>
                 {s.n === 3 ? (
                   <>
-                    После диагностики предлагаем несколько вариантов ремонта с разной стоимостью — в зависимости от
-                    типа запчастей. Все подробности — в разделе{" "}
+                    After diagnostics, we offer several repair options with different costs - depending on
+                    type of spare parts. All details are in section {" "}
                     <Link className={cls.inlineLink} to="/tracking">
-                      «Отслеживание заказа»
+                      "Order tracking"
                     </Link>
-                    . Вы заранее видите цену и сроки, что в наличии, а что придётся подождать. Выбираете вариант и
-                    подтверждаете онлайн — без скрытых платежей.
+                    . You see in advance the price and terms, what is in stock and what will have to wait. Choose an option and
+                    Confirm online - no hidden fees.
                   </>
                 ) : s.n === 4 ? (
                   <>
-                    Приступаем к работе только после вашего согласия. Этапы отображаются в разделе{" "}
+                    We begin work only after your consent. The stages are displayed in the section{" "}
                     <Link className={cls.inlineLink} to="/tracking">
-                      «Отслеживание заказа»
-                    </Link>{" "}
-                    — в любой момент можно проверить статус или связаться с менеджером.
+                      "Order tracking"
+                    </Link>
+                    . You can check the status or contact the manager at any time.
                   </>
                 ) : (
                   s.body

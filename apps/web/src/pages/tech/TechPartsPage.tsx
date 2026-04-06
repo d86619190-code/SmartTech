@@ -30,7 +30,7 @@ export const TechPartsPage: React.FC = () => {
   if (!job) {
     return (
       <>
-        <TechPageHeader title="Запчасти" subtitle="Загрузка…" />
+        <TechPageHeader title="Spare parts" subtitle="Loading…" />
         <SkeletonCard rows={5} />
       </>
     );
@@ -50,9 +50,9 @@ export const TechPartsPage: React.FC = () => {
     try {
       const res = await techApi.savePartsSelection(job.id, Array.from(picked));
       setJob(res.repair);
-      showToast("success", "Выбор запчастей сохранён");
+      showToast("success", "The selection of spare parts is saved");
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось сохранить";
+      const msg = e instanceof Error ? e.message : "Failed to save";
       showToast("error", msg);
     } finally {
       setSaving(false);
@@ -61,7 +61,7 @@ export const TechPartsPage: React.FC = () => {
 
   return (
     <>
-      <TechPageHeader title="Запчасти" subtitle="Подбор деталей с учётом OEM и наличия." />
+      <TechPageHeader title="Spare parts" subtitle="Selection of parts taking into account OEM and availability." />
       <TechCard style={{ padding: 0, marginBottom: 16 }}>
         {partsCatalog.map((p: any) => (
           <div
@@ -80,7 +80,7 @@ export const TechPartsPage: React.FC = () => {
                 <strong>{p.name}</strong>
               </p>
               <span className={cls.muted}>
-                {p.oem ? "OEM" : "Не оригинал"} · {p.inStock ? "В наличии" : "Нет в наличии"}
+                {p.oem ? "OEM" : "Not original"} · {p.inStock ? "In stock" : "Not available"}
               </span>
             </div>
             <div style={{ textAlign: "right" }}>
@@ -90,10 +90,10 @@ export const TechPartsPage: React.FC = () => {
         ))}
       </TechCard>
       <Button type="button" onClick={() => void save()} disabled={saving}>
-        {saving ? "Сохранение…" : "Зафиксировать выбор"}
+        {saving ? "Saving…" : "Freeze selection"}
       </Button>
       <Link className={cls.link} to={`/tech/repairs/${job.id}/price`} style={{ marginLeft: 16 }}>
-        К смете
+        To the estimate
       </Link>
       {toast ? <StatusToast tone={toast.tone} message={toast.message} onClose={closeToast} /> : null}
     </>

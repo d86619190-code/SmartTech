@@ -1,9 +1,9 @@
 import { isElectronApp } from "./isElectronApp";
 
 /**
- * Публичный http(s)-origin веб-приложения для ссылок в системный браузер из Electron.
- * В окне с `file://` (сборка без dev-сервера) `window.location.origin` не подходит.
- * Задаётся при сборке: `VITE_APP_ORIGIN=https://ваш-домен` (без слэша в конце).
+ * Public http(s)-origin web application for links to the system browser from Electron.
+ * In a window with `file://` (build without a dev server) `window.location.origin` is not suitable.
+ * Set during assembly: `VITE_APP_ORIGIN=https://your-domain` (without the slash at the end).
  */
 export function getAppPublicOrigin(): string {
   const fromEnv = import.meta.env.VITE_APP_ORIGIN?.trim().replace(/\/$/, "");
@@ -15,7 +15,7 @@ export function getAppPublicOrigin(): string {
   return window.location.origin;
 }
 
-/** Стабильный URL для HashRouter: всегда `origin/#/path?query`. Пустая строка, если origin неизвестен. */
+/** Stable URL for HashRouter: always `origin/#/path?query`. Empty string if origin is unknown. */
 export function buildHashAppUrl(pathWithLeadingSlash: string, searchParams: URLSearchParams): string {
   const base = getAppPublicOrigin().replace(/\/$/, "");
   if (!base) return "";

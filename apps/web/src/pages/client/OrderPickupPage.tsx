@@ -51,7 +51,7 @@ export const OrderPickupPage: React.FC = () => {
   if (metaLoading) {
     return (
       <div className={cls.shell}>
-        <PageHeader title="Выдача" subtitle={order.deviceLabel} />
+        <PageHeader title="Issue" subtitle={order.deviceLabel} />
         <div className={cls.body}>
           <SkeletonCard rows={5} />
         </div>
@@ -72,7 +72,7 @@ export const OrderPickupPage: React.FC = () => {
   return (
     <div className={cls.shell}>
       <PageHeader
-        title={done ? "Ремонт завершён" : "Готово к выдаче"}
+        title={done ? "Repair completed" : "Ready for pickup"}
         subtitle={order.deviceLabel}
       />
       <div className={cls.body}>
@@ -83,26 +83,26 @@ export const OrderPickupPage: React.FC = () => {
             </div>
             <p className={cls.lead}>
               {done
-                ? "Спасибо, что выбрали нас. Гарантийные условия указаны в акте."
-                : "Устройство можно забрать в сервисе. Возьмите документ, удостоверяющий личность."}
+                ? "Thank you for choosing us. The warranty conditions are specified in the deed."
+                : "The device can be picked up at the service center. Take your identification document."}
             </p>
           </div>
           <div className={cls.row}>
-            <span className={cls.rowLabel}>Итоговая стоимость</span>
+            <span className={cls.rowLabel}>Total cost</span>
             <span className={cls.rowVal}>{formatRub(order.finalPriceRub)}</span>
           </div>
           {order.repairDurationLabel ? (
             <div className={cls.row}>
-              <span className={cls.rowLabel}>Длительность ремонта</span>
+              <span className={cls.rowLabel}>Repair duration</span>
               <span className={cls.rowVal}>{order.repairDurationLabel}</span>
             </div>
           ) : null}
           <div className={cls.row}>
-            <span className={cls.rowLabel}>Гарантия на работы</span>
-            <span className={cls.rowVal}>{order.warrantyDays} дн.</span>
+            <span className={cls.rowLabel}>Work guarantee</span>
+            <span className={cls.rowVal}>{order.warrantyDays} days.</span>
           </div>
           <div className={cls.row}>
-            <span className={cls.rowLabel}>Адрес</span>
+            <span className={cls.rowLabel}>Address</span>
             <span className={cls.rowVal} style={{ maxWidth: "60%" }}>
               {SITE.address}
             </span>
@@ -110,19 +110,19 @@ export const OrderPickupPage: React.FC = () => {
         </section>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           <Link to="/" style={{ textDecoration: "none" }}>
-            <Button type="button">На главную</Button>
+            <Button type="button">Home</Button>
           </Link>
           <Button type="button" variant="outline" onClick={() => window.open(`tel:${SITE.phoneTel}`)}>
-            Связаться с сервисом
+            Contact the service
           </Button>
           <Link to={`/messages/${order.id}`} style={{ textDecoration: "none" }}>
             <Button type="button" variant="outline">
-              Написать в чат
+              Write to chat
             </Button>
           </Link>
         </div>
         <Link to={`/tracking/${order.id}`} style={{ color: "var(--color-link)", fontWeight: 700, fontSize: 14 }}>
-          Полная карточка заказа →
+          Full order card →
         </Link>
       </div>
     </div>

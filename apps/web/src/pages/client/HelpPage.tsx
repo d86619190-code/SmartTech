@@ -8,24 +8,24 @@ import cls from "./clientPages.module.css";
 export const HelpPage: React.FC = () => {
   return (
     <div className={cls.shell}>
-      <PageHeader title="Помощь" subtitle="Ответы на частые вопросы и ссылки на разделы сервиса." />
+      <PageHeader title="Help" subtitle="Answers to frequently asked questions and links to service sections." />
       <div className={cls.body}>
         <section className={cls.card}>
-          <h2 className={cls.h2}>Частые вопросы</h2>
+          <h2 className={cls.h2}>Frequently asked questions</h2>
           <FaqAccordion items={FAQ_ITEMS} idPrefix="help-faq" />
         </section>
         <section className={cls.card}>
-          <h2 className={cls.h2}>Ещё материалы</h2>
-          <p className={cls.lead}>Юридическая информация и контакты — в соответствующих разделах.</p>
+          <h2 className={cls.h2}>More materials</h2>
+          <p className={cls.lead}>Legal information and contacts are in the appropriate sections.</p>
           <div className={cls.linkGrid}>
             <Link className={cls.navCard} to="/warranty">
-              Гарантия на ремонт
+              Repair warranty
             </Link>
             <Link className={cls.navCard} to="/reviews">
-              Отзывы клиентов
+              Customer Reviews
             </Link>
             <Link className={cls.navCard} to="/contacts">
-              Контакты и график
+              Contacts and schedule
             </Link>
           </div>
         </section>

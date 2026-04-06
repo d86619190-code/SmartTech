@@ -5,7 +5,7 @@ import cls from "./FaqAccordion.module.css";
 type FaqAccordionProps = {
   items: FaqItem[];
   idPrefix?: string;
-  /** Тёмная тема для лендинга / тёмных экранов */
+  /** Dark theme for landing pages / dark screens */
   variant?: "default" | "dark";
 };
 

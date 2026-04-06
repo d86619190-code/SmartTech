@@ -26,7 +26,7 @@ export const TechApprovalSendPage: React.FC = () => {
   if (!job) {
     return (
       <>
-        <TechPageHeader title="Отправить на согласование" subtitle="Загрузка…" />
+        <TechPageHeader title="Send for approval" subtitle="Loading…" />
         <SkeletonCard rows={4} />
       </>
     );
@@ -39,9 +39,9 @@ export const TechApprovalSendPage: React.FC = () => {
     try {
       const res = await techApi.sendApproval(job.id);
       setJob(res.repair);
-      showToast("success", "Стоимость отправлена клиенту на согласование");
+      showToast("success", "The cost has been sent to the client for approval.");
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось отправить";
+      const msg = e instanceof Error ? e.message : "Failed to send";
       showToast("error", msg);
     } finally {
       setSending(false);
@@ -50,33 +50,33 @@ export const TechApprovalSendPage: React.FC = () => {
 
   return (
     <>
-      <TechPageHeader title="Отправить на согласование" subtitle="Клиент получит уведомление в приложении." />
+      <TechPageHeader title="Send for approval" subtitle="The client will receive a notification in the application." />
       <TechCard style={{ padding: 24, marginBottom: 20 }}>
-        <p className={cls.blockTitle}>Ремонт</p>
+        <p className={cls.blockTitle}>Repair</p>
         <p className={cls.p}>
           {job.device} — {job.publicId}
         </p>
         <p className={cls.blockTitle} style={{ marginTop: 20 }}>
-          Итоговая стоимость
+          Total cost
         </p>
         <p className={cls.p} style={{ fontSize: 22 }}>
           <strong>{formatRub(total)}</strong>
         </p>
         <p className={cls.blockTitle} style={{ marginTop: 20 }}>
-          Срок
+          Term
         </p>
-        <p className={cls.p}>Ориентир: ~{job.etaHours} ч после согласования и наличия запчастей.</p>
+        <p className={cls.p}>Reference: ~{job.etaHours} hours after approval and availability of spare parts.</p>
         {alreadySent ? (
           <p className={cls.p} style={{ marginTop: 16, color: "var(--badge-completed-fg)" }}>
-            Запрос уже у клиента — дождитесь ответа в разделе согласований.
+            The client has already received a request - wait for a response in the approvals section.
           </p>
         ) : null}
       </TechCard>
       <Button type="button" onClick={() => void send()} disabled={sending || alreadySent}>
-        {alreadySent ? "Уже отправлено" : sending ? "Отправка…" : "Отправить клиенту"}
+        {alreadySent ? "Already sent" : sending ? "Dispatch..." : "Send to client"}
       </Button>
       <Link className={cls.link} to={`/tech/repairs/${job.id}/tracking`} style={{ marginLeft: 16 }}>
-        К этапам
+        To the stages
       </Link>
       {toast ? <StatusToast tone={toast.tone} message={toast.message} onClose={closeToast} /> : null}
     </>

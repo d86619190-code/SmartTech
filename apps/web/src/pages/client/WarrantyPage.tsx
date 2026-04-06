@@ -17,8 +17,8 @@ export const WarrantyPage: React.FC = () => {
             ))}
           </ul>
           <p className={cls.lead} style={{ marginTop: 20 }}>
-            Условия фиксируются в акте при выдаче устройства. При наступлении гарантийного случая обратитесь в сервис с
-            чеком и устройством.
+            The conditions are recorded in the act when the device is issued. In the event of a warranty claim, contact service
+            check and device.
           </p>
         </section>
       </div>

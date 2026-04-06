@@ -58,7 +58,7 @@ export const CreateOrderDraftsPage: React.FC = () => {
     } catch (e) {
       setRows(local);
       if (local.length === 0) {
-        showToast("error", e instanceof Error ? e.message : "Не удалось загрузить черновики");
+        showToast("error", e instanceof Error ? e.message : "Failed to load drafts");
         navigate("/create-order?new=1", { replace: true });
       }
     } finally {
@@ -75,7 +75,7 @@ export const CreateOrderDraftsPage: React.FC = () => {
       await deleteOrderDraftApi(id);
     } catch (e) {
       // could be local-only draft
-      if (!(e instanceof Error) || !/401|авторизац|сессия/i.test(e.message)) {
+      if (!(e instanceof Error) || !/401|authorization|session/i.test(e.message)) {
         // noop for server miss
       }
     }
@@ -88,17 +88,17 @@ export const CreateOrderDraftsPage: React.FC = () => {
 
   return (
     <div className={cls.shell}>
-      <PageHeader title="Черновики заявок" />
+      <PageHeader title="Draft applications" />
       <div className={cls.body}>
         <div className={cls.topbar}>
           <div />
           <Button type="button" onClick={() => navigate("/create-order?new=1")}>
             {/* no redirect loop */}
-            Новая заявка
+            New application
           </Button>
         </div>
         {loading ? (
-          <p className={cls.empty}>Загрузка…</p>
+          <p className={cls.empty}>Loading…</p>
         ) : (
           <div className={cls.carousel}>
             {rows.map((d) => (
@@ -112,13 +112,13 @@ export const CreateOrderDraftsPage: React.FC = () => {
                     minute: "2-digit",
                   })}
                 </p>
-                <p className={cls.meta}>Фото: {Array.isArray(d.payload?.photos) ? d.payload.photos.length : 0}</p>
+                <p className={cls.meta}>Photo: {Array.isArray(d.payload?.photos) ? d.payload.photos.length : 0}</p>
                 <div className={cls.actions}>
                   <Link className={cls.openBtn} to={`/create-order?draft=${encodeURIComponent(d.id)}&new=1`}>
-                    Открыть
+                    Open
                   </Link>
                   <Button type="button" variant="outline" onClick={() => void remove(d.id)}>
-                    Удалить
+                    Delete
                   </Button>
                 </div>
               </article>

@@ -28,7 +28,7 @@ export const AdminServicesPage: React.FC = () => {
   };
 
   const addChild = (parentId: string) => {
-    const label = window.prompt("Название подкатегории");
+    const label = window.prompt("Subcategory name");
     if (!label?.trim()) return;
     setTree((t) => {
       const next =
@@ -49,7 +49,7 @@ export const AdminServicesPage: React.FC = () => {
   };
 
   const removeRoot = (id: string) => {
-    if (!window.confirm("Удалить категорию и все подкатегории?")) return;
+    if (!window.confirm("Delete a category and all subcategories?")) return;
     setTree((t) => {
       const next = t.filter((c) => c.id !== id);
       void updateAdminCategoriesApi(next);
@@ -60,17 +60,17 @@ export const AdminServicesPage: React.FC = () => {
   return (
     <>
       <AdminPageHeader
-        title="Услуги и категории"
-        subtitle="Таксономия ремонтов: дисплей, аккумулятор, вода и типовые неисправности."
+        title="Services and categories"
+        subtitle="Taxonomy of repairs: display, battery, water and common faults."
         actions={
           <Button type="button" onClick={addRoot} disabled={!draftName.trim()}>
-            Добавить категорию
+            Add category
           </Button>
         }
       />
       <AdminCard style={{ marginBottom: 16, padding: 20 }}>
         <div className={cls.toolbar} style={{ marginBottom: 0 }}>
-          <AdminInput placeholder="Новая корневая категория" value={draftName} onChange={(e) => setDraftName(e.target.value)} />
+          <AdminInput placeholder="New root category" value={draftName} onChange={(e) => setDraftName(e.target.value)} />
         </div>
       </AdminCard>
       {tree.map((cat) => (
@@ -80,10 +80,10 @@ export const AdminServicesPage: React.FC = () => {
               <h3 className={cls.catTitle}>{cat.name}</h3>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <Button type="button" variant="outline" onClick={() => addChild(cat.id)}>
-                  Подкатегория
+                  Subcategory
                 </Button>
                 <Button type="button" variant="ghost" onClick={() => removeRoot(cat.id)}>
-                  Удалить
+                  Delete
                 </Button>
               </div>
             </div>
@@ -93,14 +93,14 @@ export const AdminServicesPage: React.FC = () => {
                   <li key={ch.id}>
                     {ch.name}{" "}
                     <button type="button" className={cls.sortBtn} onClick={() => removeChild(cat.id, ch.id)} style={{ fontSize: 12 }}>
-                      удалить
+                      delete
                     </button>
                   </li>
                 ))}
               </ul>
             ) : (
               <p className={cls.p} style={{ marginTop: 8 }}>
-                Нет подкатегорий.
+                No subcategories.
               </p>
             )}
           </div>

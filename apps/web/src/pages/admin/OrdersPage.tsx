@@ -17,29 +17,29 @@ import {
 import cls from "./adminPages.module.css";
 
 const STATUS_OPTS: { value: string; label: string }[] = [
-  { value: "all", label: "Все статусы" },
-  { value: "new", label: "Новый" },
-  { value: "diagnostics", label: "Диагностика" },
-  { value: "approval", label: "Согласование" },
-  { value: "in_progress", label: "В работе" },
-  { value: "ready", label: "Готово" },
-  { value: "completed", label: "Завершён" },
-  { value: "cancelled", label: "Отменён" },
+  { value: "all", label: "All statuses" },
+  { value: "new", label: "New" },
+  { value: "diagnostics", label: "Diagnostics" },
+  { value: "approval", label: "Coordination" },
+  { value: "in_progress", label: "In progress" },
+  { value: "ready", label: "Ready" },
+  { value: "completed", label: "Completed" },
+  { value: "cancelled", label: "Canceled" },
 ];
 
 const DEVICE_OPTS = [
-  { value: "all", label: "Все устройства" },
-  { value: "phone", label: "Телефон" },
-  { value: "tablet", label: "Планшет" },
-  { value: "laptop", label: "Ноутбук" },
+  { value: "all", label: "All devices" },
+  { value: "phone", label: "Telephone" },
+  { value: "tablet", label: "Tablet" },
+  { value: "laptop", label: "Laptop" },
 ];
 
 const TECH_OPTS = [
-  { value: "all", label: "Все мастера" },
-  { value: "И. Петров", label: "И. Петров" },
-  { value: "К. Орлов", label: "К. Орлов" },
-  { value: "С. Николаев", label: "С. Николаев" },
-  { value: "__unassigned", label: "Не назначен" },
+  { value: "all", label: "All masters" },
+  { value: "I. Petrov", label: "I. Petrov" },
+  { value: "K. Orlov", label: "K. Orlov" },
+  { value: "S. Nikolaev", label: "S. Nikolaev" },
+  { value: "__unassigned", label: "Not assigned" },
 ];
 
 type SortKey = "createdAt" | "publicId" | "totalRub" | "customer";
@@ -105,9 +105,9 @@ export const AdminOrdersPage: React.FC = () => {
 
   return (
     <>
-      <AdminPageHeader title="Заказы" subtitle="Все заявки на ремонт: фильтрация, поиск и действия по строке." />
+      <AdminPageHeader title="Orders" subtitle="All repair requests: filtering, searching and actions by line." />
       <FilterBar>
-        <AdminInput placeholder="Поиск по №, устройству, клиенту…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <AdminInput placeholder="Search by No., device, client..." value={q} onChange={(e) => setQ(e.target.value)} />
         <AdminSelect value={status} onChange={(e) => setStatus(e.target.value)}>
           {STATUS_OPTS.map((o) => (
             <option key={o.value} value={o.value}>
@@ -133,14 +133,14 @@ export const AdminOrdersPage: React.FC = () => {
       <AdminTable>
         <thead>
           <tr>
-            <AdminTh>{sortLabel("publicId", "№ заказа")}</AdminTh>
-            <AdminTh>Устройство</AdminTh>
-            <AdminTh>{sortLabel("customer", "Клиент")}</AdminTh>
-            <AdminTh>Статус</AdminTh>
-            <AdminTh>Мастер</AdminTh>
-            <AdminTh>{sortLabel("totalRub", "Сумма")}</AdminTh>
-            <AdminTh>{sortLabel("createdAt", "Дата")}</AdminTh>
-            <AdminTh>Действия</AdminTh>
+            <AdminTh>{sortLabel("publicId", "№ order")}</AdminTh>
+            <AdminTh>Device</AdminTh>
+            <AdminTh>{sortLabel("customer", "Client")}</AdminTh>
+            <AdminTh>Status</AdminTh>
+            <AdminTh>Master</AdminTh>
+            <AdminTh>{sortLabel("totalRub", "Sum")}</AdminTh>
+            <AdminTh>{sortLabel("createdAt", "Date")}</AdminTh>
+            <AdminTh>Actions</AdminTh>
           </tr>
         </thead>
         <tbody>
@@ -162,7 +162,7 @@ export const AdminOrdersPage: React.FC = () => {
               <AdminTd>{o.createdAt}</AdminTd>
               <AdminTd>
                 <Link className={cls.link} to={`/admin/orders/${o.id}`}>
-                  Карточка
+                  Card
                 </Link>
               </AdminTd>
             </tr>
@@ -172,7 +172,7 @@ export const AdminOrdersPage: React.FC = () => {
       {visible < sorted.length && (
         <div style={{ marginTop: 16 }}>
           <Button type="button" variant="outline" onClick={() => setVisible((v) => v + 12)}>
-            Показать ещё ({sorted.length - visible})
+            Show more ({sorted.length - visible})
           </Button>
         </div>
       )}

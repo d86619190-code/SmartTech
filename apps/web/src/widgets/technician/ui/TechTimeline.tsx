@@ -3,12 +3,12 @@ import type { TechRepairStage } from "@/entities/technician";
 import cls from "./TechTimeline.module.css";
 
 const STAGES: { key: TechRepairStage; label: string }[] = [
-  { key: "accepted", label: "Принято" },
-  { key: "diagnostics", label: "Диагностика" },
-  { key: "waiting_approval", label: "Согласование" },
-  { key: "repair", label: "Ремонт" },
-  { key: "ready", label: "Готово" },
-  { key: "completed", label: "Выдано" },
+  { key: "accepted", label: "Accepted" },
+  { key: "diagnostics", label: "Diagnostics" },
+  { key: "waiting_approval", label: "Coordination" },
+  { key: "repair", label: "Repair" },
+  { key: "ready", label: "Ready" },
+  { key: "completed", label: "Issued" },
 ];
 
 function stageIndex(s: TechRepairStage): number {

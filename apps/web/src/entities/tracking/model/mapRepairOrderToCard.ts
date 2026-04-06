@@ -14,7 +14,7 @@ function progressFromStatus(s: RepairOrderStatus): number {
   }
 }
 
-/** id заказа в `entities/order` (mockOrders) для перехода в детали */
+/** id order in `entities/order` (mockOrders) to go to details */
 function demoRouteOrderId(order: RepairOrder): string | undefined {
   return order.id;
 }
@@ -28,10 +28,10 @@ export function repairOrderToTrackingCard(order: RepairOrder): TrackingCardData 
     progressPercent: progressFromStatus(order.status),
     estimateLabel:
       order.status === "completed"
-        ? "Завершён"
+        ? "Completed"
         : order.status === "canceled"
-          ? "Отменён"
-          : "См. детали заказа",
+          ? "Canceled"
+          : "See order details",
     orderId: demoRouteOrderId(order),
   };
 }

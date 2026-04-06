@@ -2,17 +2,17 @@ import * as React from "react";
 import cls from "./TypingIndicator.module.css";
 
 type TypingIndicatorProps = {
-  /** Текст перед точками, по умолчанию «Печатает» */
+  /** Text before dots, “Prints” by default */
   label?: string;
   className?: string;
-  /** В чате мастера — выравнивание «как пузырь» клиента или сервиса */
+  /** In the wizard's chat - alignment “like a bubble” of the client or service */
   align?: "start" | "end";
-  /** Одна строка со статусом (вместо «вы в сети»), без большой карточки */
+  /** One line with status (instead of “you are online”), without a large card */
   variant?: "card" | "inline";
 };
 
 export const TypingIndicator: React.FC<TypingIndicatorProps> = ({
-  label = "Печатает",
+  label = "Prints",
   className,
   align = "start",
   variant = "card",

@@ -5,10 +5,10 @@ import { AdminCard, AdminInput, AdminPageHeader, AdminSelect } from "@/widgets/a
 import cls from "./adminPages.module.css";
 
 export const AdminSettingsPage: React.FC = () => {
-  const [defaultAdminRole, setDefaultAdminRole] = React.useState("Оператор");
+  const [defaultAdminRole, setDefaultAdminRole] = React.useState("Operator");
   const [notifyEmail, setNotifyEmail] = React.useState(true);
   const [notifyPush, setNotifyPush] = React.useState(false);
-  const [legalName, setLegalName] = React.useState('ООО "Сервис"');
+  const [legalName, setLegalName] = React.useState('OOO"Service"');
   const [inn, setInn] = React.useState("7700000000");
   const [supportPhone, setSupportPhone] = React.useState("+7 495 000-00-00");
   const [supportEmail, setSupportEmail] = React.useState("support@example.com");
@@ -40,58 +40,58 @@ export const AdminSettingsPage: React.FC = () => {
 
   return (
     <>
-      <AdminPageHeader title="Настройки" subtitle="Роли, уведомления и реквизиты сервиса (демо-форма)." />
+      <AdminPageHeader title="Settings" subtitle="Roles, notifications and service details (demo form)." />
       <AdminCard style={{ marginBottom: 16 }}>
         <div className={cls.settingsSection}>
           <h2 className={cls.h2} style={{ marginBottom: 16 }}>
-            Роли и доступ
+            Roles and access
           </h2>
           <div className={cls.row}>
-            <span className={cls.p}>Роль по умолчанию для новых администраторов</span>
+            <span className={cls.p}>Default role for new administrators</span>
             <div style={{ minWidth: 200 }}>
               <AdminSelect value={defaultAdminRole} onChange={(e) => setDefaultAdminRole(e.target.value)}>
-                <option>Оператор</option>
-                <option>Супервизор</option>
-                <option>Владелец</option>
+                <option>Operator</option>
+                <option>Supervisor</option>
+                <option>Owner</option>
               </AdminSelect>
             </div>
           </div>
           <div className={cls.row}>
-            <span className={cls.p}>Двухфакторная аутентификация</span>
+            <span className={cls.p}>Two-factor authentication</span>
             <Button type="button" variant="outline">
-              Настроить
+              Tune
             </Button>
           </div>
         </div>
         <div className={cls.settingsSection}>
           <h2 className={cls.h2} style={{ marginBottom: 16 }}>
-            Уведомления
+            Notifications
           </h2>
           <label className={cls.row}>
-            <span className={cls.p}>Email при смене статуса заказа</span>
+            <span className={cls.p}>Email when order status changes</span>
             <input type="checkbox" checked={notifyEmail} onChange={(e) => setNotifyEmail(e.target.checked)} />
           </label>
           <label className={cls.row}>
-            <span className={cls.p}>Push для мастеров</span>
+            <span className={cls.p}>Push for masters</span>
             <input type="checkbox" checked={notifyPush} onChange={(e) => setNotifyPush(e.target.checked)} />
           </label>
         </div>
         <div className={cls.settingsSection}>
           <h2 className={cls.h2} style={{ marginBottom: 16 }}>
-            Юридические и контакты
+            Legal and contacts
           </h2>
           <div className={cls.detailGrid} style={{ marginBottom: 0 }}>
-            <AdminInput label="Название юрлица" value={legalName} onChange={(e) => setLegalName(e.target.value)} />
-            <AdminInput label="ИНН" value={inn} onChange={(e) => setInn(e.target.value)} />
-            <AdminInput label="Телефон линии" value={supportPhone} onChange={(e) => setSupportPhone(e.target.value)} />
-            <AdminInput label="Email поддержки" value={supportEmail} onChange={(e) => setSupportEmail(e.target.value)} />
+            <AdminInput label="Legal entity name" value={legalName} onChange={(e) => setLegalName(e.target.value)} />
+            <AdminInput label="TIN" value={inn} onChange={(e) => setInn(e.target.value)} />
+            <AdminInput label="Telephone line" value={supportPhone} onChange={(e) => setSupportPhone(e.target.value)} />
+            <AdminInput label="Email support" value={supportEmail} onChange={(e) => setSupportEmail(e.target.value)} />
           </div>
         </div>
         <div className={cls.settingsSection} style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
           <Button type="button" variant="outline">
-            Сбросить
+            Reset
           </Button>
-          <Button type="button" onClick={() => void save()}>Сохранить</Button>
+          <Button type="button" onClick={() => void save()}>Save</Button>
         </div>
       </AdminCard>
     </>

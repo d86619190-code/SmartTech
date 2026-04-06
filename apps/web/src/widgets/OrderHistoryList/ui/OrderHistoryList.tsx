@@ -12,7 +12,7 @@ type OrderHistoryListProps = {
 export const OrderHistoryList: React.FC<OrderHistoryListProps> = ({
   orders,
   className,
-  heading = "Прошлые заказы на ремонт",
+  heading = "Past repair orders",
 }) => {
   return (
     <section className={[cls.card, className].filter(Boolean).join(" ")} aria-labelledby="past-repair-orders-heading">

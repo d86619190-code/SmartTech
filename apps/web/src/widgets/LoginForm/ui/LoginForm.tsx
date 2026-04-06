@@ -11,7 +11,7 @@ import cls from "./LoginForm.module.css";
 type LoginFormProps = {
   mode: "login" | "register";
   authMethod: "phone" | "email";
-  /** contact — только email/телефон и «Отправить код»; code — шаг ввода OTP */
+  /** contact — only email/phone and “Send code”; code — OTP input step */
   otpPhase: "contact" | "code";
   name: string;
   phone: string;
@@ -30,9 +30,9 @@ type LoginFormProps = {
   onVerifyCode: () => void | Promise<void>;
   onGoogleCredential?: (credential: string) => void | Promise<void>;
   onGoogleOpenInBrowser?: () => void;
-  /** Из Electron: открыть страницу входа по коду в системном браузере с возвратом в приложение */
+  /** From Electron: open the login page using the code in the system browser and return to the application */
   onOpenAuthInBrowser?: () => void;
-  /** Пока main-процесс не поднял localhost-мост для возврата сессии */
+  /** While the main process has not raised the localhost bridge to return the session */
   openInBrowserPending?: boolean;
 };
 

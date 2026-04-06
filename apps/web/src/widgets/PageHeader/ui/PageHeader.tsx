@@ -8,9 +8,9 @@ type PageHeaderProps = {
   subtitle?: string;
   className?: string;
   titleClassName?: string;
-  /** Заголовок внутри уже ограниченного контейнера страницы (без своих max-width и боковых отступов). */
+  /** Heading inside an already limited page container (without its own max-width and side padding). */
   embedded?: boolean;
-  /** Ширина колонки заголовка; не применяется при embedded. */
+  /** Header column width; does not apply when embedded. */
   maxWidth?: PageHeaderMaxWidth;
 };
 

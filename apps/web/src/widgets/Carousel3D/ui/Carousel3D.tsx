@@ -8,7 +8,7 @@ export type Carousel3DProps = {
   children: React.ReactNode;
   initialIndex?: number;
   className?: string;
-  /** Минимальная высота области просмотра */
+  /** Minimum viewport height */
   sceneHeight?: number;
   onSlideChange?: (index: number) => void;
 };
@@ -258,7 +258,7 @@ export const Carousel3D: React.FC<Carousel3DProps> = ({
         onScroll={onScroll}
         role="region"
         aria-roledescription="carousel"
-        aria-label="Карусель. Листайте или перетаскивайте влево и вправо."
+        aria-label="Carousel. Swipe or drag left and right."
       >
         {items.map((child, i) => (
           <div key={i} className={cls.slide} aria-hidden={i !== index}>

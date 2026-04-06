@@ -39,12 +39,12 @@ export const NotificationsPage: React.FC = () => {
   return (
     <div className={cls.shell}>
       <div className={cls.inner}>
-        <PageHeader embedded title="Уведомления" subtitle="Согласования и напоминания по заказам." />
+        <PageHeader embedded title="Notifications" subtitle="Coordination and reminders for orders." />
 
         {loading || !auth?.accessToken || approvals.length > 0 ? (
           <section className={cls.card} aria-labelledby="approvals-heading">
             <h2 id="approvals-heading" className={cls.cardTitle}>
-              Нужно ваше решение
+              We need your solution
             </h2>
 
             {loading ? (
@@ -55,14 +55,14 @@ export const NotificationsPage: React.FC = () => {
                 <SkeletonBone style={{ height: 40, width: 200, borderRadius: 12, marginTop: 8 }} />
               </div>
             ) : !auth?.accessToken ? (
-              <p className={cls.empty}>Войдите в аккаунт, чтобы видеть согласования.</p>
+              <p className={cls.empty}>Log in to your account to see approvals.</p>
             ) : (
               <div className={cls.list}>
                 {approvals.map((item) => (
                   <article key={item.id} className={cls.row}>
                     <p className={cls.label}>{item.label}</p>
                     <Button type="button" onClick={() => navigate(`/orders/${item.orderId}/approval`)}>
-                      Перейти к согласованию
+                      Go to approval
                     </Button>
                   </article>
                 ))}

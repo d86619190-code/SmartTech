@@ -1,4 +1,4 @@
-/** Базовый URL API (без завершающего слэша). */
+/** Base API URL (no trailing slash). */
 const rawApiOrigin = (import.meta.env.VITE_API_ORIGIN ?? "http://localhost:4000").replace(/\/$/, "");
 
 function resolveApiOrigin(origin: string): string {
@@ -18,5 +18,5 @@ function resolveApiOrigin(origin: string): string {
 
 export const apiOrigin = resolveApiOrigin(rawApiOrigin);
 
-/** Google OAuth 2.0 Client ID (Web) из Google Cloud Console — должен совпадать с бэкендом. */
+/** Google OAuth 2.0 Client ID (Web) from Google Cloud Console - must match the backend. */
 export const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";

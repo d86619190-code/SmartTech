@@ -10,7 +10,7 @@ const SLIDE_MS = 680;
 const FALLBACK_CURTAIN_IN_MS = 520;
 const FALLBACK_CURTAIN_OUT_MS = 550;
 
-/** Согласовано с AppLayout: сайдбар колонкой от 768px */
+/** Coordinated with AppLayout: sidebar column from 768px */
 const MEDIA_MIN_DESKTOP = "(min-width: 768px)";
 
 type Direction = "forward" | "backward" | "neutral";

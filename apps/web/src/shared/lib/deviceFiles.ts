@@ -1,19 +1,19 @@
 /**
- * Выбор файлов с устройства: работает в браузере, в WebView (Capacitor),
- * Electron и на мобильных через стандартный `<input type="file">` с `capture`.
- * Без облака — вложения остаются data URL / скачиваются локально.
- * Фото и видео автоматически сжимаются под лимит (canvas + WebP/JPEG; видео — canvas + MediaRecorder).
+ * Selecting files from the device: works in the browser, in WebView (Capacitor),
+ * Electron and on mobile devices via the standard `<input type="file">` with `capture`.
+ * Without the cloud - attachments remain data URL / downloaded locally.
+ * Photos and videos are automatically compressed to the limit (canvas + WebP/JPEG; video - canvas + MediaRecorder).
  */
 
-export const MAX_CHAT_FILE_BYTES = 2_400_000; /** ~2.3 MB — лимит для JSON в локальной БД */
+export const MAX_CHAT_FILE_BYTES = 2_400_000; /** ~2.3 MB — limit for JSON in the local database */
 export const MAX_ORDER_PHOTO_BYTES = 6_000_000;
 export const MAX_DIAGNOSTIC_PHOTO_BYTES = 4_000_000;
 
-/** Макс. длительность видео для попытки перекодирования в браузере */
+/** Max. video duration to try to recode in the browser */
 const MAX_VIDEO_COMPRESS_DURATION_SEC = 120;
-/** Макс. длинная сторона кадра при сжатии видео */
+/** Max. long side of the frame when compressing video */
 const MAX_VIDEO_LONG_EDGE = 1280;
-/** Стартовый битрейт видео при перекодировании */
+/** Starting video bitrate when transcoding */
 const VIDEO_START_BITS_PER_SECOND = 1_200_000;
 
 export type PickedFileMeta = {
@@ -41,16 +41,16 @@ async function dataUrlByteLength(dataUrl: string): Promise<number> {
 function readFileAsDataUrl(file: File, maxBytes: number): Promise<string> {
   return new Promise((resolve, reject) => {
     if (file.size > maxBytes) {
-      reject(new Error(`Файл больше ${Math.round(maxBytes / 1024 / 1024)} МБ`));
+      reject(new Error(`The file is larger than ${Math.round(maxBytes / 1024 / 1024)} MB`));
       return;
     }
     const r = new FileReader();
     r.onload = () => {
       const url = r.result;
       if (typeof url === "string") resolve(url);
-      else reject(new Error("Не удалось прочитать файл"));
+      else reject(new Error("Failed to read file"));
     };
-    r.onerror = () => reject(new Error("Ошибка чтения файла"));
+    r.onerror = () => reject(new Error("Error reading file"));
     r.readAsDataURL(file);
   });
 }
@@ -61,9 +61,9 @@ function blobToDataUrl(blob: Blob): Promise<string> {
     r.onload = () => {
       const u = r.result;
       if (typeof u === "string") resolve(u);
-      else reject(new Error("Не удалось прочитать результат"));
+      else reject(new Error("Failed to read result"));
     };
-    r.onerror = () => reject(new Error("Ошибка чтения результата"));
+    r.onerror = () => reject(new Error("Error reading result"));
     r.readAsDataURL(blob);
   });
 }
@@ -78,7 +78,7 @@ async function loadDrawableImage(file: File): Promise<ImageBitmap | HTMLImageEle
     try {
       return await createImageBitmap(file);
     } catch {
-      /* HEIC / неподдерживаемый — пробуем Image */
+      /* HEIC / unsupported - try Image */
     }
   }
   const img = new Image();
@@ -86,7 +86,7 @@ async function loadDrawableImage(file: File): Promise<ImageBitmap | HTMLImageEle
   try {
     await new Promise<void>((resolve, reject) => {
       img.onload = () => resolve();
-      img.onerror = () => reject(new Error("Не удалось открыть изображение"));
+      img.onerror = () => reject(new Error("Could not open image"));
       img.src = url;
     });
     return img;
@@ -100,7 +100,7 @@ function encodeCanvasRaster(canvas: HTMLCanvasElement, quality: number): string 
     const webp = canvas.toDataURL("image/webp", quality);
     if (webp.startsWith("data:image/webp") && webp.length > 100) return webp;
   } catch {
-    /* WebP не поддерживается */
+    /* WebP not supported */
   }
   return canvas.toDataURL("image/jpeg", quality);
 }
@@ -115,14 +115,14 @@ function disposeDrawable(drawable: ImageBitmap | HTMLImageElement): void {
   }
 }
 
-/** Сжатие фото под maxBytes: уменьшение стороны и качества. */
+/** Photo compression under maxBytes: reducing aspect ratio and quality. */
 export async function compressImageFileToDataUrl(file: File, maxBytes: number): Promise<string> {
   const drawable = await loadDrawableImage(file);
   const sw = drawable instanceof ImageBitmap ? drawable.width : drawable.naturalWidth;
   const sh = drawable instanceof ImageBitmap ? drawable.height : drawable.naturalHeight;
   if (!sw || !sh) {
     disposeDrawable(drawable);
-    throw new Error("Пустое изображение");
+    throw new Error("Blank image");
   }
 
   let maxEdge = Math.min(2048, Math.max(sw, sh));
@@ -131,7 +131,7 @@ export async function compressImageFileToDataUrl(file: File, maxBytes: number): 
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     disposeDrawable(drawable);
-    throw new Error("Не удалось подготовить изображение");
+    throw new Error("Failed to prepare image");
   }
 
   try {
@@ -154,10 +154,10 @@ export async function compressImageFileToDataUrl(file: File, maxBytes: number): 
       }
       quality -= 0.05;
       if (quality < 0.32) {
-        throw new Error("Не удалось сжать фото до допустимого размера — выберите другое изображение");
+        throw new Error("Failed to compress photo to acceptable size - please select another image");
       }
     }
-    throw new Error("Не удалось сжать изображение");
+    throw new Error("Failed to compress image");
   } finally {
     disposeDrawable(drawable);
   }
@@ -179,7 +179,7 @@ async function compressVideoFileToDataUrl(file: File, maxBytes: number): Promise
   const mime = pickVideoRecorderMime();
   if (!mime) {
     throw new Error(
-      "Видео слишком большое, а перекодирование в этом браузере недоступно. Выберите короткий ролик или файл меньшего размера.",
+      "The video is too large and transcoding is not available in this browser. Select a short video or smaller file.",
     );
   }
 
@@ -193,15 +193,15 @@ async function compressVideoFileToDataUrl(file: File, maxBytes: number): Promise
   try {
     await new Promise<void>((resolve, reject) => {
       video.onloadedmetadata = () => resolve();
-      video.onerror = () => reject(new Error("Не удалось открыть видео"));
+      video.onerror = () => reject(new Error("Failed to open video"));
     });
 
     if (!Number.isFinite(video.duration) || video.duration <= 0) {
-      throw new Error("Не удалось определить длительность видео");
+      throw new Error("Could not determine video duration");
     }
     if (video.duration > MAX_VIDEO_COMPRESS_DURATION_SEC) {
       throw new Error(
-        `Видео длиннее ${MAX_VIDEO_COMPRESS_DURATION_SEC} с — выберите более короткий ролик или уменьшите размер в галерее.`,
+        `The video is longer than ${MAX_VIDEO_COMPRESS_DURATION_SEC} s - select a shorter video or reduce the size in the gallery.`,
       );
     }
 
@@ -209,7 +209,7 @@ async function compressVideoFileToDataUrl(file: File, maxBytes: number): Promise
     const vh = video.videoHeight || 480;
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Не удалось подготовить видео");
+    if (!ctx) throw new Error("Failed to prepare video");
 
     const videoMime = mime.split(";")[0] || "video/webm";
     let bps = VIDEO_START_BITS_PER_SECOND;
@@ -230,7 +230,7 @@ async function compressVideoFileToDataUrl(file: File, maxBytes: number): Promise
           }
         }
       } catch {
-        /* без звука */
+        /* no sound */
       }
 
       const chunks: Blob[] = [];
@@ -252,13 +252,13 @@ async function compressVideoFileToDataUrl(file: File, maxBytes: number): Promise
 
         const timeoutMs = Math.min(180_000, Math.ceil((video.duration + 3) * 1000));
         timeoutId = window.setTimeout(() => {
-          done(new Error("Перекодирование видео заняло слишком много времени"));
+          done(new Error("Transcoding the video took too long"));
         }, timeoutMs);
 
         recorder.ondataavailable = (e) => {
           if (e.data.size) chunks.push(e.data);
         };
-        recorder.onerror = () => done(new Error("Ошибка записи видео"));
+        recorder.onerror = () => done(new Error("Video recording error"));
 
         let finishRequested = false;
         const finish = () => {
@@ -275,7 +275,7 @@ async function compressVideoFileToDataUrl(file: File, maxBytes: number): Promise
               }
               if (recorder.state !== "inactive") recorder.stop();
             } catch {
-              done(new Error("Ошибка остановки записи"));
+              done(new Error("Stop recording error"));
             }
           }, 150);
         };
@@ -319,7 +319,7 @@ async function compressVideoFileToDataUrl(file: File, maxBytes: number): Promise
     }
 
     throw new Error(
-      "Не удалось сжать видео до допустимого размера — выберите более короткий ролик или снимите в меньшем разрешении.",
+      "The video could not be compressed to the acceptable size - select a shorter video or shoot in a lower resolution.",
     );
   } finally {
     video.pause();
@@ -340,11 +340,11 @@ async function fileToDataUrlForLimit(file: File, maxBytes: number): Promise<stri
   return readFileAsDataUrl(file, maxBytes);
 }
 
-/** Универсальный выбор: галерея/файлы; на телефоне системный диалог или камера при capture. */
+/** Universal selection: gallery/files; on the phone system dialogue or camera when capturing. */
 export function pickFiles(options: {
   accept: string;
   multiple?: boolean;
-  /** Камера: `environment` — задняя, `user` — фронтальная */
+  /** Camera: `environment` - rear, `user` - front */
   capture?: "user" | "environment";
   maxBytesPerFile?: number;
 }): Promise<PickedFileMeta[]> {
@@ -395,7 +395,7 @@ export function pickPhotosOrVideos(multiple = true): Promise<PickedFileMeta[]> {
   });
 }
 
-/** Скачать data URL / blob на устройство (без облака). */
+/** Download data URL/blob to your device (without cloud). */
 export function downloadDataUrl(dataUrl: string, filename: string): void {
   const a = document.createElement("a");
   a.href = dataUrl;

@@ -59,17 +59,17 @@ export const OrderHistoryPage: React.FC = () => {
       <div className={cls.inner}>
         <PageHeader
           embedded
-          title="История заказов"
-          subtitle="Заказы из вашего аккаунта (данные с сервера)."
+          title="Order history"
+          subtitle="Orders from your account (data from the server)."
         />
         {!auth?.accessToken ? (
           <Navigate to="/login?next=/history" replace />
         ) : loading ? (
           <SkeletonOrderRows count={4} />
         ) : orders.length === 0 ? (
-          <p className={cls.hint}>Пока нет заказов в истории.</p>
+          <p className={cls.hint}>There are no orders in history yet.</p>
         ) : (
-          <OrderHistoryList orders={orders} heading="Ремонты" />
+          <OrderHistoryList orders={orders} heading="Repairs" />
         )}
       </div>
     </div>
