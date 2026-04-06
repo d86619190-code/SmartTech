@@ -32,6 +32,13 @@ body {
   padding-right: env(safe-area-inset-right);
 }
 
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
 *::-webkit-scrollbar {
   display: none;
   width: 0;
@@ -116,4 +123,14 @@ input[type="checkbox"]:focus-visible {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+@media (max-width: 767px) {
+  input,
+  textarea,
+  select,
+  button {
+    /* Prevent iOS auto-zoom on focused controls */
+    font-size: 16px;
+  }
 }
