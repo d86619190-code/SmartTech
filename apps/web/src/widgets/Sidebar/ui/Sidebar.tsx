@@ -5,6 +5,7 @@ import { useLandingExitNav } from "@/pages/Landing/lib/LandingExitNav";
 import { getInboxSummaryApi, type InboxSummary } from "@/shared/lib/clientInboxApi";
 import { useInboxSummarySse } from "@/shared/lib/realtime/useSseStreams";
 import { readAuthSession } from "@/shared/lib/authSession";
+import { useI18n, type Locale } from "@/shared/i18n/i18n";
 import { IconLogin } from "@/shared/ui/Icon/NavAndAuthIcons";
 import { primarySidebarItems } from "../model/sidebarNav";
 import cls from "./Sidebar.module.css";
@@ -15,8 +16,9 @@ export const Sidebar: React.FC = () => {
   const { navigateWithTransition } = useLandingExitNav();
   const closeMenu = () => mobileNav?.closeMobileNav();
   const auth = readAuthSession();
+  const { t, locale, setLocale } = useI18n();
   const [badgeCount, setBadgeCount] = React.useState(0);
-  const userName = auth?.user.name?.trim() || "Профиль";
+  const userName = auth?.user.name?.trim() || t("common.profile");
   const userAvatar = auth?.user.avatarUrl?.trim() || "";
   const userInitial = userName.charAt(0).toUpperCase();
 
@@ -46,9 +48,16 @@ export const Sidebar: React.FC = () => {
 
   useInboxSummarySse(!!auth, onInboxBadge);
 
+  const onLanguageChange = React.useCallback(
+    (next: Locale) => {
+      if (next !== locale) setLocale(next);
+    },
+    [locale, setLocale]
+  );
+
   return (
-    <aside id="app-sidebar" className={cls.root} aria-label="Разделы приложения">
-      <nav className={cls.nav} aria-label="Основное меню">
+    <aside id="app-sidebar" className={cls.root} aria-label={t("sidebar.sections")}>
+      <nav className={cls.nav} aria-label={t("sidebar.mainMenu")}>
         {primarySidebarItems.map((item) =>
           item.to === "/landing" ? (
             <NavLink
@@ -65,7 +74,7 @@ export const Sidebar: React.FC = () => {
               <span className={cls.icon}>
                 <item.Icon />
               </span>
-              <span className={cls.itemLabel}>{item.label}</span>
+              <span className={cls.itemLabel}>{t(item.labelKey)}</span>
             </NavLink>
           ) : (
             <NavLink
@@ -79,7 +88,7 @@ export const Sidebar: React.FC = () => {
                 <item.Icon />
               </span>
               <span className={cls.itemLabel}>
-                {item.label}
+                {t(item.labelKey)}
                 {item.key === "messages" && badgeCount > 0 ? <span className={cls.badge}>{badgeCount}</span> : null}
               </span>
             </NavLink>
@@ -87,6 +96,27 @@ export const Sidebar: React.FC = () => {
         )}
       </nav>
       <div className={cls.spacer} aria-hidden />
+      <div className={cls.langRow} aria-label={t("sidebar.language")}>
+        <span className={cls.langLabel}>{t("sidebar.language")}</span>
+        <div className={cls.langButtons}>
+          <button
+            type="button"
+            className={[cls.langButton, locale === "ru" ? cls.langButtonActive : ""].filter(Boolean).join(" ")}
+            onClick={() => onLanguageChange("ru")}
+            aria-pressed={locale === "ru"}
+          >
+            {t("sidebar.langRu")}
+          </button>
+          <button
+            type="button"
+            className={[cls.langButton, locale === "en" ? cls.langButtonActive : ""].filter(Boolean).join(" ")}
+            onClick={() => onLanguageChange("en")}
+            aria-pressed={locale === "en"}
+          >
+            {t("sidebar.langEn")}
+          </button>
+        </div>
+      </div>
       <div className={cls.divider} role="separator" />
       <div className={cls.footer}>
         {auth ? (
@@ -107,7 +137,7 @@ export const Sidebar: React.FC = () => {
             <span className={cls.icon}>
               <IconLogin />
             </span>
-            <span>Вход</span>
+            <span>{t("auth.login")}</span>
           </NavLink>
         )}
       </div>

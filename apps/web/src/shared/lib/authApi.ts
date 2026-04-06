@@ -1,4 +1,5 @@
 import { apiOrigin } from "@/shared/config/api";
+import { translateStatic } from "@/shared/i18n/i18n";
 import { clearAuthSession, readAuthSession, saveAuthSession, type AuthSession } from "./authSession";
 import { normalizeAuthRequiredMessage, redirectToLoginForAuthMissing, isAuthRequiredMessage } from "./authRedirect";
 
@@ -37,7 +38,7 @@ async function authPostJson(path: string, body: unknown): Promise<Response> {
   } catch (e: unknown) {
     const name = e instanceof DOMException ? e.name : e instanceof Error ? e.name : "";
     if (name === "AbortError" || name === "TimeoutError") {
-      throw new Error("Сервер не ответил вовремя. Проверьте сеть и попробуйте снова.");
+      throw new Error(translateStatic("errors.timeout"));
     }
     throw e;
   }
@@ -45,9 +46,9 @@ async function authPostJson(path: string, body: unknown): Promise<Response> {
 
 async function parseError(res: Response): Promise<string> {
   const body = (await res.json().catch(() => ({}))) as { error?: string };
-  const base = body.error ?? `Ошибка ${res.status}`;
+  const base = body.error ?? `HTTP ${res.status}`;
   if (/unexpected socket close|connection closed|socket disconnected|tls|network/i.test(base)) {
-    return "Что-то не так с сетью. Если у вас включен VPN, попробуйте отключить его и повторить.";
+    return translateStatic("errors.timeout");
   }
   if (isAuthRequiredMessage(base)) {
     redirectToLoginForAuthMissing();
@@ -134,7 +135,7 @@ export async function getMe(): Promise<ApiUser> {
   let session = readAuthSession();
   if (!session) {
     redirectToLoginForAuthMissing();
-    throw new Error("Нужна авторизация");
+    throw new Error(translateStatic("auth.needAuth"));
   }
 
   let res = await fetch(`${apiOrigin}/api/v1/auth/me`, {
@@ -142,7 +143,7 @@ export async function getMe(): Promise<ApiUser> {
   });
   if (res.status === 401) {
     session = await refreshSessionOrNull();
-    if (!session) throw new Error("Сессия истекла");
+    if (!session) throw new Error(translateStatic("auth.sessionExpired"));
     res = await fetch(`${apiOrigin}/api/v1/auth/me`, {
       headers: { Authorization: `Bearer ${session.accessToken}` },
     });
@@ -158,7 +159,7 @@ export async function updateMe(name: string, avatarUrl?: string, phone?: string)
   let session = readAuthSession();
   if (!session) {
     redirectToLoginForAuthMissing();
-    throw new Error("Нужна авторизация");
+    throw new Error(translateStatic("auth.needAuth"));
   }
   let res = await fetch(`${apiOrigin}/api/v1/auth/me`, {
     method: "PATCH",
@@ -170,7 +171,7 @@ export async function updateMe(name: string, avatarUrl?: string, phone?: string)
   });
   if (res.status === 401) {
     session = await refreshSessionOrNull();
-    if (!session) throw new Error("Сессия истекла");
+    if (!session) throw new Error(translateStatic("auth.sessionExpired"));
     res = await fetch(`${apiOrigin}/api/v1/auth/me`, {
       method: "PATCH",
       headers: {
@@ -204,7 +205,7 @@ export async function getStreamToken(): Promise<string> {
   let session = readAuthSession();
   if (!session) {
     redirectToLoginForAuthMissing();
-    throw new Error("Нужна авторизация");
+    throw new Error(translateStatic("auth.needAuth"));
   }
   let res = await fetch(`${apiOrigin}/api/v1/auth/stream-token`, {
     method: "POST",
@@ -212,7 +213,7 @@ export async function getStreamToken(): Promise<string> {
   });
   if (res.status === 401) {
     session = await refreshSessionOrNull();
-    if (!session) throw new Error("Сессия истекла");
+    if (!session) throw new Error(translateStatic("auth.sessionExpired"));
     res = await fetch(`${apiOrigin}/api/v1/auth/stream-token`, {
       method: "POST",
       headers: { Authorization: `Bearer ${session.accessToken}` },

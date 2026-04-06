@@ -12,6 +12,7 @@ import {
 } from "@/shared/lib/authApi";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
 import { buildHashAppUrl } from "@/shared/lib/appPublicOrigin";
+import { useI18n } from "@/shared/i18n/i18n";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
 import cls from "./LoginPage.module.css";
 
@@ -79,6 +80,7 @@ function redirectSessionToElectronBridge(callbackBase: string, encodedSession: s
 }
 
 export const LoginPage: React.FC = () => {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
   const isElectronBrowserRoute = location.pathname === "/login/electron";
@@ -172,7 +174,7 @@ export const LoginPage: React.FC = () => {
         await getMe();
         if (!cancelled) navigate(nextPath, { replace: true });
       } catch {
-        // Сессия в localStorage могла быть протухшей: очищаем и остаёмся на логине.
+        // Session in localStorage may be stale: clear and stay on login page.
         clearAuthSession();
       }
     })();
@@ -193,13 +195,12 @@ export const LoginPage: React.FC = () => {
       setCode("");
       setCodeTone("idle");
       setOtpPhase("code");
-      const baseHint =
-        authMethod === "phone" ? "Код отправлен. Проверьте SMS." : "Код отправлен. Проверьте email.";
+      const baseHint = authMethod === "phone" ? t("login.codeSentPhone") : t("login.codeSentEmail");
       const showDev =
         Boolean(devCode) && import.meta.env.DEV;
-      showToast("success", showDev ? `${baseHint} (локально) Код: ${devCode}` : baseHint);
+      showToast("success", showDev ? `${baseHint} ${t("login.codeSentLocal")} ${devCode}` : baseHint);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось отправить код";
+      const msg = e instanceof Error ? e.message : t("login.sendCodeFailed");
       showToast("error", msg);
     } finally {
       setIsSubmitting(false);
@@ -225,11 +226,11 @@ export const LoginPage: React.FC = () => {
         redirectSessionToElectronBridge(resolvedElectronCallback, encoded);
         return;
       }
-      showToast("success", mode === "register" ? "Регистрация выполнена" : "Вход выполнен");
+      showToast("success", mode === "register" ? t("login.registerDone") : t("login.loginDone"));
       navigate(nextPath, { replace: true });
     } catch (e) {
       setCodeTone("error");
-      const msg = e instanceof Error ? e.message : "Не удалось войти по коду";
+      const msg = e instanceof Error ? e.message : t("login.verifyFailed");
       showToast("error", msg);
     } finally {
       setIsSubmitting(false);
@@ -257,10 +258,10 @@ export const LoginPage: React.FC = () => {
         redirectSessionToElectronBridge(resolvedElectronCallback, encoded);
         return;
       }
-      showToast("success", "Успешный вход через Google");
+      showToast("success", t("login.googleSuccess"));
       navigate(nextPath, { replace: true });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось войти через Google";
+      const msg = e instanceof Error ? e.message : t("login.googleFailed");
       showToast("error", msg);
     } finally {
       setIsSubmitting(false);
@@ -281,13 +282,13 @@ export const LoginPage: React.FC = () => {
     if (!target) {
       showToast(
         "error",
-        "Для входа через браузер задайте VITE_APP_ORIGIN при сборке фронта — URL сайта (например https://app.example.com).",
+        t("login.browserOriginMissing"),
       );
       return;
     }
     window.open(target, "_blank", "noopener,noreferrer");
-    showToast("success", "Открыл браузер. После входа по коду откроется приложение.");
-  }, [buildElectronBrowserUrl, isBrowser, showToast]);
+    showToast("success", t("login.browserOpened"));
+  }, [buildElectronBrowserUrl, isBrowser, showToast, t]);
 
   const handleGoogleOpenInBrowser = React.useCallback(() => {
     if (!isBrowser) return;
@@ -298,15 +299,15 @@ export const LoginPage: React.FC = () => {
     if (!target) {
       showToast(
         "error",
-        "Для входа через браузер задайте VITE_APP_ORIGIN при сборке фронта — URL сайта (например https://app.example.com).",
+        t("login.browserOriginMissing"),
       );
       return;
     }
     window.open(target, "_blank", "noopener,noreferrer");
-    showToast("success", "Открыл браузер для входа через Google");
-  }, [resolvedElectronCallback, isBrowser, nextPath, showToast]);
+    showToast("success", t("login.googleBrowserOpened"));
+  }, [resolvedElectronCallback, isBrowser, nextPath, showToast, t]);
 
-  const pageTitle = isElectronBrowserRoute ? "Регистрация для приложения" : "Вход";
+  const pageTitle = isElectronBrowserRoute ? t("login.titleRegisterApp") : t("login.title");
   const showBrowserBridgeHint = electronBridgeOn || isElectronBrowserRoute;
 
   return (
@@ -316,8 +317,8 @@ export const LoginPage: React.FC = () => {
           {showBrowserBridgeHint ? (
             <p className={cls.electronHint} role="status">
               {electronBridgeOn
-                ? "После входа сессия отправляется в приложение на 127.0.0.1 (без длинной ссылки в адресе). Запасной вариант — ссылка evrenyan://."
-                : "Страница для регистрации и входа по коду из приложения на ПК."}
+                ? t("login.electronHintBridge")
+                : t("login.electronHintPage")}
             </p>
           ) : null}
           <h1 className={cls.title}>{pageTitle}</h1>

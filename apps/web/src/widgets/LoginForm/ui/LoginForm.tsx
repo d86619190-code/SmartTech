@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { Button } from "@/shared/ui/Button/Button";
 import { Card } from "@/shared/ui/Card/Card";
 import { Input } from "@/shared/ui/Input/Input";
+import { useI18n } from "@/shared/i18n/i18n";
 import { IconPhone } from "@/shared/ui/Icon/NavAndAuthIcons";
 import { GoogleSignInButton } from "./GoogleSignInButton";
 import cls from "./LoginForm.module.css";
@@ -59,6 +60,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onOpenAuthInBrowser,
   openInBrowserPending,
 }) => {
+  const { t } = useI18n();
   const onGoogle = onGoogleCredential ?? (async () => {});
   const contactReady = authMethod === "phone" ? phone.trim().length >= 8 : email.trim().includes("@");
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -80,7 +82,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       >
         {otpPhase === "contact" ? (
           <>
-            <div className={cls.methodTabs} role="tablist" aria-label="Способ входа">
+            <div className={cls.methodTabs} role="tablist" aria-label={t("login.method")}>
               <button
                 type="button"
                 className={[cls.methodTab, authMethod === "email" ? cls.methodTabActive : ""].join(" ")}
@@ -93,7 +95,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 className={[cls.methodTab, authMethod === "phone" ? cls.methodTabActive : ""].join(" ")}
                 onClick={() => onAuthMethodChange("phone")}
               >
-                Телефон (опционально)
+                {t("login.phoneOptional")}
               </button>
             </div>
             <div className={cls.fields}>
@@ -102,11 +104,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                   type="text"
                   name="name"
                   autoComplete="name"
-                  placeholder="Ваше имя"
+                  placeholder={t("login.yourName")}
                   value={name}
                   onChange={(e) => onNameChange(e.target.value)}
                   required
-                  aria-label="Имя"
+                  aria-label={t("login.name")}
                 />
               ) : null}
               {authMethod === "phone" ? (
@@ -119,7 +121,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                   onChange={(e) => onPhoneChange(e.target.value)}
                   icon={<IconPhone size={18} />}
                   required
-                  aria-label="Телефон"
+                  aria-label={t("login.phone")}
                 />
               ) : null}
               {authMethod === "email" ? (
@@ -136,7 +138,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               ) : null}
             </div>
             <Button type="button" variant="outline" fullWidth disabled={isSubmitting || !contactReady} onClick={() => void onSendCode()}>
-              Отправить код
+              {t("login.sendCode")}
             </Button>
             {onOpenAuthInBrowser ? (
               <Button
@@ -146,12 +148,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 disabled={isSubmitting || openInBrowserPending}
                 onClick={onOpenAuthInBrowser}
               >
-                {openInBrowserPending ? "Подготовка входа в браузере…" : "Регистрация и вход в браузере"}
+                {openInBrowserPending ? t("login.prepareBrowser") : t("login.openBrowserAuth")}
               </Button>
             ) : null}
-            <div className={cls.orRow} role="separator" aria-label="или">
+            <div className={cls.orRow} role="separator" aria-label={t("login.or")}>
               <span className={cls.orLine} />
-              <span className={cls.orText}>или</span>
+              <span className={cls.orText}>{t("login.or")}</span>
               <span className={cls.orLine} />
             </div>
             <GoogleSignInButton onCredential={onGoogle} onOpenInBrowser={onGoogleOpenInBrowser} disabled={isSubmitting} />
@@ -161,10 +163,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 className={cls.linkButton}
                 onClick={() => onModeChange(mode === "login" ? "register" : "login")}
               >
-                {mode === "login" ? "Нужна регистрация?" : "Уже есть аккаунт?"}
+                {mode === "login" ? t("login.needRegister") : t("login.haveAccount")}
               </button>
               <NavLink className={cls.link} to="/forgot-password">
-                Не пришёл код?
+                {t("login.codeNotReceived")}
               </NavLink>
             </div>
           </>
@@ -172,16 +174,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           <>
             <div className={cls.codeStepHead}>
               <p className={cls.codeStepHint}>
-                {authMethod === "phone" ? "Код отправлен на номер" : "Код отправлен на"}{" "}
+                {authMethod === "phone" ? t("login.codeSentToPhone") : t("login.codeSentTo")}{" "}
                 <strong className={cls.codeStepContact}>{authMethod === "phone" ? phone.trim() || "—" : email.trim() || "—"}</strong>
               </p>
               <button type="button" className={cls.changeContactBtn} onClick={onBackToContact}>
-                Изменить
+                {t("login.change")}
               </button>
             </div>
             <div className={cls.fields}>
               <div className={cls.otpBlock}>
-                <p className={cls.otpLabel}>{authMethod === "phone" ? "Код из SMS" : "Код из email"}</p>
+                <p className={cls.otpLabel}>{authMethod === "phone" ? t("login.codeSms") : t("login.codeEmail")}</p>
                 <div
                   className={[
                     cls.otpGrid,
@@ -206,20 +208,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                     maxLength={6}
                     value={code}
                     onChange={(e) => onCodeChange(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                    aria-label="Код подтверждения"
+                    aria-label={t("login.confirmationCode")}
                   />
                 </div>
               </div>
             </div>
             <Button type="submit" fullWidth disabled={isSubmitting || code.length !== 6 || (mode === "register" && name.trim().length < 2)}>
-              {isSubmitting ? "Отправляем…" : mode === "register" ? "Зарегистрироваться" : "Войти по коду"}
+              {isSubmitting ? t("login.sending") : mode === "register" ? t("login.signUp") : t("login.signInCode")}
             </Button>
             <Button type="button" variant="outline" fullWidth disabled={isSubmitting || !contactReady} onClick={() => void onSendCode()}>
-              Отправить код ещё раз
+              {t("login.sendAgain")}
             </Button>
-            <div className={cls.orRow} role="separator" aria-label="или">
+            <div className={cls.orRow} role="separator" aria-label={t("login.or")}>
               <span className={cls.orLine} />
-              <span className={cls.orText}>или</span>
+              <span className={cls.orText}>{t("login.or")}</span>
               <span className={cls.orLine} />
             </div>
             <GoogleSignInButton onCredential={onGoogle} onOpenInBrowser={onGoogleOpenInBrowser} disabled={isSubmitting} />
@@ -229,10 +231,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 className={cls.linkButton}
                 onClick={() => onModeChange(mode === "login" ? "register" : "login")}
               >
-                {mode === "login" ? "Нужна регистрация?" : "Уже есть аккаунт?"}
+                {mode === "login" ? t("login.needRegister") : t("login.haveAccount")}
               </button>
               <NavLink className={cls.link} to="/forgot-password">
-                Не пришёл код?
+                {t("login.codeNotReceived")}
               </NavLink>
             </div>
           </>

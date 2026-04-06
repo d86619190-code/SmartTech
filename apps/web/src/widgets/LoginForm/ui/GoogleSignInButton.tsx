@@ -1,5 +1,6 @@
 import * as React from "react";
 import { googleClientId } from "@/shared/config/api";
+import { useI18n } from "@/shared/i18n/i18n";
 import cls from "./LoginForm.module.css";
 
 const GSI_SCRIPT = "https://accounts.google.com/gsi/client";
@@ -23,7 +24,7 @@ function loadGsiScript(): Promise<void> {
     if (existing) {
       const done = () => {
         if (window.google?.accounts?.id) resolve();
-        else reject(new Error("Google Identity Services недоступен"));
+        else reject(new Error("Google Identity Services is unavailable"));
       };
       if (existing.dataset.loaded === "1") {
         done();
@@ -33,7 +34,7 @@ function loadGsiScript(): Promise<void> {
         existing.dataset.loaded = "1";
         done();
       });
-      existing.addEventListener("error", () => reject(new Error("Не удалось загрузить Google")));
+      existing.addEventListener("error", () => reject(new Error("Failed to load Google")));
       return;
     }
     const s = document.createElement("script");
@@ -43,14 +44,15 @@ function loadGsiScript(): Promise<void> {
     s.onload = () => {
       s.dataset.loaded = "1";
       if (window.google?.accounts?.id) resolve();
-      else reject(new Error("Google Identity Services недоступен"));
+      else reject(new Error("Google Identity Services is unavailable"));
     };
-    s.onerror = () => reject(new Error("Не удалось загрузить Google"));
+    s.onerror = () => reject(new Error("Failed to load Google"));
     document.head.appendChild(s);
   });
 }
 
 export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCredential, onOpenInBrowser, disabled }) => {
+  const { t, locale } = useI18n();
   const containerRef = React.useRef<HTMLDivElement>(null);
   const onCredRef = React.useRef(onCredential);
   onCredRef.current = onCredential;
@@ -82,7 +84,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCreden
         if (cancelled || !containerRef.current) return;
         const g = window.google;
         if (!g?.accounts?.id) {
-          setError("Google Identity Services недоступен");
+          setError(t("login.googleUnavailable"));
           return;
         }
         if (!gsiSingleton.initialized) {
@@ -97,18 +99,18 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCreden
             error_callback: (resp: any) => {
               const reason = String(resp?.type ?? "unknown");
               if (reason === "popup_failed_to_open" || reason === "popup_closed") {
-                setError("Google popup не открылся на устройстве");
-                setHint("Откройте сайт в Chrome/Safari и разрешите всплывающие окна.");
+                setError(t("login.googlePopupFailed"));
+                setHint(t("login.googleOpenChrome"));
                 return;
               }
-              setError(`Ошибка Google (${reason})`);
-              setHint("Проверьте, что вход выполняется не во встроенном браузере мессенджера.");
+              setError(`${t("login.googleError")} (${reason})`);
+              setHint(t("login.googleInAppBrowserHint"));
             },
             callback: (resp: any) => {
               const credential = typeof resp?.credential === "string" ? resp.credential.trim() : "";
               if (!credential || credential.length < 10) {
-                setError("Google не передал корректный credential");
-                setHint("Откройте сайт в обычном Chrome/Safari и повторите вход. Во встроенных браузерах это частая причина 400.");
+                setError(t("login.googleBadCredential"));
+                setHint(t("login.googleOpenNormalBrowser"));
                 return;
               }
               gsiSingleton.dispatchCredential(credential);
@@ -125,30 +127,33 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCreden
           text: "signin_with",
           shape: "rectangular",
           width: 320,
-          locale: "ru",
+          locale,
         });
         if (isInAppWebView) {
-          setHint("Во встроенном браузере (Telegram/Instagram/др.) Google-вход часто возвращает 400. Лучше открыть ссылку в Chrome/Safari.");
+          setHint(t("login.googleInAppBrowserHint"));
         } else if (isMobile) {
-          setHint("Если увидите 400, проверьте системную дату/время телефона и отключите строгую блокировку cookies для сайта.");
+          setHint(t("login.googleMobileHint"));
         } else {
           setHint(null);
         }
         setReady(true);
       } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Ошибка Google");
+        if (!cancelled) setError(e instanceof Error ? e.message : t("login.googleGenericError"));
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [googleUiSupported]);
+  }, [googleUiSupported, locale, t]);
 
   if (!googleClientId) {
     return (
       <p className={cls.googleHint} role="status">
-        Укажите <code className={cls.code}>VITE_GOOGLE_CLIENT_ID</code> для входа через Google.
+        {t("login.googleNeedClientId")}
+        {" "}
+        <code className={cls.code}>VITE_GOOGLE_CLIENT_ID</code>
+        {locale === "ru" ? " для входа через Google." : " to enable Google sign in."}
       </p>
     );
   }
@@ -157,12 +162,12 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCreden
       <div className={cls.googleWrap}>
         <p className={cls.googleHint} role="status">
           {isElectron
-            ? "Во встроенном окне Electron Google-вход блокируется. Используйте вход через браузер."
-            : "В приложении вход через Google недоступен. Используйте вход по номеру телефона."}
+            ? t("login.googleElectronBlocked")
+            : t("login.googleUnsupported")}
         </p>
         {isElectron && onOpenInBrowser ? (
           <button type="button" className={cls.googleAltBtn} onClick={onOpenInBrowser} disabled={disabled}>
-            Войти через Google в браузере
+            {t("login.googleOpenInBrowser")}
           </button>
         ) : null}
       </div>
@@ -189,7 +194,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCreden
       />
       {onOpenInBrowser && isMobile && !isElectron ? (
         <button type="button" className={cls.googleAltBtn} onClick={onOpenInBrowser} disabled={disabled}>
-          Войти через Google в браузере
+          {t("login.googleOpenInBrowser")}
         </button>
       ) : null}
     </div>

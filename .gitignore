@@ -5,6 +5,7 @@ node_modules/
 # Builds
 dist/
 **/dist/
+apps/web/dist-*.zip
 apps/desktop/web-dist/
 apps/desktop/release/
 

@@ -1,0 +1,34 @@
+stages:
+  - deploy
+
+deploy_web_majordomo:
+  stage: deploy
+  image: oven/bun:1
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - apps/web/**/*
+        - .gitlab-ci.yml
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "api"'
+    - when: never
+  before_script:
+    - apt-get update && apt-get install -y lftp
+  script:
+    - cd apps/web
+    - bun install --frozen-lockfile || bun install
+    - bun run build
+    - test -n "$MAJORDOMO_SFTP_HOST"
+    - test -n "$MAJORDOMO_SFTP_USER"
+    - test -n "$MAJORDOMO_SFTP_PASSWORD"
+    - test -n "$MAJORDOMO_REMOTE_DIR"
+    - |
+      lftp -u "$MAJORDOMO_SFTP_USER","$MAJORDOMO_SFTP_PASSWORD" "sftp://$MAJORDOMO_SFTP_HOST:${MAJORDOMO_SFTP_PORT:-22}" <<EOF
+      set ssl:verify-certificate no
+      set sftp:auto-confirm yes
+      mirror -R --delete --verbose dist "$MAJORDOMO_REMOTE_DIR"
+      bye
+      EOF
+  variables:
+    VITE_API_ORIGIN: $VITE_API_ORIGIN
+    VITE_GOOGLE_CLIENT_ID: $VITE_GOOGLE_CLIENT_ID

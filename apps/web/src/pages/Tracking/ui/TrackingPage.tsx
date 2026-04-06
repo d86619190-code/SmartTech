@@ -4,12 +4,14 @@ import { clientRepairToTrackingCard } from "@/entities/tracking";
 import { getClientRepairsApi } from "@/shared/lib/clientInboxApi";
 import { readAuthSession } from "@/shared/lib/authSession";
 import { SkeletonTrackingCards } from "@/shared/ui/Skeleton";
+import { useI18n } from "@/shared/i18n/i18n";
 import { PageHeader } from "@/widgets/PageHeader";
 import { TrackingRepairCard } from "@/widgets/TrackingRepairCard";
 import cls from "./TrackingPage.module.css";
 
 export const TrackingPage: React.FC = () => {
   const auth = readAuthSession();
+  const { t } = useI18n();
   const [repairs, setRepairs] = React.useState<Awaited<ReturnType<typeof getClientRepairsApi>>>([]);
   const [loading, setLoading] = React.useState(false);
   const lastSigRef = React.useRef<string>("");
@@ -57,16 +59,16 @@ export const TrackingPage: React.FC = () => {
   return (
     <div className={cls.shell}>
       <div className={cls.inner}>
-        <PageHeader embedded title="Отслеживание" subtitle="Статусы ваших ремонтов." />
+        <PageHeader embedded title={t("common.tracking")} subtitle={t("tracking.subtitle")} />
         {loading ? (
           <SkeletonTrackingCards count={2} />
         ) : cards.length === 0 ? (
-          <p className={cls.loginHint}>Пока нет заказов для отображения.</p>
+          <p className={cls.loginHint}>{t("tracking.empty")}</p>
         ) : (
           <div className={cls.cardsGrid}>
             {cards.map((card) => (
               <div key={card.id} className={cls.cardWrap}>
-                <TrackingRepairCard data={card} cardTitle="Активный ремонт" />
+                <TrackingRepairCard data={card} cardTitle={t("tracking.activeRepair")} />
               </div>
             ))}
           </div>

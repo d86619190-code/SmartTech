@@ -79,6 +79,50 @@
   min-height: 16px;
 }
 
+.langRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 4px 6px 2px;
+}
+
+.langLabel {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.langButtons {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.langButton {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.92);
+  border-radius: 10px;
+  min-width: 44px;
+  height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.langButton:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.langButtonActive {
+  background: rgba(255, 255, 255, 0.96);
+  color: #111827;
+  border-color: rgba(255, 255, 255, 0.98);
+}
+
 .divider {
   height: 1px;
   margin: 12px 4px 14px;

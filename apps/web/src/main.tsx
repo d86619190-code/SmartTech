@@ -55,6 +55,7 @@ import {
   TechTasksPage,
   TechTrackingPage,
 } from "./pages/tech";
+import { I18nProvider, useI18n } from "@/shared/i18n/i18n";
 
 const HomePage = React.lazy(() => import("./pages/Home").then((m) => ({ default: m.HomePage })));
 const LandingPage = React.lazy(() => import("./pages/Landing").then((m) => ({ default: m.LandingPage })));
@@ -64,11 +65,10 @@ function OrdersToTrackingRedirect() {
   return <Navigate to={`/tracking/${orderId}`} replace />;
 }
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <HashRouter>
-      <LandingExitNavProvider>
-      <Routes>
+function AppRoutes() {
+  const { t } = useI18n();
+  return (
+    <Routes>
         <Route
           path="landing"
           element={
@@ -109,16 +109,16 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route
             path="forgot-password"
             element={
-              <div style={{ padding: 32, fontFamily: "var(--font-sans)" }}>Восстановление пароля — скоро.</div>
+              <div style={{ padding: 32, fontFamily: "var(--font-sans)" }}>{t("main.forgotPassword")}</div>
             }
           />
           <Route
             path="sign-up"
-            element={<div style={{ padding: 32, fontFamily: "var(--font-sans)" }}>Регистрация — скоро.</div>}
+            element={<div style={{ padding: 32, fontFamily: "var(--font-sans)" }}>{t("main.signUp")}</div>}
           />
-          <Route path="privacy" element={<LegalStubPage title="Политика конфиденциальности" />} />
-          <Route path="terms" element={<LegalStubPage title="Пользовательское соглашение" />} />
-          <Route path="personal-data" element={<LegalStubPage title="Обработка персональных данных" />} />
+          <Route path="privacy" element={<LegalStubPage title={t("main.privacy")} />} />
+          <Route path="terms" element={<LegalStubPage title={t("main.terms")} />} />
+          <Route path="personal-data" element={<LegalStubPage title={t("main.personalData")} />} />
         </Route>
         <Route path="admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />
@@ -151,8 +151,18 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="profile" element={<TechProfilePage />} />
           <Route path="settings" element={<TechSettingsPage />} />
         </Route>
-      </Routes>
+    </Routes>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <I18nProvider>
+      <HashRouter>
+        <LandingExitNavProvider>
+          <AppRoutes />
       </LandingExitNavProvider>
-    </HashRouter>
+      </HashRouter>
+    </I18nProvider>
   </React.StrictMode>
 );

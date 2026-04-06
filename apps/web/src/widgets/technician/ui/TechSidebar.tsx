@@ -1,19 +1,20 @@
 import * as React from "react";
 import { NavLink } from "react-router-dom";
 import { useMobileNavOptional } from "@/app/mobileNavContext";
+import { useI18n } from "@/shared/i18n/i18n";
 import { techApi } from "@/shared/lib/techApi";
 import cls from "./TechSidebar.module.css";
 
 type Icon = "dash" | "inbox" | "tasks" | "done" | "chat" | "user" | "gear";
 
-const ITEMS: { to: string; label: string; icon: Icon; end?: boolean }[] = [
-  { to: "/tech", label: "Дашборд", icon: "dash", end: true },
-  { to: "/tech/incoming", label: "Входящие", icon: "inbox" },
-  { to: "/tech/tasks", label: "Задачи", icon: "tasks" },
-  { to: "/tech/completed", label: "Завершённые", icon: "done" },
-  { to: "/tech/messages", label: "Сообщения", icon: "chat" },
-  { to: "/tech/profile", label: "Профиль", icon: "user" },
-  { to: "/tech/settings", label: "Настройки", icon: "gear" },
+const ITEMS: { to: string; labelKey: string; icon: Icon; end?: boolean }[] = [
+  { to: "/tech", labelKey: "tech.dashboard", icon: "dash", end: true },
+  { to: "/tech/incoming", labelKey: "tech.incoming", icon: "inbox" },
+  { to: "/tech/tasks", labelKey: "tech.tasks", icon: "tasks" },
+  { to: "/tech/completed", labelKey: "tech.completed", icon: "done" },
+  { to: "/tech/messages", labelKey: "profile.messages", icon: "chat" },
+  { to: "/tech/profile", labelKey: "common.profile", icon: "user" },
+  { to: "/tech/settings", labelKey: "tech.settings", icon: "gear" },
 ];
 
 function Icon({ name }: { name: Icon }) {
@@ -76,6 +77,7 @@ function Icon({ name }: { name: Icon }) {
 
 export const TechSidebar: React.FC = () => {
   const mobileNav = useMobileNavOptional();
+  const { t } = useI18n();
   const closeMenu = () => mobileNav?.closeMobileNav();
   const [incomingBadge, setIncomingBadge] = React.useState(0);
 
@@ -98,12 +100,12 @@ export const TechSidebar: React.FC = () => {
   }, []);
 
   return (
-    <aside id="tech-sidebar" className={cls.root} aria-label="Меню мастера">
+    <aside id="tech-sidebar" className={cls.root} aria-label={t("tech.menu")}>
       <div className={cls.brand}>
         <span className={cls.brandMark} aria-hidden />
-        <span className={cls.brandText}>Сервис · Мастер</span>
+        <span className={cls.brandText}>{t("tech.brand")}</span>
       </div>
-      <nav className={cls.nav} aria-label="Разделы мастера">
+      <nav className={cls.nav} aria-label={t("tech.sections")}>
         {ITEMS.map((item) => (
           <NavLink
             key={item.to}
@@ -114,7 +116,7 @@ export const TechSidebar: React.FC = () => {
           >
             <Icon name={item.icon} />
             <span className={cls.itemLabel}>
-              {item.label}
+              {t(item.labelKey)}
               {item.to === "/tech/incoming" && incomingBadge > 0 ? <span className={cls.badge}>{incomingBadge}</span> : null}
             </span>
           </NavLink>
@@ -124,7 +126,7 @@ export const TechSidebar: React.FC = () => {
       <div className={cls.divider} role="separator" />
       <div className={cls.footer}>
         <NavLink to="/" onClick={closeMenu} className={cls.back}>
-          ← К сайту
+          ← {t("admin.backToSite")}
         </NavLink>
       </div>
     </aside>

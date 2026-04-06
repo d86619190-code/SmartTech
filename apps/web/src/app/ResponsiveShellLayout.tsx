@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useEffect } from "react";
 import { IconMenu } from "@/shared/ui/Icon/NavAndAuthIcons";
+import { useI18n } from "@/shared/i18n/i18n";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 import { MobileNavProvider, useMobileNav } from "./mobileNavContext";
 import cls from "./ResponsiveShellLayout.module.css";
@@ -15,6 +16,7 @@ type ResponsiveShellLayoutProps = {
 
 function ResponsiveShellLayoutInner({ sidebarId, sidebar, children }: ResponsiveShellLayoutProps) {
   const { isMobileNavOpen, closeMobileNav, toggleMobileNav } = useMobileNav();
+  const { t } = useI18n();
   const isDesktop = useMediaQuery(MEDIA_MIN_DESKTOP);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ function ResponsiveShellLayoutInner({ sidebarId, sidebar, children }: Responsive
         className={cls.backdrop}
         data-visible={isMobileNavOpen}
         onClick={closeMobileNav}
-        aria-label="Закрыть меню"
+        aria-label={t("nav.closeMenu")}
         tabIndex={isMobileNavOpen ? 0 : -1}
       />
       <div className={cls.sidebarShell} data-open={isMobileNavOpen}>
@@ -37,7 +39,7 @@ function ResponsiveShellLayoutInner({ sidebarId, sidebar, children }: Responsive
       <button
         type="button"
         className={cls.burger}
-        aria-label={isMobileNavOpen ? "Закрыть меню" : "Открыть меню"}
+        aria-label={isMobileNavOpen ? t("nav.closeMenu") : t("nav.openMenu")}
         aria-expanded={isMobileNavOpen}
         aria-controls={sidebarId}
         onClick={toggleMobileNav}

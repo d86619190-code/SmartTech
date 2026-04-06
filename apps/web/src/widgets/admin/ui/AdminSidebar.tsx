@@ -1,20 +1,25 @@
 import * as React from "react";
 import { NavLink } from "react-router-dom";
 import { useMobileNavOptional } from "@/app/mobileNavContext";
+import { useI18n } from "@/shared/i18n/i18n";
 import cls from "./AdminSidebar.module.css";
 
-type Item = { to: string; label: string; icon: "dash" | "orders" | "users" | "tech" | "price" | "cat" | "chart" | "log" | "gear" };
+type Item = {
+  to: string;
+  labelKey: string;
+  icon: "dash" | "orders" | "users" | "tech" | "price" | "cat" | "chart" | "log" | "gear";
+};
 
 const ITEMS: Item[] = [
-  { to: "/admin", label: "Дашборд", icon: "dash" },
-  { to: "/admin/orders", label: "Заказы", icon: "orders" },
-  { to: "/admin/users", label: "Клиенты", icon: "users" },
-  { to: "/admin/technicians", label: "Мастера", icon: "tech" },
-  { to: "/admin/pricing", label: "Прайс", icon: "price" },
-  { to: "/admin/services", label: "Услуги", icon: "cat" },
-  { to: "/admin/analytics", label: "Аналитика", icon: "chart" },
-  { to: "/admin/logs", label: "Журнал", icon: "log" },
-  { to: "/admin/settings", label: "Настройки", icon: "gear" },
+  { to: "/admin", labelKey: "admin.dashboard", icon: "dash" },
+  { to: "/admin/orders", labelKey: "admin.orders", icon: "orders" },
+  { to: "/admin/users", labelKey: "admin.clients", icon: "users" },
+  { to: "/admin/technicians", labelKey: "admin.masters", icon: "tech" },
+  { to: "/admin/pricing", labelKey: "admin.pricing", icon: "price" },
+  { to: "/admin/services", labelKey: "admin.services", icon: "cat" },
+  { to: "/admin/analytics", labelKey: "admin.analytics", icon: "chart" },
+  { to: "/admin/logs", labelKey: "admin.logs", icon: "log" },
+  { to: "/admin/settings", labelKey: "admin.settings", icon: "gear" },
 ];
 
 function Icon({ name }: { name: Item["icon"] }) {
@@ -85,15 +90,16 @@ function Icon({ name }: { name: Item["icon"] }) {
 
 export const AdminSidebar: React.FC = () => {
   const mobileNav = useMobileNavOptional();
+  const { t } = useI18n();
   const closeMenu = () => mobileNav?.closeMobileNav();
 
   return (
-    <aside id="admin-sidebar" className={cls.root} aria-label="Админ-меню">
+    <aside id="admin-sidebar" className={cls.root} aria-label={t("admin.menu")}>
       <div className={cls.brand}>
         <span className={cls.brandMark} aria-hidden />
         <span className={cls.brandText}>Service Admin</span>
       </div>
-      <nav className={cls.nav} aria-label="Разделы админки">
+      <nav className={cls.nav} aria-label={t("admin.sections")}>
         {ITEMS.map((item) => (
           <NavLink
             key={item.to}
@@ -103,7 +109,7 @@ export const AdminSidebar: React.FC = () => {
             className={({ isActive }) => [cls.item, isActive && cls.active].filter(Boolean).join(" ")}
           >
             <Icon name={item.icon} />
-            <span>{item.label}</span>
+            <span>{t(item.labelKey)}</span>
           </NavLink>
         ))}
       </nav>
@@ -111,7 +117,7 @@ export const AdminSidebar: React.FC = () => {
       <div className={cls.divider} role="separator" />
       <div className={cls.footer}>
         <NavLink to="/" onClick={closeMenu} className={cls.back}>
-          ← К сайту
+          ← {t("admin.backToSite")}
         </NavLink>
       </div>
     </aside>

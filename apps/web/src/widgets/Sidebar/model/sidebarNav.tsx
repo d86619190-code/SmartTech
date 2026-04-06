@@ -13,19 +13,19 @@ import {
 
 export type SidebarNavItem = {
   key: string;
-  label: string;
+  labelKey: string;
   to: string;
   Icon: ComponentType<{ className?: string }>;
 };
 
 export const primarySidebarItems: SidebarNavItem[] = [
-  { key: "home", label: "Главная", to: "/", Icon: IconDashboard },
-  { key: "landing", label: "Шоу-лендинг", to: "/landing", Icon: IconSpark },
-  { key: "tracking", label: "Отслеживание", to: "/tracking", Icon: IconTrack },
-  { key: "create", label: "Новая заявка", to: "/create-order", Icon: IconPlus },
-  { key: "history", label: "История заказов", to: "/history", Icon: IconHistory },
-  { key: "messages", label: "Сообщения", to: "/messages", Icon: IconMessage },
-  { key: "help", label: "Помощь", to: "/help", Icon: IconHelp },
-  { key: "contacts", label: "Контакты", to: "/contacts", Icon: IconMapPin },
-  { key: "profile", label: "Профиль", to: "/profile", Icon: IconUser },
+  { key: "home", labelKey: "sidebar.home", to: "/", Icon: IconDashboard },
+  { key: "landing", labelKey: "sidebar.landing", to: "/landing", Icon: IconSpark },
+  { key: "tracking", labelKey: "sidebar.tracking", to: "/tracking", Icon: IconTrack },
+  { key: "create", labelKey: "sidebar.create", to: "/create-order", Icon: IconPlus },
+  { key: "history", labelKey: "sidebar.history", to: "/history", Icon: IconHistory },
+  { key: "messages", labelKey: "sidebar.messages", to: "/messages", Icon: IconMessage },
+  { key: "help", labelKey: "sidebar.help", to: "/help", Icon: IconHelp },
+  { key: "contacts", labelKey: "sidebar.contacts", to: "/contacts", Icon: IconMapPin },
+  { key: "profile", labelKey: "sidebar.profile", to: "/profile", Icon: IconUser },
 ];

@@ -5,6 +5,7 @@ import { PageHeader } from "@/widgets/PageHeader";
 import { Button } from "@/shared/ui/Button/Button";
 import { getMe, logoutCurrentSession, updateMe } from "@/shared/lib/authApi";
 import { readAuthSession } from "@/shared/lib/authSession";
+import { useI18n } from "@/shared/i18n/i18n";
 import { useStatusToast } from "@/shared/lib/useStatusToast";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
 import cls from "./ProfilePage.module.css";
@@ -70,9 +71,10 @@ async function compressAvatarToDataUrl(file: File): Promise<string> {
 }
 
 export const ProfilePage: React.FC = () => {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [role, setRole] = React.useState<"client" | "master" | "admin" | "boss">("client");
-  const [name, setName] = React.useState("Пользователь");
+  const [name, setName] = React.useState(t("profile.defaultUser"));
   const [avatarUrl, setAvatarUrl] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -95,12 +97,12 @@ export const ProfilePage: React.FC = () => {
       try {
         const me = await getMe();
         setRole(me.role);
-        setName(me.name ?? "Пользователь");
+        setName(me.name ?? t("profile.defaultUser"));
         setAvatarUrl(me.avatarUrl ?? "");
         setPhone(me.phone ?? "");
         setEmail(me.email ?? "");
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Не удалось загрузить профиль";
+        const msg = e instanceof Error ? e.message : t("errors.loadProfile");
         const isAuthError = /требуется авторизация|сессия истекла|401/i.test(msg);
         if (isAuthError) {
           navigate("/login", { replace: true });
@@ -132,13 +134,13 @@ export const ProfilePage: React.FC = () => {
       setIsSaving(true);
       const updated = await updateMe(name, avatarUrl, phone);
       setRole(updated.role);
-      setName(updated.name ?? "Пользователь");
+      setName(updated.name ?? t("profile.defaultUser"));
       setAvatarUrl(updated.avatarUrl ?? "");
       setPhone(updated.phone ?? "");
       setEmail(updated.email ?? "");
-      showToast("success", "Профиль сохранен");
+      showToast("success", t("profile.saved"));
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось сохранить профиль";
+      const msg = e instanceof Error ? e.message : t("errors.saveProfile");
       showToast("error", msg);
     } finally {
       setIsSaving(false);
@@ -162,20 +164,20 @@ export const ProfilePage: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      showToast("error", "Выберите изображение");
+      showToast("error", t("errors.pickImage"));
       return;
     }
     if (file.size > 6 * 1024 * 1024) {
-      showToast("error", "Файл слишком большой (до 6MB)");
+      showToast("error", t("errors.fileTooLarge"));
       return;
     }
     void (async () => {
       try {
         const compressed = await compressAvatarToDataUrl(file);
         setAvatarDraftUrl(compressed);
-        showToast("info", "Фото оптимизировано для быстрой загрузки");
+        showToast("info", t("profile.avatarOptimized"));
       } catch (err) {
-        const msg = err instanceof Error ? err.message : "Не удалось обработать изображение";
+        const msg = err instanceof Error ? err.message : t("errors.imageProcessFailed");
         showToast("error", msg);
       }
     })();
@@ -186,10 +188,10 @@ export const ProfilePage: React.FC = () => {
       setIsAvatarSaving(true);
       const updated = await updateMe(name, avatarDraftUrl);
       setAvatarUrl(updated.avatarUrl ?? "");
-      showToast("success", "Аватар обновлен");
+      showToast("success", t("profile.avatarUpdated"));
       setIsAvatarModalOpen(false);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Не удалось обновить аватар";
+      const msg = e instanceof Error ? e.message : t("errors.avatarUpdateFailed");
       showToast("error", msg);
     } finally {
       setIsAvatarSaving(false);
@@ -207,11 +209,9 @@ export const ProfilePage: React.FC = () => {
   const isGenericName = /^(пользователь|user|user\d*)$/i.test(trimmedName) || trimmedName.length < 4;
   const isLatinOnlyName = looksLikeLatinOnlyName(name);
   const showNameReminder = !hideNameReminder && (isGenericName || isLatinOnlyName);
-  const nameReminderText = isGenericName
-    ? "Похоже, это не настоящее имя. Обновите для профиля."
-    : "Имя указано латиницей — похоже, это не ваше настоящее имя. Укажите, как к вам обращаться, на русском: так мастеру проще.";
+  const nameReminderText = isGenericName ? t("profile.realNameHint") : t("profile.realNameLatinHint");
   const roleLabel =
-    role === "master" ? "Мастер" : role === "admin" ? "Администратор" : role === "boss" ? "Босс" : "";
+    role === "master" ? t("role.master") : role === "admin" ? t("role.admin") : role === "boss" ? t("role.boss") : "";
 
   const dismissNameReminder = () => {
     const session = readAuthSession();
@@ -225,7 +225,7 @@ export const ProfilePage: React.FC = () => {
   if (isLoading) {
     return (
       <div className={cls.shell}>
-        <PageHeader title="Профиль" />
+        <PageHeader title={t("common.profile")} />
         <div className={cls.body}>
           <SkeletonProfileHero />
           <SkeletonCard rows={4} />
@@ -236,12 +236,12 @@ export const ProfilePage: React.FC = () => {
 
   return (
     <div className={cls.shell}>
-      <PageHeader title="Профиль" />
+      <PageHeader title={t("common.profile")} />
       <div className={cls.body}>
         <section className={cls.hero}>
-          <button type="button" className={cls.avatarButton} onClick={openAvatarModal} aria-label="Изменить аватар">
+          <button type="button" className={cls.avatarButton} onClick={openAvatarModal} aria-label={t("profile.changeAvatar")}>
             {avatarUrl ? (
-              <img src={avatarUrl} alt="Аватар пользователя" className={cls.avatarImage} />
+              <img src={avatarUrl} alt={t("profile.userAvatar")} className={cls.avatarImage} />
             ) : (
               <div className={cls.avatar} aria-hidden>
                 {initials}
@@ -251,33 +251,33 @@ export const ProfilePage: React.FC = () => {
               <span className={cls.avatarEditIcon} aria-hidden>
                 ✎
               </span>
-              <span className={cls.avatarEditText}>Изменить</span>
+              <span className={cls.avatarEditText}>{t("profile.change")}</span>
             </span>
           </button>
           <div className={cls.heroContent}>
             <div className={cls.nameRow}>
-              <h2 className={cls.heroName}>{name || "Пользователь"}</h2>
+              <h2 className={cls.heroName}>{name || t("profile.defaultUser")}</h2>
               {showNameReminder ? (
                 <div className={cls.nameReminder} role="note">
                   <span className={cls.reminderText}>{nameReminderText}</span>
-                  <button type="button" className={cls.reminderClose} onClick={dismissNameReminder} aria-label="Скрыть напоминание">
+                  <button type="button" className={cls.reminderClose} onClick={dismissNameReminder} aria-label={t("profile.hideReminder")}>
                     ×
                   </button>
                 </div>
               ) : null}
             </div>
-            <p className={cls.heroSub}>{email || "Личный кабинет клиента"}</p>
+            <p className={cls.heroSub}>{email || t("profile.clientCabinet")}</p>
             <div className={cls.badges}>
-              <span className={cls.badge}>Премиум сервис</span>
+              <span className={cls.badge}>{t("profile.premiumService")}</span>
               <span className={cls.badgeMuted}>ID: {email ? "GOOGLE" : "PHONE"}</span>
-              {role !== "client" ? <span className={cls.roleBadge}>Роль: {roleLabel}</span> : null}
+              {role !== "client" ? <span className={cls.roleBadge}>{t("profile.role")}: {roleLabel}</span> : null}
             </div>
           </div>
         </section>
 
         <div className={cls.grid}>
           <section className={cls.card}>
-            <h3 className={cls.cardTitle}>Личные данные</h3>
+            <h3 className={cls.cardTitle}>{t("profile.personalData")}</h3>
             <form
               className={cls.form}
               onSubmit={(e) => {
@@ -286,11 +286,11 @@ export const ProfilePage: React.FC = () => {
               }}
             >
               <label className={cls.label}>
-                Имя
+                {t("profile.name")}
                 <input className={cls.input} value={name} onChange={(e) => setName(e.target.value)} />
               </label>
               <label className={cls.label}>
-                Телефон
+                {t("profile.phone")}
                 <input
                   className={cls.input}
                   value={phone}
@@ -300,58 +300,58 @@ export const ProfilePage: React.FC = () => {
                 />
               </label>
               {email ? <p className={cls.meta}>Google: {email}</p> : null}
-              <p className={cls.hint}>Имя и телефон сохраняются на сервере.</p>
+              <p className={cls.hint}>{t("profile.serverHint")}</p>
               <Button type="submit" variant="outline" disabled={isSaving || name.trim().length < 2}>
-                {isSaving ? "Сохраняем..." : "Сохранить изменения"}
+                {isSaving ? t("profile.saving") : t("profile.saveChanges")}
               </Button>
             </form>
           </section>
 
           <section className={cls.card}>
-            <h3 className={cls.cardTitle}>Навигация</h3>
+            <h3 className={cls.cardTitle}>{t("profile.navigation")}</h3>
             <div className={cls.links}>
               <Link className={cls.navLink} to="/history">
-                История заказов
+                {t("profile.orderHistory")}
               </Link>
               <Link className={cls.navLink} to="/messages">
-                Сообщения
+                {t("profile.messages")}
               </Link>
               <Link className={cls.navLink} to="/help">
-                Помощь
+                {t("profile.help")}
               </Link>
               <Link className={cls.navLink} to="/account/settings">
-                Настройки аккаунта
+                {t("profile.accountSettings")}
               </Link>
               <Link className={cls.navLink} to="/contacts">
-                Контакты сервиса
+                {t("profile.contacts")}
               </Link>
               {role === "master" || role === "admin" || role === "boss" ? (
                 <Link className={cls.navLink} to="/tech">
-                  Панель мастера
+                  {t("profile.techPanel")}
                 </Link>
               ) : null}
               {role === "admin" || role === "boss" ? (
                 <Link className={cls.navLink} to="/admin">
-                  Панель администратора
+                  {t("profile.adminPanel")}
                 </Link>
               ) : null}
             </div>
             <div className={cls.logoutRow}>
               <Button type="button" variant="ghost" onClick={() => void logout()}>
-                Выйти из аккаунта
+                {t("profile.logout")}
               </Button>
             </div>
           </section>
         </div>
       </div>
       {isAvatarModalOpen ? (
-        <div className={cls.modalOverlay} role="dialog" aria-modal="true" aria-label="Изменение аватара">
+        <div className={cls.modalOverlay} role="dialog" aria-modal="true" aria-label={t("profile.avatarDialog")}>
           <div className={cls.modalCard}>
-            <h3 className={cls.modalTitle}>Фото профиля</h3>
-            <p className={cls.modalHint}>Выберите фото с устройства. Работает и на телефоне, и на компьютере.</p>
+            <h3 className={cls.modalTitle}>{t("profile.photoTitle")}</h3>
+            <p className={cls.modalHint}>{t("profile.photoHint")}</p>
             <div className={cls.modalPreviewWrap}>
               {avatarDraftUrl ? (
-                <img src={avatarDraftUrl} alt="Предпросмотр аватара" className={cls.modalPreview} />
+                <img src={avatarDraftUrl} alt={t("profile.avatarPreview")} className={cls.modalPreview} />
               ) : (
                 <div className={cls.modalFallback}>{initials}</div>
               )}
@@ -366,17 +366,17 @@ export const ProfilePage: React.FC = () => {
             />
             <div className={cls.modalActions}>
               <Button type="button" variant="outline" onClick={onPickAvatarClick}>
-                Загрузить фото
+                {t("profile.uploadPhoto")}
               </Button>
               <Button
                 type="button"
                 onClick={() => void onApplyAvatar()}
                 disabled={isAvatarSaving || avatarDraftUrl.trim().length === 0}
               >
-                {isAvatarSaving ? "Сохраняем..." : "Сохранить"}
+                {isAvatarSaving ? t("profile.saving") : t("common.save")}
               </Button>
               <Button type="button" variant="ghost" onClick={closeAvatarModal}>
-                Отмена
+                {t("common.cancel")}
               </Button>
             </div>
           </div>
