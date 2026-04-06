@@ -37,6 +37,7 @@ export async function getAdminDashboardApi() {
   const res = await authFetch("/api/v1/admin/dashboard");
   if (!res.ok) throw new Error(await parseError(res));
   return res.json();
+  
 }
 
 export async function getAdminOrdersApi() {
