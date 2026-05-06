@@ -1,11 +1,11 @@
 import * as React from "react";
 import { googleClientId } from "@/shared/config/api";
+import { isInAppBrowser } from "@/shared/lib/inAppBrowser";
 import { useI18n } from "@/shared/i18n/i18n";
 import cls from "./LoginForm.module.css";
 
 const GSI_SCRIPT = "https://accounts.google.com/gsi/client";
 
-/** GSI allows one call to `initialize()` per client_id; otherwise spam in the console and races in Strict Mode. */
 const gsiSingleton = {
   initialized: false,
   dispatchCredential: (_credential: string) => {},
@@ -67,12 +67,9 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCreden
   const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
   const isElectron = /Electron/i.test(ua);
   const googleUiSupported = /^(https?:|capacitor:|ionic:)$/i.test(protocol) && !isElectron;
-  const isInAppWebView = /(FBAN|FBAV|Instagram|Line|Telegram|wv;|WebView|MiuiBrowser|YaApp_Android)/i.test(ua);
+  const isInAppWebView = isInAppBrowser();
   const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
 
-  // We do not bind the effect to `disabled` / isSubmitting: otherwise when “Submit code” GSI
-  // is re-initialized, COOP/postMessage from accounts.google.com appears in the console, races are possible.
-  // Click blocking - via `data-disabled` + CSS (pointer-events: none).
   React.useEffect(() => {
     if (!googleClientId || !googleUiSupported) return;
 
@@ -94,7 +91,6 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onCreden
             auto_select: false,
             itp_support: true,
             cancel_on_tap_outside: false,
-            // Better compatibility for mobile/in-app browsers where FedCM path can fail with 4xx.
             use_fedcm_for_prompt: false,
             error_callback: (resp: any) => {
               const reason = String(resp?.type ?? "unknown");

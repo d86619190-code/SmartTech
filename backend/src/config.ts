@@ -53,6 +53,6 @@ export const config = {
   smtpFrom: process.env.SMTP_FROM ?? "no-reply@example.com",
   /** Опционально: отправка OTP через https://resend.com (надёжно с Railway; Gmail SMTP часто режет датацентры). */
   resendApiKey: process.env.RESEND_API_KEY ?? "",
-  /** Например: Evrenyan <noreply@твой-домен.ru> или onboarding@resend.dev для теста */
+  /** Например: repair <noreply@твой-домен.ru> или onboarding@resend.dev для теста */
   resendFrom: process.env.RESEND_FROM ?? "onboarding@resend.dev",
 };

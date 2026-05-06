@@ -1,5 +1,5 @@
 {
-    "name": "evrenyan-mobile",
+    "name": "repair-mobile",
     "version": "1.0.0",
     "devDependencies": {
         "@capacitor/android": "^8.2.0",

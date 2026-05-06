@@ -4,9 +4,7 @@ function getRouteFromHash(): string | null {
   if (typeof window === "undefined") return null;
   const hash = window.location.hash ?? "";
   if (!hash) return null;
-  // HashRouter format: "#/path?query"
   if (hash.startsWith("#/")) return hash.slice(1);
-  // Fallback: just strip leading "#"
   if (hash.startsWith("#")) return hash.slice(1);
   return null;
 }
@@ -14,7 +12,7 @@ function getRouteFromHash(): string | null {
 export function setLastAuthRoute(routeWithSearch: string): void {
   if (typeof sessionStorage === "undefined") return;
   if (!routeWithSearch) return;
-  if (routeWithSearch.startsWith("/login")) return; // avoid loops
+  if (routeWithSearch.startsWith("/login") || routeWithSearch.startsWith("/register")) return;
   sessionStorage.setItem(LAST_ROUTE_KEY, routeWithSearch);
 }
 
@@ -44,11 +42,10 @@ export function redirectToLoginForAuthMissing(nextPath?: string): void {
     next = readLastAuthRoute() ?? getCurrentRouteFallback();
   }
   if (!next.startsWith("/")) next = `/${next}`;
-  if (next.startsWith("/login")) next = "/";
+  if (next.startsWith("/login") || next.startsWith("/register")) next = "/";
 
   const url = `${baseUrl}#/login?next=${encodeURIComponent(next)}`;
 
-  // Using location assignment so it works from non-react code (api wrappers).
   window.location.assign(url);
 }
 

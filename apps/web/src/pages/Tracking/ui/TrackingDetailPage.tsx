@@ -3,10 +3,12 @@ import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { getOrderById, type OrderFlowStepId } from "@/entities/order";
 import { SITE } from "@/shared/config/siteContacts";
 import { readAuthSession } from "@/shared/lib/authSession";
-import { getClientOrderMetaApi } from "@/shared/lib/clientInboxApi";
+import { confirmClientOrderCompletionApi, getClientOrderMetaApi } from "@/shared/lib/clientInboxApi";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
+import { useStatusToast } from "@/shared/lib/useStatusToast";
 import { SkeletonCard } from "@/shared/ui/Skeleton";
 import { Button } from "@/shared/ui/Button/Button";
+import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
 import { PageHeader } from "@/widgets/PageHeader";
 import { OrderStagePanel } from "@/widgets/OrderStagePanel";
 import { OrderTimeline } from "@/widgets/OrderTimeline";
@@ -30,7 +32,13 @@ export const TrackingDetailPage: React.FC = () => {
   const [meta, setMeta] = React.useState<Awaited<ReturnType<typeof getClientOrderMetaApi>> | null>(null);
   const [metaLoading, setMetaLoading] = React.useState(true);
   const [metaError, setMetaError] = React.useState(false);
+  const [confirmPopupOpen, setConfirmPopupOpen] = React.useState(false);
+  const [confirmStars, setConfirmStars] = React.useState(5);
+  const [confirmReviewText, setConfirmReviewText] = React.useState("");
+  const [confirmSaving, setConfirmSaving] = React.useState(false);
+  const { toast, showToast, closeToast } = useStatusToast();
   const lastMetaSigRef = React.useRef<string>("");
+  const autoPopupShownRef = React.useRef<string>("");
 
   React.useEffect(() => {
     if (!orderId || !auth?.accessToken) {
@@ -73,6 +81,15 @@ export const TrackingDetailPage: React.FC = () => {
       window.clearInterval(t);
     };
   }, [orderId, auth?.accessToken]);
+
+  React.useEffect(() => {
+    if (!meta?.canConfirmCompletion) return;
+    if (autoPopupShownRef.current === meta.id) return;
+    autoPopupShownRef.current = meta.id;
+    setConfirmStars(Math.max(1, Math.min(5, meta.myRating ?? 5)));
+    setConfirmReviewText(meta.myReviewText ?? "");
+    setConfirmPopupOpen(true);
+  }, [meta]);
 
   const order = React.useMemo(() => {
     if (!mockOrder || !meta) return mockOrder;
@@ -171,6 +188,29 @@ export const TrackingDetailPage: React.FC = () => {
   }
 
   const selected = order.quoteOptions?.find((q) => q.id === order.selectedQuoteId);
+  const openConfirmPopup = () => {
+    setConfirmStars(Math.max(1, Math.min(5, meta.myRating ?? 5)));
+    setConfirmReviewText(meta.myReviewText ?? "");
+    setConfirmPopupOpen(true);
+  };
+  const submitCompletionConfirm = async () => {
+    try {
+      setConfirmSaving(true);
+      await confirmClientOrderCompletionApi(order.id, {
+        stars: confirmStars,
+        reviewText: confirmReviewText.trim() || undefined,
+      });
+      const nextMeta = await getClientOrderMetaApi(order.id);
+      setMeta(nextMeta);
+      setConfirmPopupOpen(false);
+      showToast("success", "Завершение подтверждено. Спасибо за отзыв!");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Не удалось подтвердить завершение";
+      showToast("error", msg);
+    } finally {
+      setConfirmSaving(false);
+    }
+  };
 
   return (
     <div className={cls.shell}>
@@ -202,6 +242,14 @@ export const TrackingDetailPage: React.FC = () => {
           <div className={cls.banner}>
             The device is ready for pickup.{" "}
             <Link to={`/orders/${order.id}/pickup`}>Instructions and summary →</Link>
+          </div>
+        ) : null}
+        {meta.canConfirmCompletion ? (
+          <div className={cls.banner}>
+            Мастер завершил ремонт. Подтвердите завершение и оставьте оценку, чтобы закрыть заказ.{" "}
+            <button type="button" className={cls.bannerBtn} onClick={openConfirmPopup}>
+              Подтвердить завершение
+            </button>
           </div>
         ) : null}
 
@@ -412,6 +460,48 @@ export const TrackingDetailPage: React.FC = () => {
           </Link>
         </p>
       </div>
+      {confirmPopupOpen ? (
+        <div className={cls.overlay} onClick={() => !confirmSaving && setConfirmPopupOpen(false)}>
+          <div className={cls.popup} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <h3 className={cls.popupTitle}>Подтверждение завершения</h3>
+            <p className={cls.popupText}>Оцените качество ремонта и при желании оставьте отзыв.</p>
+            <label className={cls.popupField}>
+              <span>Оценка</span>
+              <select
+                value={confirmStars}
+                onChange={(e) => setConfirmStars(Number(e.target.value))}
+                className={cls.popupInput}
+              >
+                <option value={5}>5 ⭐</option>
+                <option value={4}>4 ⭐</option>
+                <option value={3}>3 ⭐</option>
+                <option value={2}>2 ⭐</option>
+                <option value={1}>1 ⭐</option>
+              </select>
+            </label>
+            <label className={cls.popupField}>
+              <span>Отзыв (необязательно)</span>
+              <textarea
+                value={confirmReviewText}
+                onChange={(e) => setConfirmReviewText(e.target.value)}
+                rows={4}
+                className={cls.popupInput}
+                maxLength={1200}
+                placeholder="Например: сделали быстро, всё работает отлично"
+              />
+            </label>
+            <div className={cls.popupActions}>
+              <Button type="button" variant="outline" onClick={() => setConfirmPopupOpen(false)} disabled={confirmSaving}>
+                Позже
+              </Button>
+              <Button type="button" onClick={() => void submitCompletionConfirm()} disabled={confirmSaving}>
+                {confirmSaving ? "Сохраняем..." : "Подтвердить"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {toast ? <StatusToast tone={toast.tone} message={toast.message} onClose={closeToast} /> : null}
     </div>
   );
 };

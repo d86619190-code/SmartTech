@@ -1,6 +1,6 @@
 /** Contacts and details of the service - put in env during deployment */
 export const SITE = {
-  name: "Evrenyan Service",
+  name: "repair Service",
   tagline: "Smartphone repair",
   phoneDisplay: "+7 (900) 000-00-00",
   phoneTel: "+79000000000",

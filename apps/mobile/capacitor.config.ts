@@ -1,8 +1,8 @@
 ﻿import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.evrenyan.app',
-  appName: 'Evrenyan App',
+  appId: 'com.repair.app',
+  appName: 'repair App',
   webDir: '../web/dist',
 };
 

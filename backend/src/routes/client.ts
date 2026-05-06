@@ -20,7 +20,11 @@ import {
   resolveApproval,
   sendUserMessage,
 } from "../services/inbox.js";
-import { createTechIncomingFromClient, submitClientOrderRating } from "../services/techMock.js";
+import {
+  confirmClientOrderCompletion,
+  createTechIncomingFromClient,
+  submitClientOrderRating,
+} from "../services/techMock.js";
 
 const sendMessageBody = z
   .object({
@@ -42,6 +46,10 @@ const resolveApprovalBody = z.object({
 });
 const rateOrderBody = z.object({
   stars: z.number().int().min(1).max(5),
+});
+const completeOrderBody = z.object({
+  stars: z.number().int().min(1).max(5),
+  reviewText: z.string().max(1200).optional(),
 });
 
 const createOrderBody = z.object({
@@ -229,6 +237,44 @@ clientRouter.post("/orders/:orderId/rate", async (req, res) => {
       not_completed: "Оценку можно поставить после выдачи заказа",
       already_rated: "Оценка уже сохранена",
       invalid_stars: "Некорректная оценка",
+    };
+    res.status(map[result.error] ?? 400).json({ error: msg[result.error] ?? "Ошибка" });
+    return;
+  }
+  res.status(200).json({ ok: true });
+});
+
+clientRouter.post("/orders/:orderId/complete", async (req, res) => {
+  const userId = req.auth?.userId;
+  if (!userId) {
+    res.status(401).json({ error: "Требуется авторизация" });
+    return;
+  }
+  const parsed = completeOrderBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Укажите оценку от 1 до 5", details: parsed.error.flatten() });
+    return;
+  }
+  const result = await confirmClientOrderCompletion(
+    userId,
+    req.params.orderId,
+    parsed.data.stars,
+    parsed.data.reviewText
+  );
+  if (!result.ok) {
+    const map: Record<string, number> = {
+      not_found: 404,
+      forbidden: 403,
+      not_completed: 400,
+      invalid_stars: 400,
+      already_confirmed: 409,
+    };
+    const msg: Record<string, string> = {
+      not_found: "Заказ не найден",
+      forbidden: "Нет доступа к этому заказу",
+      not_completed: "Подтверждение возможно после завершения мастером",
+      invalid_stars: "Некорректная оценка",
+      already_confirmed: "Завершение уже подтверждено",
     };
     res.status(map[result.error] ?? 400).json({ error: msg[result.error] ?? "Ошибка" });
     return;

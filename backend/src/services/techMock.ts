@@ -656,11 +656,22 @@ export async function listTechTasks() {
     hydrateIncomingClientAvatars(s);
     const st = ensureTechState(s);
     const incoming = st.incoming.filter((i) => i.status === "pending");
-    return { incoming, repairs: st.repairs };
+    return { incoming, repairs: st.repairs.filter((r) => r.stage !== "completed") };
   });
 }
 export async function listTechCompleted() {
-  return withStore((s) => ensureTechState(s).completed);
+  return withStore((s) => {
+    const st = ensureTechState(s);
+    const extraCompleted = st.repairs.filter((r) => r.stage === "completed");
+    if (extraCompleted.length > 0) {
+      const extraIds = new Set(extraCompleted.map((r) => r.id));
+      st.repairs = st.repairs.filter((r) => !extraIds.has(r.id));
+      for (const row of [...extraCompleted].reverse()) {
+        if (!st.completed.some((x) => x.id === row.id)) st.completed.unshift(row);
+      }
+    }
+    return st.completed;
+  });
 }
 export async function getTechRepairById(id: string) {
   return withStore((s) => allRepairs(ensureTechState(s)).find((x) => x.id === id));
@@ -804,6 +815,10 @@ export async function saveTechStage(id: string, stage: TechRepairStage) {
     const repair = allRepairs(st).find((x) => x.id === id);
     if (!repair) return null;
     repair.stage = stage;
+    if (stage === "completed" && !repair.completionRequestedAt) {
+      repair.completionRequestedAt = Date.now();
+      repair.completionConfirmedAt = undefined;
+    }
     const stageLabel: Record<TechRepairStage, string> = {
       accepted: "Принято",
       diagnostics: "Диагностика",
@@ -813,6 +828,14 @@ export async function saveTechStage(id: string, stage: TechRepairStage) {
       completed: "Завершено",
     };
     broadcastClientServiceMessage(s, repair.id, `Статус заказа обновлён: ${stageLabel[stage]}.`, undefined);
+    if (stage === "completed") {
+      broadcastClientServiceMessage(
+        s,
+        repair.id,
+        "Ремонт завершён мастером. Подтвердите завершение в карточке заказа и оставьте отзыв.",
+        undefined
+      );
+    }
     if (s.adminPanelMock) {
       const row = s.adminPanelMock.orders.find((o) => o.id === repair.id);
       if (row) row.status = techStageToAdminStatus(stage);
@@ -823,6 +846,19 @@ export async function saveTechStage(id: string, stage: TechRepairStage) {
       title: `Этап: ${stageLabel[stage]}`,
       description: "Статус заказа обновлён мастером.",
     });
+    if (stage === "completed") {
+      const inRepairsIdx = st.repairs.findIndex((r) => r.id === repair.id);
+      if (inRepairsIdx >= 0) {
+        const [row] = st.repairs.splice(inRepairsIdx, 1);
+        row.completedAt = row.completedAt ?? nowLabel();
+        if (!st.completed.some((x) => x.id === row.id)) st.completed.unshift(row);
+      } else if (!st.completed.some((x) => x.id === repair.id)) {
+        repair.completedAt = repair.completedAt ?? nowLabel();
+        st.completed.unshift(repair);
+      }
+      st.profile.completedJobs = st.completed.length;
+      st.profile.monthEarningsRub = st.completed.reduce((sum, r) => sum + (r.earningsRub ?? 0), 0);
+    }
     return repair;
   });
 }
@@ -970,6 +1006,71 @@ export async function submitClientOrderRating(
       read_by_user: true,
       service_sender_name: "Сервис",
     });
+    return { ok: true };
+  });
+}
+
+export async function confirmClientOrderCompletion(
+  userId: string,
+  orderId: string,
+  stars: number,
+  reviewText?: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  return withStore((s) => {
+    const st = ensureTechState(s);
+    const repair = allRepairs(st).find((r) => r.id === orderId);
+    if (!repair) return { ok: false, error: "not_found" };
+    if (repair.stage !== "completed") return { ok: false, error: "not_completed" };
+    if (repair.clientUserId) {
+      if (repair.clientUserId !== userId) return { ok: false, error: "forbidden" };
+    } else if (!userInboxHasOrder(s, userId, orderId)) {
+      return { ok: false, error: "forbidden" };
+    }
+
+    const raw = Number(stars);
+    if (!Number.isFinite(raw)) return { ok: false, error: "invalid_stars" };
+    const n = Math.min(5, Math.max(1, Math.round(raw)));
+
+    const normalizedReview = (reviewText ?? "").trim().slice(0, 1200);
+    if (repair.completionConfirmedAt) return { ok: false, error: "already_confirmed" };
+
+    repair.clientRatingStars = n;
+    repair.clientReviewText = normalizedReview || undefined;
+    repair.clientRatedAt = Date.now();
+    repair.completionConfirmedAt = Date.now();
+    if (!repair.clientUserId) repair.clientUserId = userId;
+    repair.rating = n;
+    repair.completedAt = nowLabel();
+    repair.earningsRub = Math.max(0, (repair.laborRub ?? 0) + (repair.partsRub ?? 0));
+
+    const stillInRepairsIdx = st.repairs.findIndex((r) => r.id === repair.id);
+    if (stillInRepairsIdx >= 0) {
+      const [row] = st.repairs.splice(stillInRepairsIdx, 1);
+      st.completed.unshift(row);
+    } else if (!st.completed.some((r) => r.id === repair.id)) {
+      st.completed.unshift(repair);
+    }
+
+    syncMasterAvgRating(st);
+    st.profile.completedJobs = st.completed.length;
+    st.profile.monthEarningsRub = st.completed.reduce((sum, r) => sum + (r.earningsRub ?? 0), 0);
+
+    if (s.adminPanelMock) {
+      const row = s.adminPanelMock.orders.find((o) => o.id === repair.id);
+      if (row) row.status = "completed";
+    }
+
+    const inbox = ensureInboxUser(s, userId);
+    inbox.messages.push({
+      id: crypto.randomUUID(),
+      order_id: orderId,
+      from: "service",
+      text: `Спасибо! Завершение подтверждено, оценка: ${n} из 5 ⭐`,
+      at: Date.now(),
+      read_by_user: true,
+      service_sender_name: "Сервис",
+    });
+
     return { ok: true };
   });
 }

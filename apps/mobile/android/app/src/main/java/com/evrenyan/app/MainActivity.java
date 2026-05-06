@@ -1,4 +1,4 @@
-package com.evrenyan.app;
+package com.repair.app;
 
 import com.getcapacitor.BridgeActivity;
 

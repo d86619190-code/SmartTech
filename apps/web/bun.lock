@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "evrenyan-web",
+      "name": "repair-web",
       "dependencies": {
         "gsap": "^3.14.2",
         "react": "^19.2.4",

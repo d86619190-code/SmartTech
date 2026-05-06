@@ -2,7 +2,7 @@
 
 interface Window {
   /** Only in Electron (preload.js) */
-  evrenyanDesktop?: {
+  repairDesktop?: {
     getAuthBridgeOrigin: () => Promise<string | null>;
     consumePendingSession: () => Promise<string | null>;
   };

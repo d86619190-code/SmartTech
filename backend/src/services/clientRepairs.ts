@@ -35,8 +35,12 @@ export type ClientOrderMeta = {
   clientStep: ClientOrderClientStep;
   /** Заказ выдан (completed) и клиент ещё не ставил оценку */
   canRateOrder?: boolean;
+  /** Мастер завершил заказ, нужно подтверждение клиента */
+  canConfirmCompletion?: boolean;
   /** Уже поставленная оценка 1–5 */
   myRating?: number;
+  /** Уже сохранённый текст отзыва */
+  myReviewText?: string;
   /** Мастер печатает (для строки статуса в чате) */
   serviceTyping?: boolean;
   /** Мастер «на связи» (для зелёного индикатора) */
@@ -289,7 +293,9 @@ export async function getClientOrderMeta(userId: string, orderId: string): Promi
     if (tech) {
       const clientStep: ClientOrderClientStep = needsApproval
         ? "awaiting_approval"
-        : techStageToClientStep(tech.stage);
+        : tech.stage === "completed" && !tech.completionConfirmedAt
+          ? "ready"
+          : techStageToClientStep(tech.stage);
       const quoteOptions = buildQuoteOptionsFromTech(s, tech);
       const thread = s.techPanelMock?.threads.find((t) => t.repairId === orderId);
       const serviceTyping = Boolean(thread && Date.now() - (thread.masterTypingAt ?? 0) < TYPING_MS);
@@ -305,7 +311,9 @@ export async function getClientOrderMeta(userId: string, orderId: string): Promi
         needsApproval,
         clientStep,
         canRateOrder: tech.stage === "completed" && !tech.clientRatingStars,
+        canConfirmCompletion: tech.stage === "completed" && !tech.completionConfirmedAt,
         myRating: tech.clientRatingStars,
+        myReviewText: tech.clientReviewText,
         serviceTyping,
         counterpartOnline,
         diagnosticFeeRub: 990,

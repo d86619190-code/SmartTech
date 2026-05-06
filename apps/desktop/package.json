@@ -1,11 +1,11 @@
 {
-  "name": "evrenyan-desktop",
+  "name": "repair-desktop",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "copy:web": "node -e \"const fs=require('fs');const p=require('path');const s=p.join('..','web','dist');const d=p.join('web-dist');if(!fs.existsSync(s))throw new Error('Сначала соберите фронт: cd apps/web && bun run build');fs.rmSync(d,{recursive:true,force:true});fs.cpSync(s,d,{recursive:true});\"",
-    "dist:win": "bun run copy:web && electron-packager . evrenyan-desktop --platform=win32 --arch=x64 --asar --out=release --overwrite"
+    "dist:win": "bun run copy:web && electron-packager . repair-desktop --platform=win32 --arch=x64 --asar --out=release --overwrite"
   },
   "devDependencies": {
     "electron": "^26.0.0",

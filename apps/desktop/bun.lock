@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "evrenyan-desktop",
+      "name": "repair-desktop",
       "devDependencies": {
         "electron": "^26.0.0",
         "electron-packager": "^17.1.2",

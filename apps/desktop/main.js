@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const http = require("http");
 
-const APP_PROTOCOL = "evrenyan";
+const APP_PROTOCOL = "repair";
 let mainWindow = null;
 let pendingSession = null;
 /** Base64 сессии для передачи в renderer через IPC (не в URL — лимит длины) */
@@ -208,9 +208,9 @@ if (process.defaultApp) {
   app.setAsDefaultProtocolClient(APP_PROTOCOL);
 }
 
-ipcMain.handle("evrenyan:auth-bridge-origin", () => authBridgeOrigin);
+ipcMain.handle("repair:auth-bridge-origin", () => authBridgeOrigin);
 
-ipcMain.handle("evrenyan:consume-pending-session", () => {
+ipcMain.handle("repair:consume-pending-session", () => {
   const s = pendingSessionPayload;
   pendingSessionPayload = null;
   return s;
@@ -220,7 +220,7 @@ app.whenReady().then(async () => {
   try {
     await startAuthBridgeServer();
   } catch (e) {
-    console.error("evrenyan: auth bridge server failed", e);
+    console.error("repair: auth bridge server failed", e);
   }
   consumeProtocolFromArgv(process.argv);
   void createWindow();

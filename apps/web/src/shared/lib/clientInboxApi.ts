@@ -59,7 +59,9 @@ export type ClientOrderMeta = {
     | "ready"
     | "completed";
   canRateOrder?: boolean;
+  canConfirmCompletion?: boolean;
   myRating?: number;
+  myReviewText?: string;
   /** The wizard types a message (when the backend sends it) - we show “Printing” instead of “you are online” */
   serviceTyping?: boolean;
   /** The master is recently online - green indicator */
@@ -276,6 +278,18 @@ export async function rateClientOrderApi(orderId: string, stars: number): Promis
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ stars }),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+}
+
+export async function confirmClientOrderCompletionApi(
+  orderId: string,
+  payload: { stars: number; reviewText?: string }
+): Promise<void> {
+  const res = await authorizedFetch(`/api/v1/client/orders/${orderId}/complete`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error(await parseError(res));
 }

@@ -376,7 +376,7 @@
   position: relative;
   /* Выше декоративных fixed-слоёв (тот же stacking root, что и scrollFog), чтобы клики стабильно попадали в ссылки/кнопки */
   z-index: 4;
-  padding: 0 0 48px;
+  /* padding: 0 0 48px; */
   scroll-behavior: smooth;
 }
 

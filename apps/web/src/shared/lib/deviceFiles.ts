@@ -1,19 +1,9 @@
-/**
- * Selecting files from the device: works in the browser, in WebView (Capacitor),
- * Electron and on mobile devices via the standard `<input type="file">` with `capture`.
- * Without the cloud - attachments remain data URL / downloaded locally.
- * Photos and videos are automatically compressed to the limit (canvas + WebP/JPEG; video - canvas + MediaRecorder).
- */
-
-export const MAX_CHAT_FILE_BYTES = 2_400_000; /** ~2.3 MB — limit for JSON in the local database */
+export const MAX_CHAT_FILE_BYTES = 2_400_000;
 export const MAX_ORDER_PHOTO_BYTES = 6_000_000;
 export const MAX_DIAGNOSTIC_PHOTO_BYTES = 4_000_000;
 
-/** Max. video duration to try to recode in the browser */
 const MAX_VIDEO_COMPRESS_DURATION_SEC = 120;
-/** Max. long side of the frame when compressing video */
 const MAX_VIDEO_LONG_EDGE = 1280;
-/** Starting video bitrate when transcoding */
 const VIDEO_START_BITS_PER_SECOND = 1_200_000;
 
 export type PickedFileMeta = {
@@ -77,9 +67,7 @@ async function loadDrawableImage(file: File): Promise<ImageBitmap | HTMLImageEle
   if (typeof createImageBitmap === "function") {
     try {
       return await createImageBitmap(file);
-    } catch {
-      /* HEIC / unsupported - try Image */
-    }
+    } catch {}
   }
   const img = new Image();
   const url = URL.createObjectURL(file);
@@ -99,9 +87,7 @@ function encodeCanvasRaster(canvas: HTMLCanvasElement, quality: number): string 
   try {
     const webp = canvas.toDataURL("image/webp", quality);
     if (webp.startsWith("data:image/webp") && webp.length > 100) return webp;
-  } catch {
-    /* WebP not supported */
-  }
+  } catch {}
   return canvas.toDataURL("image/jpeg", quality);
 }
 
@@ -109,13 +95,10 @@ function disposeDrawable(drawable: ImageBitmap | HTMLImageElement): void {
   if (typeof ImageBitmap !== "undefined" && drawable instanceof ImageBitmap) {
     try {
       drawable.close();
-    } catch {
-      /* noop */
-    }
+    } catch {}
   }
 }
 
-/** Photo compression under maxBytes: reducing aspect ratio and quality. */
 export async function compressImageFileToDataUrl(file: File, maxBytes: number): Promise<string> {
   const drawable = await loadDrawableImage(file);
   const sw = drawable instanceof ImageBitmap ? drawable.width : drawable.naturalWidth;
@@ -229,9 +212,7 @@ async function compressVideoFileToDataUrl(file: File, maxBytes: number): Promise
             canvasStream.addTrack(track);
           }
         }
-      } catch {
-        /* no sound */
-      }
+      } catch {}
 
       const chunks: Blob[] = [];
       const recorder = new MediaRecorder(canvasStream, {
@@ -269,9 +250,7 @@ async function compressVideoFileToDataUrl(file: File, maxBytes: number): Promise
               if (recorder.state === "recording") {
                 try {
                   recorder.requestData();
-                } catch {
-                  /* noop */
-                }
+                } catch {}
               }
               if (recorder.state !== "inactive") recorder.stop();
             } catch {
@@ -340,11 +319,9 @@ async function fileToDataUrlForLimit(file: File, maxBytes: number): Promise<stri
   return readFileAsDataUrl(file, maxBytes);
 }
 
-/** Universal selection: gallery/files; on the phone system dialogue or camera when capturing. */
 export function pickFiles(options: {
   accept: string;
   multiple?: boolean;
-  /** Camera: `environment` - rear, `user` - front */
   capture?: "user" | "environment";
   maxBytesPerFile?: number;
 }): Promise<PickedFileMeta[]> {
@@ -395,7 +372,6 @@ export function pickPhotosOrVideos(multiple = true): Promise<PickedFileMeta[]> {
   });
 }
 
-/** Download data URL/blob to your device (without cloud). */
 export function downloadDataUrl(dataUrl: string, filename: string): void {
   const a = document.createElement("a");
   a.href = dataUrl;

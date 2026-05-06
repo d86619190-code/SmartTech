@@ -8,7 +8,6 @@ import cls from "./LeadForm.module.css";
 type LeadFormProps = {
   className?: string;
   variant?: "default" | "dark";
-  /** If specified (for example, an animated exit from the landing page), it is called instead of navigate */
   navigateTo?: (path: string) => void;
 };
 
@@ -24,7 +23,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({ className, variant = "defaul
       go("/create-order");
       return;
     }
-    go("/sign-up");
+    go("/register");
   };
 
   return (

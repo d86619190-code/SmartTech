@@ -210,7 +210,13 @@ export type TechRepairJob = {
   clientUserId?: string;
   /** Оценка клиента после выдачи (1–5) */
   clientRatingStars?: number;
+  /** Текстовый отзыв клиента после завершения */
+  clientReviewText?: string;
   clientRatedAt?: number;
+  /** Момент, когда мастер выставил "завершено" и ожидается подтверждение клиента */
+  completionRequestedAt?: number;
+  /** Момент подтверждения завершения клиентом */
+  completionConfirmedAt?: number;
   earningsRub?: number;
   diagnosticsIssues: string[];
   selectedPartIds: string[];

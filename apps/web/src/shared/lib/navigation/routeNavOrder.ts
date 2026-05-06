@@ -1,8 +1,3 @@
-/**
- * The order of the sidebar items from top to bottom is for the direction of the transition animation.
- * Below in the menu → a new screen “rises” from the bottom (forward).
- */
-
 export function getRouteNavOrder(pathname: string): number {
   const p = pathname.replace(/\/$/, "") || "/";
 
@@ -20,8 +15,8 @@ export function getRouteNavOrder(pathname: string): number {
     "/contacts": 4,
     "/profile": 5,
     "/account/settings": 5.3,
-    "/login/electron": 6,
     "/login": 6,
+    "/register": 6,
   };
 
   if (exact[p] !== undefined) return exact[p];
@@ -30,7 +25,6 @@ export function getRouteNavOrder(pathname: string): number {
   if (p.startsWith("/orders/") && p.endsWith("/pickup")) return 3.18;
   if (p.startsWith("/orders/") && p.endsWith("/approval")) return 3.25;
   if (p.startsWith("/orders/")) return 3.15;
-  if (p === "/forgot-password" || p === "/sign-up") return 6.5;
   if (p === "/privacy" || p === "/terms" || p === "/personal-data") return 6.4;
   return 3;
 }

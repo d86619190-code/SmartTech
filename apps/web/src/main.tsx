@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
-import { HashRouter, Navigate, Route, Routes, useParams } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import AppLayout from "./app/AppLayout";
 import { RouteLoading } from "./app/RouteLoading";
 import "./app/index.css";
@@ -65,6 +65,11 @@ function OrdersToTrackingRedirect() {
   return <Navigate to={`/tracking/${orderId}`} replace />;
 }
 
+function LoginElectronToRegisterRedirect() {
+  const { search } = useLocation();
+  return <Navigate to={`/register${search}`} replace />;
+}
+
 function AppRoutes() {
   const { t } = useI18n();
   return (
@@ -104,18 +109,11 @@ function AppRoutes() {
           <Route path="messages" element={<MessagesListPage />} />
           <Route path="messages/:orderId" element={<ClientChatPage />} />
           <Route path="account/settings" element={<AccountSettingsPage />} />
-          <Route path="login/electron" element={<LoginPage />} />
+          <Route path="login/electron" element={<LoginElectronToRegisterRedirect />} />
           <Route path="login" element={<LoginPage />} />
-          <Route
-            path="forgot-password"
-            element={
-              <div style={{ padding: 32, fontFamily: "var(--font-sans)" }}>{t("main.forgotPassword")}</div>
-            }
-          />
-          <Route
-            path="sign-up"
-            element={<div style={{ padding: 32, fontFamily: "var(--font-sans)" }}>{t("main.signUp")}</div>}
-          />
+          <Route path="register" element={<LoginPage />} />
+          <Route path="forgot-password" element={<Navigate to="/login" replace />} />
+          <Route path="sign-up" element={<Navigate to="/register" replace />} />
           <Route path="privacy" element={<LegalStubPage title={t("main.privacy")} />} />
           <Route path="terms" element={<LegalStubPage title={t("main.terms")} />} />
           <Route path="personal-data" element={<LegalStubPage title={t("main.personalData")} />} />

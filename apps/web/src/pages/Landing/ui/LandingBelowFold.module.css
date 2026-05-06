@@ -3,7 +3,6 @@
   z-index: 1;
 }
 
-/* ——— Лента-маркер ——— */
 .tape {
   border-top: 1px solid rgba(56, 189, 248, 0.12);
   border-bottom: 1px solid rgba(56, 189, 248, 0.12);
@@ -34,7 +33,6 @@
   }
 }
 
-/* ——— Общие блоки ——— */
 .block {
   position: relative;
   padding: clamp(3.5rem, 10vw, 6.5rem) max(20px, 4vw);
@@ -105,7 +103,6 @@
   }
 }
 
-/* ——— Бенто ——— */
 .benefits {
   background:
     radial-gradient(ellipse 90% 60% at 10% 20%, rgba(56, 189, 248, 0.07), transparent 50%),
@@ -169,7 +166,6 @@
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45), 0 0 48px var(--glow, rgba(56, 189, 248, 0.08));
 }
 
-/* Тематические фоны + мини-молнии при hover */
 .bentoFx {
   position: absolute;
   inset: 0;
@@ -267,7 +263,6 @@
   animation-delay: 0.5s;
 }
 
-/* 1 — диагностика: сканирующая линия */
 .bentoTheme_diagnostic .bentoFx {
   background:
     linear-gradient(180deg, transparent 0%, rgba(56, 189, 248, 0.12) 48%, rgba(56, 189, 248, 0.22) 50%, rgba(56, 189, 248, 0.12) 52%, transparent 100%),
@@ -288,7 +283,6 @@
   }
 }
 
-/* 2 — мастерство: тёплый «искристый» шиммер */
 .bentoTheme_craft .bentoFx {
   background:
     radial-gradient(circle at 20% 30%, rgba(251, 191, 36, 0.2) 0%, transparent 35%),
@@ -310,7 +304,6 @@
   }
 }
 
-/* 3 — оплата по факту: мягкий «успех»-пульс */
 .bentoTheme_pay .bentoFx {
   background: radial-gradient(circle at 50% 50%, rgba(52, 211, 153, 0.28) 0%, transparent 55%);
   animation: bentoPayRipple 2.6s ease-out infinite;
@@ -332,7 +325,6 @@
   }
 }
 
-/* 4 — 24/7: кольца как часы */
 .bentoTheme_track .bentoFx {
   background:
     repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg 8deg, rgba(56, 189, 248, 0.06) 8deg 9deg),
@@ -346,7 +338,6 @@
   }
 }
 
-/* 5 — запчасти: движущаяся сетка */
 .bentoTheme_parts .bentoFx {
   background-image:
     linear-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px),
@@ -361,7 +352,6 @@
   }
 }
 
-/* 6 — данные + гарантия: щитовой градиент */
 .bentoTheme_shield .bentoFx {
   background:
     radial-gradient(ellipse 70% 85% at 50% 100%, rgba(52, 211, 153, 0.18), transparent 55%),
@@ -383,7 +373,6 @@
   }
 }
 
-/* 7 — прозрачная цена: «столбики» */
 .bentoTheme_pricing .bentoFx {
   background: linear-gradient(
     90deg,
@@ -514,7 +503,6 @@
   color: rgba(241, 245, 249, 0.94);
 }
 
-/* ——— Процесс (вертикальный таймлайн) ——— */
 .processScene {
   padding: clamp(3rem, 10vw, 6rem) max(20px, 4vw) 0;
   background:
@@ -712,7 +700,6 @@
   }
 }
 
-/* ——— Гарантия ——— */
 .guarantee {
   position: relative;
   min-height: min(100dvh, 920px);
@@ -817,7 +804,6 @@
   }
 }
 
-/* ——— Отзывы ——— */
 .reviews {
   background: #020203;
 }
@@ -881,7 +867,6 @@
   color: rgba(148, 163, 184, 0.9);
 }
 
-/* ——— FAQ ——— */
 .faqScene {
   padding: clamp(3.5rem, 10vw, 6.5rem) max(20px, 4vw);
   background:
@@ -1054,7 +1039,6 @@
   }
 }
 
-/* ——— Контакт + карта ——— */
 .contactScene {
   position: relative;
   padding: clamp(3rem, 8vw, 5rem) max(20px, 4vw) clamp(2rem, 6vw, 4rem);
@@ -1262,7 +1246,6 @@
   display: none;
 }
 
-/* ——— Футер ——— */
 .footer {
   position: relative;
   margin-top: 24px;

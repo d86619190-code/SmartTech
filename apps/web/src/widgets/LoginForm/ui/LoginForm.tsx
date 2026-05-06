@@ -10,8 +10,9 @@ import cls from "./LoginForm.module.css";
 
 type LoginFormProps = {
   mode: "login" | "register";
+  modeSwitchStyle?: "toggle" | "routes";
+  navSearch?: string;
   authMethod: "phone" | "email";
-  /** contact — only email/phone and “Send code”; code — OTP input step */
   otpPhase: "contact" | "code";
   name: string;
   phone: string;
@@ -30,14 +31,14 @@ type LoginFormProps = {
   onVerifyCode: () => void | Promise<void>;
   onGoogleCredential?: (credential: string) => void | Promise<void>;
   onGoogleOpenInBrowser?: () => void;
-  /** From Electron: open the login page using the code in the system browser and return to the application */
   onOpenAuthInBrowser?: () => void;
-  /** While the main process has not raised the localhost bridge to return the session */
   openInBrowserPending?: boolean;
 };
 
 export const LoginForm: React.FC<LoginFormProps> = ({
   mode,
+  modeSwitchStyle = "toggle",
+  navSearch = "",
   authMethod,
   otpPhase,
   name,
@@ -61,6 +62,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   openInBrowserPending,
 }) => {
   const { t } = useI18n();
+  const otherAuthPath = mode === "login" ? "/register" : "/login";
   const onGoogle = onGoogleCredential ?? (async () => {});
   const contactReady = authMethod === "phone" ? phone.trim().length >= 8 : email.trim().includes("@");
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -158,16 +160,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             </div>
             <GoogleSignInButton onCredential={onGoogle} onOpenInBrowser={onGoogleOpenInBrowser} disabled={isSubmitting} />
             <div className={cls.footer}>
-              <button
-                type="button"
-                className={cls.linkButton}
-                onClick={() => onModeChange(mode === "login" ? "register" : "login")}
-              >
-                {mode === "login" ? t("login.needRegister") : t("login.haveAccount")}
-              </button>
-              <NavLink className={cls.link} to="/forgot-password">
-                {t("login.codeNotReceived")}
-              </NavLink>
+              {modeSwitchStyle === "routes" ? (
+                <NavLink className={cls.linkButton} to={{ pathname: otherAuthPath, search: navSearch }}>
+                  {mode === "login" ? t("login.needRegister") : t("login.haveAccount")}
+                </NavLink>
+              ) : (
+                <button
+                  type="button"
+                  className={cls.linkButton}
+                  onClick={() => onModeChange(mode === "login" ? "register" : "login")}
+                >
+                  {mode === "login" ? t("login.needRegister") : t("login.haveAccount")}
+                </button>
+              )}
+              <span className={cls.footerHint}>{t("login.resendHelp")}</span>
             </div>
           </>
         ) : (
@@ -226,16 +232,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             </div>
             <GoogleSignInButton onCredential={onGoogle} onOpenInBrowser={onGoogleOpenInBrowser} disabled={isSubmitting} />
             <div className={cls.footer}>
-              <button
-                type="button"
-                className={cls.linkButton}
-                onClick={() => onModeChange(mode === "login" ? "register" : "login")}
-              >
-                {mode === "login" ? t("login.needRegister") : t("login.haveAccount")}
-              </button>
-              <NavLink className={cls.link} to="/forgot-password">
-                {t("login.codeNotReceived")}
-              </NavLink>
+              {modeSwitchStyle === "routes" ? (
+                <NavLink className={cls.linkButton} to={{ pathname: otherAuthPath, search: navSearch }}>
+                  {mode === "login" ? t("login.needRegister") : t("login.haveAccount")}
+                </NavLink>
+              ) : (
+                <button
+                  type="button"
+                  className={cls.linkButton}
+                  onClick={() => onModeChange(mode === "login" ? "register" : "login")}
+                >
+                  {mode === "login" ? t("login.needRegister") : t("login.haveAccount")}
+                </button>
+              )}
+              <span className={cls.footerHint}>{t("login.resendHelp")}</span>
             </div>
           </>
         )}

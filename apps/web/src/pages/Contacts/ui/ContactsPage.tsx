@@ -13,7 +13,7 @@ export const ContactsPage: React.FC = () => {
 
   const goLead = () => {
     if (isElectronApp()) navigate("/create-order");
-    else navigate("/sign-up");
+    else navigate("/register");
   };
 
   return (

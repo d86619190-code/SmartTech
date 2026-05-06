@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "evrenyan-mobile",
+      "name": "repair-mobile",
       "devDependencies": {
         "@capacitor/android": "^8.2.0",
         "@capacitor/cli": "^8.2.0",

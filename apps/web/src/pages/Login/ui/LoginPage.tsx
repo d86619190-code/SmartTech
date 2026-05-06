@@ -1,7 +1,8 @@
 import * as React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LoginForm } from "@/widgets/LoginForm";
 import { clearAuthSession, readAuthSession, saveAuthSession, type AuthSession } from "@/shared/lib/authSession";
+import { isInAppBrowser } from "@/shared/lib/inAppBrowser";
 import {
   getMe,
   loginWithGoogleCredential,
@@ -14,6 +15,8 @@ import { useStatusToast } from "@/shared/lib/useStatusToast";
 import { buildHashAppUrl } from "@/shared/lib/appPublicOrigin";
 import { useI18n } from "@/shared/i18n/i18n";
 import { StatusToast } from "@/shared/ui/StatusToast/StatusToast";
+import { Button } from "@/shared/ui/Button/Button";
+import { Card } from "@/shared/ui/Card/Card";
 import cls from "./LoginPage.module.css";
 
 function useAuthSearchParams(location: ReturnType<typeof useLocation>) {
@@ -46,13 +49,11 @@ function encodeSessionParam(session: AuthSession): string {
   return window.btoa(encodeURIComponent(json));
 }
 
-/** evrenyan://auth or URL with already specified query */
 function appendSessionToCallbackUrl(callbackBase: string, encodedSession: string): string {
   const sep = callbackBase.includes("?") ? "&" : "?";
   return `${callbackBase}${sep}session=${encodeURIComponent(encodedSession)}`;
 }
 
-/** Local bridge: session in POST body - otherwise GET exceeds URL limit (“page unreachable”). */
 function isLocalAuthBridgeUrl(callbackUrl: string): boolean {
   try {
     const u = new URL(callbackUrl);
@@ -83,13 +84,13 @@ export const LoginPage: React.FC = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
-  const isElectronBrowserRoute = location.pathname === "/login/electron";
+  const isRegisterRoute = location.pathname === "/register";
   const search = useAuthSearchParams(location);
   const initialMode = React.useMemo((): "login" | "register" => {
-    if (isElectronBrowserRoute) return "register";
+    if (isRegisterRoute) return "register";
     if (search?.get("mode") === "register") return "register";
     return "login";
-  }, [isElectronBrowserRoute, search]);
+  }, [isRegisterRoute, search]);
   const [mode, setMode] = React.useState<"login" | "register">(initialMode);
   const [name, setName] = React.useState("");
   const [phone, setPhone] = React.useState("");
@@ -113,7 +114,7 @@ export const LoginPage: React.FC = () => {
     }
     void (async () => {
       try {
-        const o = await window.evrenyanDesktop?.getAuthBridgeOrigin?.();
+        const o = await window.repairDesktop?.getAuthBridgeOrigin?.();
         setAuthBridgeOrigin(o ?? null);
       } finally {
         setAuthBridgeChecked(true);
@@ -121,20 +122,19 @@ export const LoginPage: React.FC = () => {
     })();
   }, [isBrowser, isElectron]);
 
-  /** System browser after logging in: first localhost in the application, otherwise evrenyan:// */
   const resolvedElectronCallback = React.useMemo(() => {
     if (electronCallbackRaw) return electronCallbackRaw;
     if (authBridgeOrigin) return `${authBridgeOrigin.replace(/\/$/, "")}/auth-callback`;
-    return "evrenyan://auth";
+    return "repair://auth";
   }, [electronCallbackRaw, authBridgeOrigin]);
-  /** In the browser tab isElectron=false - redirect to the application only by the flag from the URL */
   const electronBridgeOn = search?.get("electronBridge") === "1";
   const nextPathRaw = search?.get("next") ?? "";
   const nextPath = nextPathRaw.startsWith("/") ? nextPathRaw : "/profile";
 
   React.useEffect(() => {
-    if (isElectronBrowserRoute) setMode("register");
-  }, [isElectronBrowserRoute]);
+    if (location.pathname === "/register") setMode("register");
+    else if (location.pathname === "/login") setMode("login");
+  }, [location.pathname]);
 
   React.useEffect(() => {
     if (!isBrowser) return;
@@ -143,16 +143,14 @@ export const LoginPage: React.FC = () => {
       let cancelled = false;
       void (async () => {
         try {
-          const raw = await window.evrenyanDesktop?.consumePendingSession?.();
+          const raw = await window.repairDesktop?.consumePendingSession?.();
           if (cancelled || !raw) return;
           const restored = decodeSessionParam(raw);
           if (restored) {
             saveAuthSession(restored);
             navigate(nextPath, { replace: true });
           }
-        } catch {
-          // noop
-        }
+        } catch {}
       })();
       return () => {
         cancelled = true;
@@ -174,7 +172,6 @@ export const LoginPage: React.FC = () => {
         await getMe();
         if (!cancelled) navigate(nextPath, { replace: true });
       } catch {
-        // Session in localStorage may be stale: clear and stay on login page.
         clearAuthSession();
       }
     })();
@@ -272,8 +269,7 @@ export const LoginPage: React.FC = () => {
     const params = new URLSearchParams({ electronBridge: "1" });
     params.set("electronCallback", resolvedElectronCallback);
     if (nextPath) params.set("next", nextPath);
-    params.set("mode", "register");
-    return buildHashAppUrl("/login/electron", params);
+    return buildHashAppUrl("/register", params);
   }, [resolvedElectronCallback, nextPath]);
 
   const handleOpenAuthInBrowser = React.useCallback(() => {
@@ -295,7 +291,7 @@ export const LoginPage: React.FC = () => {
     const params = new URLSearchParams({ electronBridge: "1" });
     params.set("electronCallback", resolvedElectronCallback);
     if (nextPath) params.set("next", nextPath);
-    const target = buildHashAppUrl("/login/electron", params);
+    const target = buildHashAppUrl("/login", params);
     if (!target) {
       showToast(
         "error",
@@ -307,8 +303,37 @@ export const LoginPage: React.FC = () => {
     showToast("success", t("login.googleBrowserOpened"));
   }, [resolvedElectronCallback, isBrowser, nextPath, showToast, t]);
 
-  const pageTitle = isElectronBrowserRoute ? t("login.titleRegisterApp") : t("login.title");
-  const showBrowserBridgeHint = electronBridgeOn || isElectronBrowserRoute;
+  const pageTitle = React.useMemo(() => {
+    if (isRegisterRoute) {
+      return electronBridgeOn ? t("login.titleRegisterApp") : t("login.titleRegister");
+    }
+    return t("login.title");
+  }, [electronBridgeOn, isRegisterRoute, t]);
+
+  const showBrowserBridgeHint = electronBridgeOn;
+  const blockRegisterInEmbeddedWebView = isRegisterRoute && isInAppBrowser() && !electronBridgeOn;
+
+  const handleCopyRegisterLink = React.useCallback(async () => {
+    if (!isBrowser) return;
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      showToast("success", t("login.copyLinkDone"));
+    } catch {
+      showToast("error", t("login.copyLinkFailed"));
+    }
+  }, [isBrowser, showToast, t]);
+
+  const handleOpenRegisterInSystemBrowser = React.useCallback(() => {
+    if (!isBrowser) return;
+    const url = window.location.href;
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (!opened) {
+      void handleCopyRegisterLink();
+      showToast("error", t("login.popupBlockedHint"));
+      return;
+    }
+    showToast("success", t("login.openBrowserTry"));
+  }, [handleCopyRegisterLink, isBrowser, showToast, t]);
 
   return (
     <div className={cls.shell}>
@@ -316,14 +341,33 @@ export const LoginPage: React.FC = () => {
         <div className={cls.authColumn}>
           {showBrowserBridgeHint ? (
             <p className={cls.electronHint} role="status">
-              {electronBridgeOn
-                ? t("login.electronHintBridge")
-                : t("login.electronHintPage")}
+              {t("login.electronHintBridge")}
             </p>
           ) : null}
-          <h1 className={cls.title}>{pageTitle}</h1>
+          {!blockRegisterInEmbeddedWebView ? <h1 className={cls.title}>{pageTitle}</h1> : null}
+          {blockRegisterInEmbeddedWebView ? (
+            <Card>
+              <div className={cls.inAppGate}>
+                <p className={cls.inAppGateLead}>{t("login.inAppRegisterTitle")}</p>
+                <p className={cls.inAppGateBody}>{t("login.inAppRegisterBody")}</p>
+                <div className={cls.inAppGateActions}>
+                  <Button type="button" fullWidth onClick={handleOpenRegisterInSystemBrowser}>
+                    {t("login.openInExternalBrowser")}
+                  </Button>
+                  <Button type="button" variant="outline" fullWidth onClick={() => void handleCopyRegisterLink()}>
+                    {t("login.copyPageLink")}
+                  </Button>
+                </div>
+                <NavLink className={cls.inAppGateLink} to={{ pathname: "/login", search: location.search }}>
+                  {t("login.onlyLoginInApp")}
+                </NavLink>
+              </div>
+            </Card>
+          ) : (
           <LoginForm
             mode={mode}
+            modeSwitchStyle="routes"
+            navSearch={location.search ?? ""}
             name={name}
             phone={phone}
             email={email}
@@ -369,6 +413,7 @@ export const LoginPage: React.FC = () => {
             onOpenAuthInBrowser={isElectron ? handleOpenAuthInBrowser : undefined}
             openInBrowserPending={isElectron && !authBridgeChecked}
           />
+          )}
         </div>
       </div>
       {toast ? <StatusToast tone={toast.tone} message={toast.message} onClose={closeToast} /> : null}
